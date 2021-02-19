@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "workspaces": [
-    "modules"
+    "modules/*"
   ],
   "dependencies": {
     "@babel/core": "7.12.3",
@@ -77,9 +77,9 @@
     "workbox-webpack-plugin": "5.1.4"
   },
   "scripts": {
-    "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "start": "yarn workspace client start",
+    "build": "yarn workspace client build",
+    "test": "yarn workspace client test"
   },
   "eslintConfig": {
     "extends": [
