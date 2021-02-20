@@ -26,6 +26,7 @@
     "bfj": "^7.0.2",
     "camelcase": "^6.1.0",
     "case-sensitive-paths-webpack-plugin": "2.3.0",
+    "concurrently": "^5.3.0",
     "css-loader": "4.3.0",
     "dotenv": "8.2.0",
     "dotenv-expand": "5.1.0",
@@ -77,9 +78,11 @@
     "workbox-webpack-plugin": "5.1.4"
   },
   "scripts": {
-    "start": "yarn workspace client start",
-    "build": "yarn workspace client build",
-    "test": "yarn workspace client test"
+    "start": "concurrently -n client,server \"yarn client:start\" \"yarn server:start\"",
+    "client:start": "yarn workspace client start",
+    "client:build": "yarn workspace client build",
+    "client:test": "yarn workspace client test",
+    "server:start": "yarn workspace server start"
   },
   "eslintConfig": {
     "extends": [
