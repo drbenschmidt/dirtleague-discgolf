@@ -82,7 +82,8 @@
     "client:start": "yarn workspace client start",
     "client:build": "yarn workspace client build",
     "client:test": "yarn workspace client test",
-    "server:start": "yarn workspace server start"
+    "server:start": "yarn workspace server start",
+    "server:mysql-start": "yarn mysql-test start"
   },
   "eslintConfig": {
     "extends": [
@@ -158,5 +159,8 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "@databases/mysql-test": "^3.1.0"
   }
 }

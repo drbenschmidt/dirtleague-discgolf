@@ -7,6 +7,8 @@ The general idea is that people can sign up and participate in events/tournament
 
 Events can consist of multiple rounds. Scorecards from UDisc can be uploaded and will be mapped to a player based on a players aliases. For example, a user named Kyle could also go as Deal Kid, DK, Back 9 Kyle, etc.
 
+This requires `node 14` and `docker` running to use the test database command.
+
 To install, run
 ```
 yarn

@@ -1,4 +1,5 @@
-const express = require('express');
+import express from 'express';
+import repositories, { createUsersTable } from './data-access/repositories.js';
 
 const app = express();
 const port = 8081;
@@ -10,6 +11,8 @@ const port = 8081;
  * get(users) - Array<UserModel>
  * delete(users) - { id }
  * patch(users) - UserModel
+ * post(profiles) - ProfileModel
+ * get(profiles) - Array<ProfileModel>
  * post(courses) - CourseModel
  * get(courses) - Array<CourseModel>
  * delete(courses) - { id }
@@ -22,6 +25,25 @@ const port = 8081;
  * post(events/import) - { file: UDisc CSV }
  */
 
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+app.get('/users', async (req, res) => {
+  const users = await repositories.users.getAll();
+
+  res.json(users);
+});
+
+app.get('/users/:id', async (req, res) => {
+  const { id } = req.params;
+  const user = await repositories.users.get(id);
+
+  res.json(user);
+});
+
+app.listen(port, async () => {
+  console.log(`DirtLeague API listening at http://localhost:${port}`);
+  console.log('Setting up database...');
+  
+  await createUsersTable();
+
+  // NOTE: this will error on re-runs.
+  await repositories.users.insert('ben@dirtleague.org', 'blue');
 });
