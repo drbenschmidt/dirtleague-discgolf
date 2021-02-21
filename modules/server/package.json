@@ -4,12 +4,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "set DEBUG=express:* & node src/index.js"
   },
   "dependencies": {
     "@databases/mysql": "5.0.0"
   },
   "devDependencies": {
-    "@databases/mysql-test": "^3.1.0"
+    "@databases/mysql-test": "^3.1.0",
+    "pbkdf2-password": "1.2.1",
+    "express-session": "1.17.1"
   }
 }
