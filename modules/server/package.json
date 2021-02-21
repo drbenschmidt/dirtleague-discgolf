@@ -8,5 +8,8 @@
   },
   "dependencies": {
     "@databases/mysql": "5.0.0"
+  },
+  "devDependencies": {
+    "@databases/mysql-test": "^3.1.0"
   }
 }

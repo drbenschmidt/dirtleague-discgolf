@@ -1,6 +1,7 @@
 import { sql } from '@databases/mysql';
 import db from './database.js';
 
+// TODO: Split out into own area.
 export const createUsersTable = async () => {
   await db.query(sql`
     CREATE TABLE IF NOT EXISTS users (
@@ -12,6 +13,7 @@ export const createUsersTable = async () => {
   `);
 };
 
+// TODO: Split out into functional components.
 const Repositories = {
   users: {
     insert: async (email, favoriteColor) => {
