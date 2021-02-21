@@ -32,9 +32,10 @@ const App = (props: any) => {
               <Menu.Item as='a' active>
                 Home
               </Menu.Item>
-              <Menu.Item as='a'>Work</Menu.Item>
-              <Menu.Item as='a'>Company</Menu.Item>
-              <Menu.Item as='a'>Careers</Menu.Item>
+              <Menu.Item as='a'>Players</Menu.Item>
+              <Menu.Item as='a'>Courses</Menu.Item>
+              <Menu.Item as='a'>Events</Menu.Item>
+              <Menu.Item as='a'>Seasons</Menu.Item>
               <Menu.Item position='right'>
                 <Button as='a' inverted={!fixed}>
                   Log in
