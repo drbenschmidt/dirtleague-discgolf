@@ -1,5 +1,5 @@
 # Thoughts
-This client is going to use `semantic-ui-react` for simplicity. It should support web and mobile just so we can upload score cards on the go. There doesn't need to be anything fancy, but each page should pull from the server. I know it's not "best practice" but we can add some helper paths to get the data on the server side.
+This client is going to use [semantic-ui-react](https://react.semantic-ui.com/) for simplicity. It should support web and mobile just so we can upload score cards on the go. There doesn't need to be anything fancy, but each page should pull from the server. I know it's not "best practice" but we can add some helper paths to get the data on the server side.
 
 We should look into using React navigation, unless it's too heavy to use then we can just be sketchy and make our own lightweight path system.
 
