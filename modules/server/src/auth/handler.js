@@ -21,16 +21,10 @@ export const authenticate = async (username, password, services) => {
 
   // query the db for the given username
   if (!user) {
-    console.log('user not found');
     return null;
   }
 
-  console.log(`User  Salt: ${user.password_salt}`);
-
   const { hash } = await hashPassword(password, user.password_salt);
-
-  console.log(`User  Hash: ${user.password_hash}`);
-  console.log(`Input Hash: ${hash}`);
 
   if (hash === user.password_hash) {
     // TODO: Remove password hash and salt.

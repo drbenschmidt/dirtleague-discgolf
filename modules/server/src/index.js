@@ -1,9 +1,11 @@
 import express from 'express';
 import session from 'express-session';
+import { getDefaultConfigManager } from './config/manager.js';
 import RepositoryServices from './data-access/repositories.js';
 import buildUsersRoute from './routes/users.js';
 import buildAuthRoute from './routes/auth.js';
 
+const configManager = getDefaultConfigManager();
 const app = express();
 const port = 8081;
 
@@ -35,7 +37,7 @@ app.use(express.urlencoded({ extended: true })) // for parsing application/x-www
 app.use(session({
   resave: false, // don't save session if unmodified
   saveUninitialized: false, // don't create session until something stored
-  secret: 'shhhh, very secret'
+  secret: configManager.props.sessionSecret
 }));
 
 app.use(function (err, req, res, next) {

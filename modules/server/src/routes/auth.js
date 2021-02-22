@@ -1,7 +1,6 @@
 import express from 'express';
 import { requireAuth, authenticate } from '../auth/handler.js';
-
-const isNil = (obj) => obj === null || obj === undefined;
+import { isNil } from '@dirtleague/common';
 
 const buildRoute = (services) => {
   const router = express.Router();
