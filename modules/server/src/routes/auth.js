@@ -1,6 +1,6 @@
 import express from 'express';
 import { requireAuth, authenticate } from '../auth/handler.js';
-import { isNil } from '@dirtleague/common';
+import { isNil, randomInt, sleep } from '@dirtleague/common';
 
 const buildRoute = (services) => {
   const router = express.Router();
@@ -8,14 +8,12 @@ const buildRoute = (services) => {
   router.post('/', async (req, res) => {
     const { username, password, redirect = '/' } = req.body;
 
-    console.log(`Authenticating ${username}:${password}`);
-
     const user = await authenticate(username, password, services);
     
     if (user) {
       // Regenerate session when signing in
       // to prevent fixation
-      req.session.regenerate(function(){
+      req.session.regenerate(() => {
         // Store the user's primary key
         // in the session store to be retrieved,
         // or in this case the entire user object
@@ -23,7 +21,8 @@ const buildRoute = (services) => {
         res.redirect(redirect);
       });
     } else {
-      // TODO: Add a random timeout to prevent brute force attacks.
+      // Add a random sleep into this to prevent someone brute force attacks.
+      await sleep(randomInt(1000, 5000));
       res.status(401);
       res.json({ error: 'Username or password invalid' });
     }
@@ -31,7 +30,6 @@ const buildRoute = (services) => {
   
   router.get('/debug', async (req, res) => {
     const { user } = req.session;
-    console.log(req.session);
 
     res.json({
       isAuthenticated: (isNil(user) ? false : true)

@@ -33,14 +33,15 @@ const port = 8081;
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
-// TODO: Setup the secret in the config provider.
+// TODO: Use https://npmjs.com/package/express-mysql-session for prod.
+// The default in-memory session store apparently will leak memory.
 app.use(session({
   resave: false, // don't save session if unmodified
   saveUninitialized: false, // don't create session until something stored
   secret: configManager.props.sessionSecret
 }));
 
-app.use(function (err, req, res, next) {
+app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).send('Something broke!')
 });

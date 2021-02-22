@@ -7,8 +7,6 @@ class ConfigManager {
 
   constructor() {
     this.props = weakMerge(DefaultConfig, EnvVarConfig);
-
-    console.log(this.props);
   }
 }
 
