@@ -1,0 +1,13 @@
+{
+    "datacenter": "dc1",
+    "data_dir": "/opt/consul",
+    "ui": true,
+    "log_level": "INFO",
+    "server": true,
+    "client_addr":  "$${IP_ADDR}",
+    "retry_join": ["provider=aws tag_key=Role tag_value=Hashi_Cluster"],
+    "bootstrap_expect": 3,
+    "acl": {
+        "enabled": ${acl_enabled}
+    }
+  }

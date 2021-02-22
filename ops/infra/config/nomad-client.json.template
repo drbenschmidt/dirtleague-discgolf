@@ -1,0 +1,12 @@
+{
+  "data_dir": "/opt/nomad/client",
+  "client": {
+    "enabled": true
+  },
+  "acl": {
+    "enabled": ${acl_enabled}
+  },
+  "consul": {
+    "address": "$${IP_ADDR}:8500"
+  }
+}

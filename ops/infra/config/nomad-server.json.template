@@ -1,0 +1,16 @@
+{
+  "data_dir": "/opt/nomad/server",
+  "server": {
+    "enabled": true,
+    "bootstrap_expect": 3,
+    "server_join": {
+      "retry_join": ["provider=aws tag_key=Role tag_value=Hashi_Cluster"]
+      }
+  },
+  "acl": {
+    "enabled": ${acl_enabled}
+  },
+  "consul": {
+    "address": "$${IP_ADDR}:8500"
+  }
+}
