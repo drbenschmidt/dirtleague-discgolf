@@ -14,7 +14,8 @@
     "client:build": "yarn workspace client build",
     "client:test": "yarn workspace client test",
     "server:start": "yarn workspace server start",
-    "server:mysql-start": "yarn mysql-test start"
+    "server:mysql-start": "yarn mysql-test start",
+    "server:mysql-seed": "yarn workspace server seed"
   },
   "eslintConfig": {
     "extends": [

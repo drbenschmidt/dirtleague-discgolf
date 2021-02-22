@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "set DEBUG=express:* & node src/index.js"
+    "start": "set DEBUG=express:* & node src/index.js",
+    "seed": "node ./src/seed-db.js"
   },
   "dependencies": {
     "@databases/mysql": "5.0.0"
