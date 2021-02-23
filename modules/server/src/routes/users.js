@@ -9,6 +9,8 @@ const corsHandler = cors({
 const buildRoute = (services) => {
   const router = express.Router();
 
+  // router.options(['/', '/:id'], corsHandler);
+
   router.get('/', corsHandler, async (req, res) => {
     const users = await services.users.getAll();
 

@@ -57,7 +57,7 @@ function useOnce<T>(fn: () => T): T {
 }
 
 const App = () => {
-  const apiFetch = useOnce(() => new ApiFetch());
+  const apiFetch = useOnce(() => ApiFetch.CreateFromLocalStorage());
   const authManager = useOnce(() => new AuthManager(apiFetch));
   const [isLoaded, setIsLoaded] = useState(false);
 

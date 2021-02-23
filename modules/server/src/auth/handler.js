@@ -1,4 +1,5 @@
 /** @typedef {import('../data-access/repositories.js').default} RepositoryServices  */
+import jwt from 'jsonwebtoken';
 import { hashPassword } from '../crypto/hash.js';
 
 export const requireAuth = (req, res, next) => {
@@ -9,6 +10,47 @@ export const requireAuth = (req, res, next) => {
     res.json({ error: 'Unauthorized' });
   }
 };
+
+export const extractToken = (req) => {
+  const bearerHeader = req.headers['authorization'];
+
+  if (typeof bearerHeader !== 'undefined') {
+      //split the space at the bearer
+      const [_bearer, token] = bearerHeader.split(' ');
+      
+      return token;
+  }
+}
+
+export const applyToken = (req, res, next) => {
+  const token = extractToken(req);
+
+  if (token) {
+    req.token = token;
+  }
+
+  next();
+};
+
+export const requireToken = (req, res, next) => {
+  if (req.token) {
+    jwt.verify(req.token, 'secretkey', (error, authData) => {
+      if (error) {
+        res
+          .status(403)
+          .json({ error });
+      } else {
+        //next middleware
+        next();
+      }
+    });
+  } else {
+      // Forbidden
+      res
+        .status(403)
+        .json({ error: 'Unauthorized' });
+  }
+}
 
 /**
  * 

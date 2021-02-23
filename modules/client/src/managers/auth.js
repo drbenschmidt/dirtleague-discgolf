@@ -23,13 +23,8 @@ class AuthManager {
   };
 
   logout = async () => {
-    const result = await this.service.logout();
-
-    if (result) {
-      this.isAuthenticated = false;
-    }
-
-    return result;
+    await this.service.logout()
+    this.isAuthenticated = false;
   };
 
   getIsAuthenticated = async () => {

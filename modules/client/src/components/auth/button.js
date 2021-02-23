@@ -18,13 +18,12 @@ const AuthButton = (props) => {
   }, [context]);
 
   const signupOnClick = useCallback(async () => {
-    await services.getUsers();
+    await services.getUser(1);
   }, []);
 
   const logoutOnClick = useCallback(async () => {
-    const result = await context.logout();
-
-    setIsAuthenticated(!result);
+    await context.logout();
+    setIsAuthenticated(false);
   }, [context]);
 
   if (isAuthenticated) {

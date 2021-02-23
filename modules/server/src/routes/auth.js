@@ -1,6 +1,7 @@
 import express from 'express';
-import { requireAuth, authenticate } from '../auth/handler.js';
-import { isNil, randomInt, sleep } from '@dirtleague/common';
+import jwt from 'jsonwebtoken';
+import { authenticate } from '../auth/handler.js';
+import { randomInt, sleep } from '@dirtleague/common';
 import cors from 'cors';
 
 const corsHandler = cors({
@@ -11,22 +12,26 @@ const corsHandler = cors({
 const buildRoute = (services) => {
   const router = express.Router();
 
-  router.options(['/', '/test'], corsHandler);
-
   router.post('/', corsHandler, async (req, res) => {
     const { username, password } = req.body;
 
     const user = await authenticate(username, password, services);
     
     if (user) {
-      // Regenerate session when signing in
-      // to prevent fixation
-      req.session.regenerate(() => {
-        // Store the user's primary key
-        // in the session store to be retrieved,
-        // or in this case the entire user object
-        req.session.user = user;
-        res.json({ success: true });
+      // TODO: Remove private user props
+      // TODO: Make secret key configurable or use certificate.
+      jwt.sign({ user }, 'secretkey', (error, token) => {
+        if (error) {
+          res.status(500).json({
+            success: false,
+            error,
+          });
+        }
+
+        res.json({
+            success: true,
+            token
+        });
       });
     } else {
       // Add a random sleep into this to prevent someone brute force attacks.
@@ -35,25 +40,25 @@ const buildRoute = (services) => {
       res.json({ success: false, error: 'Username or password invalid' });
     }
   });
-
-  router.delete('/', async (req, res) => {
-    req.session.destroy();
-    //res.clearCookie('DIRTY_COOKIE');
-    res.json({ success: true });
-  });
   
+  // NOTE: This doesn't use requireToken because it's supposed to respond to anonymous requests.
   router.get('/', corsHandler, async (req, res) => {
-    const { user } = req.session;
-
-    res.json({
-      success: true,
-      isAuthenticated: (isNil(user) ? false : true)
-    });
-  });
-
-  router.get('/test', requireAuth, (req, res) => {
-    res.json({
-      authenticated: true,
+    jwt.verify(req.token, 'secretkey', (error, authData) => {
+      if (error) {
+        res.status(403)
+          .json({
+            success: true,
+            isAuthenticated: false,
+            error,
+          });
+      } else {
+        res.status(200)
+          .json({
+            success: true,
+            isAuthenticated: true,
+            userData: authData
+          });
+      }
     });
   });
 
