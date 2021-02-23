@@ -2,12 +2,7 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 import { authenticate } from '../auth/handler.js';
 import { randomInt, sleep } from '@dirtleague/common';
-import cors from 'cors';
-
-const corsHandler = cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
-  credentials: true,
-});
+import corsHandler from '../http/cors-handler.js';
 
 const buildRoute = (services) => {
   const router = express.Router();

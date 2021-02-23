@@ -3,10 +3,12 @@ import { applyToken } from './auth/handler.js';
 import RepositoryServices from './data-access/repositories.js';
 import buildUsersRoute from './routes/users.js';
 import buildAuthRoute from './routes/auth.js';
-import cors from 'cors';
+import genericErrorHandler from './http/generic-error-handler.js';
+import corsHandler from './http/cors-handler.js';
 
 const app = express();
 const port = 8081; // TODO: Make configurable.
+const services = new RepositoryServices();
 
 /**
  * TODO: Need to add REST API support for
@@ -29,23 +31,14 @@ const port = 8081; // TODO: Make configurable.
  * post(events/import) - { file: UDisc CSV }
  */
 
+// Setup our handlers/middlewares.
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 app.use(applyToken);
+app.use(genericErrorHandler);
 
-const corsHandler = cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
-  credentials: true,
-});
-app.options('*', corsHandler)
-
-// TODO: Move into it's own middleware file.
-app.use((err, req, res, next) => {
-  console.error(err.stack)
-  res.status(500).send('Something broke!')
-});
-
-const services = new RepositoryServices();
+// For now, just tell express that any OPTIONS request should follow the same CORS rules.
+app.options('*', corsHandler);
 
 // Add the routers for each area.
 app.use('/users', buildUsersRoute(services));

@@ -1,7 +1,11 @@
+/**
+ * Handles communication between client and server.
+ * TODO: Have it look for invalid JWTs and callback an onUnauthenticated function to reset app state.
+ */
 export class ApiFetch {
   jwt = null;
   // TODO: make this configurable and work by getting the window's current scheme.
-  baseUrl = `${window.location.protocol}//127.0.0.1:8081`;
+  baseUrl = `${window.location.protocol}//localhost:8081`;
   defaultRequestOptions = {
     mode: 'cors', // no-cors, *cors, same-origin
     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
@@ -74,7 +78,7 @@ export class ApiFetch {
     return response.json();
   };
 }
-
+// TODO: Stop directly applying to local storage, just have it set on fetching class and have that manage state.
 export class AuthServices {
   /** @type {ApiFetch} */
   api = null;
@@ -111,6 +115,7 @@ export class AuthServices {
   };
 }
 
+// TODO: Move users into user repository class.
 export class RepositoryServices {
   /** @type {ApiFetch} */
   api = null;

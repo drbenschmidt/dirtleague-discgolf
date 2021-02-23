@@ -1,15 +1,8 @@
 import express from 'express';
-import cors from 'cors';
-
-const corsHandler = cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
-  credentials: true,
-});
+import corsHandler from '../http/cors-handler.js';
 
 const buildRoute = (services) => {
   const router = express.Router();
-
-  // router.options(['/', '/:id'], corsHandler);
 
   router.get('/', corsHandler, async (req, res) => {
     const users = await services.users.getAll();
