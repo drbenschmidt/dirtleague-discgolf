@@ -1,10 +1,12 @@
 import createConnectionPool from '@databases/mysql';
+import { getDefaultConfigManager } from '../config/manager.js';
 
-// TODO: build out a function to search for envvars or default to a test string.
-const connectionString = 'mysql://test-user:password@localhost:3306/test-db';
+const configManager = getDefaultConfigManager();
+const connectionString = configManager.props.sqlConnectionString;
 
 const db = createConnectionPool(connectionString);
 
+// Make sure we clean up our mess when the process exists.
 process.once('SIGTERM', () => {
   db.dispose().catch((ex) => {
     console.error(ex);

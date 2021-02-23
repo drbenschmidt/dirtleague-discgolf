@@ -1,9 +1,14 @@
 import express from 'express';
+import { applyToken } from './auth/handler.js';
 import RepositoryServices from './data-access/repositories.js';
-import applyUsersRoute from './routes/users.js';
+import buildUsersRoute from './routes/users.js';
+import buildAuthRoute from './routes/auth.js';
+import genericErrorHandler from './http/generic-error-handler.js';
+import corsHandler from './http/cors-handler.js';
 
 const app = express();
-const port = 8081;
+const port = 8081; // TODO: Make configurable.
+const services = new RepositoryServices();
 
 /**
  * TODO: Need to add REST API support for
@@ -26,9 +31,18 @@ const port = 8081;
  * post(events/import) - { file: UDisc CSV }
  */
 
-const services = new RepositoryServices();
+// Setup our handlers/middlewares.
+app.use(express.json()) // for parsing application/json
+app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+app.use(applyToken);
+app.use(genericErrorHandler);
 
-applyUsersRoute(app, services);
+// For now, just tell express that any OPTIONS request should follow the same CORS rules.
+app.options('*', corsHandler);
+
+// Add the routers for each area.
+app.use('/users', buildUsersRoute(services));
+app.use('/auth', buildAuthRoute(services));
 
 app.listen(port, async () => {
   console.log(`DirtLeague API listening at http://localhost:${port}`);  
