@@ -1,11 +1,19 @@
 import express from 'express';
 import { requireAuth, authenticate } from '../auth/handler.js';
 import { isNil, randomInt, sleep } from '@dirtleague/common';
+import cors from 'cors';
+
+const corsHandler = cors({
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  credentials: true,
+});
 
 const buildRoute = (services) => {
   const router = express.Router();
 
-  router.post('/', async (req, res) => {
+  router.options(['/', '/test'], corsHandler);
+
+  router.post('/', corsHandler, async (req, res) => {
     const { username, password } = req.body;
 
     const user = await authenticate(username, password, services);
@@ -32,9 +40,9 @@ const buildRoute = (services) => {
     req.session.destroy();
     //res.clearCookie('DIRTY_COOKIE');
     res.json({ success: true });
-  })
+  });
   
-  router.get('/', async (req, res) => {
+  router.get('/', corsHandler, async (req, res) => {
     const { user } = req.session;
 
     res.json({

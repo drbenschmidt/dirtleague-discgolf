@@ -1,6 +1,5 @@
 import express from 'express';
 import session from 'express-session';
-import cors from 'cors';
 import { getDefaultConfigManager } from './config/manager.js';
 import RepositoryServices from './data-access/repositories.js';
 import buildUsersRoute from './routes/users.js';
@@ -31,9 +30,13 @@ const port = 8081; // TODO: Make configurable.
  * post(events/import) - { file: UDisc CSV }
  */
 
+// app.options('*', cors());
+
 // NOTE: For now, just allow any other domain to access the API.
 // We're not really the most secure thing in the world, but whatever. v2 I guess.
-app.use(cors());
+/*app.use(cors({
+  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+}));*/
 
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
@@ -46,9 +49,9 @@ app.use(session({
   saveUninitialized: false, // don't create session until something stored
   secret: configManager.props.sessionSecret,
   cookie: {
-    maxAge: 1000 * 60 * 60 // one hour
+    maxAge: 1000 * 60 * 60 * 24, // one day
+    //sameSite: 'none',
   },
-  sameSite: false,
 }));
 
 // TODO: Move into it's own middleware file.

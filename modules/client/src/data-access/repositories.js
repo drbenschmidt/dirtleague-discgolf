@@ -1,10 +1,10 @@
 export class ApiFetch {
   // TODO: make this configurable and work by getting the window's current scheme.
-  baseUrl = `${window.location.protocol}//localhost:8081`;
+  baseUrl = `${window.location.protocol}//127.0.0.1:8081`;
   defaultRequestOptions = {
     mode: 'cors', // no-cors, *cors, same-origin
     cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-    credentials: 'same-origin', // include, *same-origin, omit
+    credentials: 'include', // include, *same-origin, omit
     headers: {
       'Content-Type': 'application/json'
     },
@@ -76,5 +76,18 @@ export class AuthServices {
 }
 
 export class RepositoryServices {
+  /** @type {ApiFetch} */
+  api = null;
 
+  constructor(props) {
+    const { api } = props;
+
+    this.api = api;
+  }
+
+  getUsers = async () => {
+    const result = await this.api.get('users');
+
+    console.log(result);
+  }
 }

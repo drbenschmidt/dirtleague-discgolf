@@ -1,6 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import { Button } from 'semantic-ui-react';
 import { useAuthContext } from './context';
+import { RepositoryServices, ApiFetch } from '../../data-access/repositories';
+
+const apiFetch = new ApiFetch();
+const services = new RepositoryServices({ api: apiFetch });
 
 const AuthButton = (props) => {
   const { fixed } = props;
@@ -14,7 +18,7 @@ const AuthButton = (props) => {
   }, [context]);
 
   const signupOnClick = useCallback(async () => {
-    console.log('signup?');
+    await services.getUsers();
   }, []);
 
   const logoutOnClick = useCallback(async () => {
@@ -25,9 +29,14 @@ const AuthButton = (props) => {
 
   if (isAuthenticated) {
     return (
+      <>
       <Button as='a' inverted={!fixed} onClick={logoutOnClick}>
         Log Out
       </Button>
+      <Button as='a' inverted={!fixed} primary={fixed} style={{ marginLeft: '0.5em' }} onClick={signupOnClick}>
+        Sign Up
+      </Button>
+      </>
     );
   }
 
