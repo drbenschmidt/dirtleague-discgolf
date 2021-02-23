@@ -1,5 +1,6 @@
 import express from 'express';
 import session from 'express-session';
+import cors from 'cors';
 import { getDefaultConfigManager } from './config/manager.js';
 import RepositoryServices from './data-access/repositories.js';
 import buildUsersRoute from './routes/users.js';
@@ -7,7 +8,7 @@ import buildAuthRoute from './routes/auth.js';
 
 const configManager = getDefaultConfigManager();
 const app = express();
-const port = 8081;
+const port = 8081; // TODO: Make configurable.
 
 /**
  * TODO: Need to add REST API support for
@@ -30,17 +31,27 @@ const port = 8081;
  * post(events/import) - { file: UDisc CSV }
  */
 
+// NOTE: For now, just allow any other domain to access the API.
+// We're not really the most secure thing in the world, but whatever. v2 I guess.
+app.use(cors());
+
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
 // TODO: Use https://npmjs.com/package/express-mysql-session for prod.
 // The default in-memory session store apparently will leak memory.
 app.use(session({
+  name: 'DIRTY_COOKIE', // TODO: Make configurable.
   resave: false, // don't save session if unmodified
   saveUninitialized: false, // don't create session until something stored
-  secret: configManager.props.sessionSecret
+  secret: configManager.props.sessionSecret,
+  cookie: {
+    maxAge: 1000 * 60 * 60 // one hour
+  },
+  sameSite: false,
 }));
 
+// TODO: Move into it's own middleware file.
 app.use((err, req, res, next) => {
   console.error(err.stack)
   res.status(500).send('Something broke!')

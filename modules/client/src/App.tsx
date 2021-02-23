@@ -1,8 +1,12 @@
 import 'semantic-ui-css/semantic.min.css';
-import React, { useState, useCallback } from 'react';
-import { Visibility, Segment, Menu, Container, Button} from 'semantic-ui-react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { Visibility, Segment, Menu, Container } from 'semantic-ui-react';
+import AuthContext from './components/auth/context';
+import AuthManager from './managers/auth';
+import AuthButton from './components/auth/button';
+import { ApiFetch } from './data-access/repositories';
 
-const App = (props: any) => {
+const Body = (props: any) => {
   const { children } = props;
   const [fixed, setFixed] = useState(false);
   const showFixedMenu = useCallback(() => setFixed(true), []);
@@ -37,12 +41,7 @@ const App = (props: any) => {
               <Menu.Item as='a'>Events</Menu.Item>
               <Menu.Item as='a'>Seasons</Menu.Item>
               <Menu.Item position='right'>
-                <Button as='a' inverted={!fixed}>
-                  Log in
-                </Button>
-                <Button as='a' inverted={!fixed} primary={fixed} style={{ marginLeft: '0.5em' }}>
-                  Sign Up
-                </Button>
+                <AuthButton fixed={fixed} />
               </Menu.Item>
             </Container>
           </Menu>
@@ -50,6 +49,36 @@ const App = (props: any) => {
       </Visibility>
       {children}
     </>
+  )
+};
+
+function useOnce<T>(fn: () => T): T {
+  return useMemo(fn, []);
+}
+
+const App = () => {
+  const apiFetch = useOnce(() => new ApiFetch());
+  const authManager = useOnce(() => new AuthManager(apiFetch));
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const doWork = async () => {
+      await authManager.getIsAuthenticated();
+      setIsLoaded(true);
+    };
+
+    doWork();
+  }, [authManager]);
+
+  if (!isLoaded) {
+    // TODO: Show loading screen.
+    return null;
+  }
+
+  return (
+    <AuthContext.Provider value={authManager}>
+      <Body />
+    </AuthContext.Provider>
   )
 };
 
