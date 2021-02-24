@@ -1,7 +1,7 @@
 import { Link, useRouteMatch, useParams } from 'react-router-dom';
 
-const Players = () => {
-  const { path, url } = useRouteMatch();
+export const PlayerList = () => {
+  const { url } = useRouteMatch();
 
   return (
     <>
@@ -26,5 +26,3 @@ export const PlayerDetails = () => {
 
   return <h1>Player ID {id}</h1>;
 };
-
-export default Players;

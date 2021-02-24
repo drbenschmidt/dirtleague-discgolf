@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { Visibility, Segment, Menu, Container } from 'semantic-ui-react';
+import { Visibility, Segment, Menu, Container, Grid } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import AuthButton from './components/auth/button';
 
-export const FancyLink = (props: any) => (
+export const MenuLink = (props: any) => (
   <Menu.Item
     as={Link}
     {...props}
@@ -20,36 +20,46 @@ export const Navigation = (props: any) => {
 
   return (
     <>
-    <Visibility
-      once={false}
-      onBottomPassed={showFixedMenu}
-      onBottomPassedReverse={hideFixedMenu}
-    >
-      <Segment
-        inverted
-        textAlign='center'
-        style={{ padding: '1em 0em' }}
-        vertical
+      <Visibility
+        once={false}
+        onBottomPassed={showFixedMenu}
+        onBottomPassedReverse={hideFixedMenu}
       >
-        <Menu
-          fixed={fixed ? 'top' : undefined}
-          inverted={!fixed}
-          pointing={!fixed}
-          secondary={!fixed}
-          size='large'
+        <Segment
+          inverted
+          textAlign='center'
+          style={{ padding: '1em 0em' }}
+          vertical
         >
-          <Container>
-            <FancyLink to="/">Home</FancyLink>
-            <FancyLink to="/players">Players</FancyLink>
-            <FancyLink to="/courses">Courses</FancyLink>
-            <Menu.Item position='right'>
-              <AuthButton fixed={fixed} />
-            </Menu.Item>
-          </Container>
-        </Menu>
-      </Segment>
-    </Visibility>
-    {children}
+          <Menu
+            fixed={fixed ? 'top' : undefined}
+            inverted={!fixed}
+            pointing={!fixed}
+            secondary={!fixed}
+            size='large'
+          >
+            <Container>
+              <MenuLink to="/">Home</MenuLink>
+              <MenuLink to="/players">Players</MenuLink>
+              <MenuLink to="/courses">Courses</MenuLink>
+              <MenuLink to="/events">Events</MenuLink>
+              <MenuLink to="/seasons">Seasons</MenuLink>
+              <Menu.Item position='right'>
+                <AuthButton fixed={fixed} />
+              </Menu.Item>
+            </Container>
+          </Menu>
+        </Segment>
+      </Visibility>
+      <Segment style={{ padding: '2em 0em' }} vertical>
+      <Grid container stackable verticalAlign='middle'>
+        <Grid.Row>
+          <Grid.Column width={12}>
+          {children}
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
+    </Segment>
     </>
   )
 };

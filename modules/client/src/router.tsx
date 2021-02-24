@@ -6,11 +6,10 @@ import {
 } from "react-router-dom";
 import { Navigation } from './body';
 import Home from './routes/home/index';
-import Players, { PlayerDetails } from './routes/players/index';
-
-const Courses = () => {
-  return <h1>Courses</h1>;
-};
+import { PlayerList, PlayerDetails } from './routes/players/index';
+import { CourseList, CourseDetails } from './routes/courses/index';
+import { EventList, EventDetails } from './routes/events/index';
+import { SeasonList, SeasonDetails } from './routes/seasons/index';
 
 const Router = () => {
   return (
@@ -18,9 +17,14 @@ const Router = () => {
       <Navigation>
         <Switch>
           <Route exact path="/" component={Home}/>
-          <Route exact path="/players" component={Players} />
-          <Route path="/players/:id" component={PlayerDetails} />
-          <Route path="/courses" component={Courses} />
+          <Route exact path="/players" component={PlayerList} />
+          <Route exact path="/players/:id" component={PlayerDetails} />
+          <Route exact path="/courses" component={CourseList} />
+          <Route exact path="/courses/:id" component={CourseDetails} />
+          <Route exact path="/events" component={EventList} />
+          <Route exact path="/events/:id" component={EventDetails} />
+          <Route exact path="/seasons" component={SeasonList} />
+          <Route exact path="/seasons/:id" component={SeasonDetails} />
         </Switch>
       </Navigation>
     </BrowserRouter>
