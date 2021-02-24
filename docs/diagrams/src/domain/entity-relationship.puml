@@ -1,0 +1,94 @@
+@startuml entity-relationship
+
+class User {
+  Profile
+  +int(11) id
+  +varchar(128) email
+  +varchar(256) password_hash
+  +varchar(256) password_salt
+  +tinyint(1) isAdmin
+}
+
+class Profile {
+  +int(11) id
+  +varchar(45) first_name
+  +varchar(45) last_name
+  Array<Alias> aliases
+}
+
+class Alias {
+  +int(11) id
+  +varchar(45) value
+}
+
+class Course {
+  +int(11) id
+  +varchar(128) name
+  Array<CourseLayout> layouts
+}
+
+class CourseLayout {
+  +int(11) id
+  +varchar(128) name
+  Array<CourseHold> holes
+}
+
+class CourseHole {
+  +int(11) id
+  +tinyint(4) number
+  +tinyint(8) distance
+  +tinyint(4) par
+}
+
+class CourseCard {
+  +int(11) id
+  +int(11) round_id
+  Array<CourseCardThrower> throwers
+}
+
+class CourseCardThrower {
+  +int(11) 
+  +varchar(128) team_name
+  Array<Profile> profiles
+  Array<CourseCardThrowerResult> results
+}
+
+class CourseCardThrowerResult {
+  +int(11) id
+  +int(11) course_hole_id
+  +tinyint(4) score
+}
+
+class Event {
+  +int(11) id
+  +int(11) course_id
+  +int(11) season_id
+  Array<Round> rounds
+}
+
+class Round {
+  +int(11) id
+  +int(11) event_id
+  +int(11) course_layout_id
+  Array<CourseCard> cards
+}
+
+class Season {
+  +int(11) id
+  +date start_date
+  +date end_date
+  +varchar(45) name
+}
+
+User -down-> Profile: 0 or 1:1
+Profile -down-> Alias: 1:many
+Course -down-> CourseLayout: 1:many
+CourseLayout -down-> CourseHole: 1:many
+Event <-left-> Course: many:many
+Event -right-> Season: many:1
+Event -down-> Round: 1:many
+Round -down-> CourseCard: 1:many
+CourseCard -down-> CourseCardThrower: 1:many
+CourseCardThrower -down-> CourseCardThrowerResult: 1:many
+
+@enduml
