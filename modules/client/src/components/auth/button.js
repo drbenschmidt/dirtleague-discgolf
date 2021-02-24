@@ -33,7 +33,7 @@ const AuthButton = (props) => {
         Log Out
       </Button>
       <Button as='a' inverted={!fixed} primary={fixed} style={{ marginLeft: '0.5em' }} onClick={signupOnClick}>
-        Sign Up
+        Profile
       </Button>
       </>
     );
