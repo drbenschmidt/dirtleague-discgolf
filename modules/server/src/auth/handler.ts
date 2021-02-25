@@ -1,8 +1,13 @@
-/** @typedef {import('../data-access/repositories.js').default} RepositoryServices  */
 import jwt from 'jsonwebtoken';
-import { hashPassword } from '../crypto/hash.js';
+import { hashPassword } from '../crypto/hash';
+import { Request, Response, NextFunction } from 'express';
+import RepositoryServices from '../data-access/repositories';
 
-export const extractToken = (req) => {
+interface RequestWithToken extends Request {
+  token: string;
+}
+
+export const extractToken = (req: Request) => {
   const bearerHeader = req.headers['authorization'];
 
   if (typeof bearerHeader !== 'undefined') {
@@ -13,7 +18,7 @@ export const extractToken = (req) => {
   }
 }
 
-export const applyToken = (req, res, next) => {
+export const applyToken = (req: RequestWithToken, res: Response, next: NextFunction) => {
   const token = extractToken(req);
 
   if (token) {
@@ -23,7 +28,7 @@ export const applyToken = (req, res, next) => {
   next();
 };
 
-export const requireToken = (req, res, next) => {
+export const requireToken = (req: RequestWithToken, res: Response, next: NextFunction) => {
   if (req.token) {
     jwt.verify(req.token, 'secretkey', (error, authData) => {
       if (error) {
@@ -45,12 +50,12 @@ export const requireToken = (req, res, next) => {
 
 /**
  * 
- * @param {string} username 
+ * @param {string} email 
  * @param {string} password 
  * @param {RepositoryServices} services 
  */
-export const authenticate = async (username, password, services) => {
-  const user = await services.users.getByEmail(username);
+export const authenticate = async (email: string, password: string, services: RepositoryServices) => {
+  const user = await services.users.getByEmail(email);
 
   // query the db for the given username
   if (!user) {

@@ -1,5 +1,5 @@
 import createConnectionPool from '@databases/mysql';
-import { getDefaultConfigManager } from '../config/manager.js';
+import { getDefaultConfigManager } from '../config/manager';
 
 const configManager = getDefaultConfigManager();
 const connectionString = configManager.props.sqlConnectionString;

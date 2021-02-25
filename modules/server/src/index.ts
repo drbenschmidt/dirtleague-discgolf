@@ -1,10 +1,10 @@
 import express from 'express';
-import { applyToken } from './auth/handler.js';
-import RepositoryServices from './data-access/repositories.js';
-import buildUsersRoute from './routes/users.js';
-import buildAuthRoute from './routes/auth.js';
-import genericErrorHandler from './http/generic-error-handler.js';
-import corsHandler from './http/cors-handler.js';
+import { applyToken } from './auth/handler';
+import RepositoryServices from './data-access/repositories';
+import buildUsersRoute from './routes/users';
+import buildAuthRoute from './routes/auth';
+import genericErrorHandler from './http/generic-error-handler';
+import corsHandler from './http/cors-handler';
 
 const app = express();
 const port = 8081; // TODO: Make configurable.

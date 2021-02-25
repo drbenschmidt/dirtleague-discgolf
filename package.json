@@ -5,8 +5,8 @@
   "workspaces": [
     "modules/*"
   ],
-  "dependencies": {
-    
+  "devDependencies": {
+    "typescript": "4.2.2"
   },
   "scripts": {
     "start": "concurrently -n client,server \"yarn client:start\" \"yarn server:start\"",
