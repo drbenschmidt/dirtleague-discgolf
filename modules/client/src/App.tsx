@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import useOnce from './hooks/useOnce';
 import AuthContext from './components/auth/context';
 import AuthManager from './managers/auth';
-import { ApiFetch } from './data-access/repositories';
+import ApiFetch from './data-access/api-fetch';
 import Router from './router';
 
 const App = () => {
