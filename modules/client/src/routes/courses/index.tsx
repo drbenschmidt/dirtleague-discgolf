@@ -1,4 +1,4 @@
-import { Link, useRouteMatch, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export const CourseList = () => {
   return <h1>Courses</h1>;

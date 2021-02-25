@@ -1,4 +1,4 @@
-import { Link, useRouteMatch, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export const EventList = () => {
   return <h1>Events</h1>;
