@@ -8,9 +8,9 @@ const buildRoute = (services) => {
   const router = express.Router();
 
   router.post('/', corsHandler, async (req, res) => {
-    const { username, password } = req.body;
-
-    const user = await authenticate(username, password, services);
+    const { email, password } = req.body;
+    
+    const user = await authenticate(email, password, services);
     
     if (user) {
       // TODO: Remove private user props
