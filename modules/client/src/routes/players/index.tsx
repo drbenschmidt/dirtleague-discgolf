@@ -30,7 +30,11 @@ export const PlayerList = () => {
               <Table.Cell>{user.lastName}</Table.Cell>
               <Table.Cell>{user.rating}</Table.Cell>
               <Table.Cell>
-                <Button icon="address book" as={Link} to={`${url}/${user.id}`} />
+                <Button
+                  icon="address book"
+                  as={Link}
+                  to={`${url}/${user.id}`}
+                />
               </Table.Cell>
             </Table.Row>
           ))}
@@ -38,17 +42,17 @@ export const PlayerList = () => {
 
         <Table.Footer>
           <Table.Row>
-            <Table.HeaderCell colSpan='4'>
-              <Menu floated='right' pagination>
-                <Menu.Item as='a' icon>
-                  <Icon name='chevron left' />
+            <Table.HeaderCell colSpan="4">
+              <Menu floated="right" pagination>
+                <Menu.Item as="a" icon>
+                  <Icon name="chevron left" />
                 </Menu.Item>
-                <Menu.Item as='a'>1</Menu.Item>
-                <Menu.Item as='a'>2</Menu.Item>
-                <Menu.Item as='a'>3</Menu.Item>
-                <Menu.Item as='a'>4</Menu.Item>
-                <Menu.Item as='a' icon>
-                  <Icon name='chevron right' />
+                <Menu.Item as="a">1</Menu.Item>
+                <Menu.Item as="a">2</Menu.Item>
+                <Menu.Item as="a">3</Menu.Item>
+                <Menu.Item as="a">4</Menu.Item>
+                <Menu.Item as="a" icon>
+                  <Icon name="chevron right" />
                 </Menu.Item>
               </Menu>
             </Table.HeaderCell>

@@ -7,5 +7,5 @@ export const CourseList = () => {
 export const CourseDetails = () => {
   const { id } = useParams<any>();
 
-  return <h1>Course ID {id}</h1>; 
+  return <h1>Course ID {id}</h1>;
 };

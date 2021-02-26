@@ -63,7 +63,16 @@
       },
       "ecmaVersion": 2018,
       "sourceType": "module"
+    },
+    "rules": {
+      "react/react-in-jsx-scope": 0
     }
+  },
+  "prettier": {
+    "semi": true,
+    "singleQuote": true,
+    "tabWidth": 2,
+    "arrowParens": "avoid"
   },
   "browserslist": {
     "production": [

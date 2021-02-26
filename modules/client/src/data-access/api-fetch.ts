@@ -9,7 +9,7 @@ const buildRequestOptions = (jwt: string | null, options: any) => {
   };
 
   if (jwt) {
-    reqOptions.headers['Authorization'] = `Bearer ${jwt}`;
+    reqOptions.headers.Authorization = `Bearer ${jwt}`;
   }
 
   return reqOptions;
@@ -20,7 +20,7 @@ const defaultRequestOptions = {
   cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
   credentials: 'same-origin', // include, *same-origin, omit
   headers: {
-    'Content-Type': 'application/json'
+    'Content-Type': 'application/json',
   },
   redirect: 'follow', // manual, *follow, error
   referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
@@ -32,6 +32,7 @@ const defaultRequestOptions = {
  */
 class ApiFetch {
   jwt: string | null;
+
   // TODO: make this configurable and work by getting the window's current scheme.
   baseUrl = `${window.location.protocol}//localhost:8081`;
 
@@ -62,7 +63,7 @@ class ApiFetch {
       buildUrl(this.baseUrl, url),
       buildRequestOptions(this.jwt, {
         method: 'POST',
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       })
     );
 
@@ -73,7 +74,7 @@ class ApiFetch {
     const response = await fetch(
       buildUrl(this.baseUrl, url),
       buildRequestOptions(this.jwt, {
-        method: 'GET'
+        method: 'GET',
       })
     );
 

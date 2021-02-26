@@ -10,12 +10,13 @@ class AuthManager {
   service: AuthServices;
 
   isAuthenticated = false;
+
   isAdmin = false;
 
   constructor(apiFetch: ApiFetch) {
     this.service = new AuthServices({ api: apiFetch });
   }
-  
+
   authenticate = async ({ email, password }: AuthModel) => {
     const result = await this.service.auth({ email, password });
 

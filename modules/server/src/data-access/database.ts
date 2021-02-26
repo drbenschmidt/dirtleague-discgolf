@@ -8,7 +8,7 @@ const db = createConnectionPool(connectionString);
 
 // Make sure we clean up our mess when the process exists.
 process.once('SIGTERM', () => {
-  db.dispose().catch((ex) => {
+  db.dispose().catch(ex => {
     console.error(ex);
   });
 });

@@ -7,5 +7,5 @@ export const SeasonList = () => {
 export const SeasonDetails = () => {
   const { id } = useParams<any>();
 
-  return <h1>Season ID {id}</h1>; 
+  return <h1>Season ID {id}</h1>;
 };

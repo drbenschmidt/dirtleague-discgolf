@@ -29,7 +29,7 @@ const App = () => {
     <AuthContext.Provider value={authManager}>
       <Router />
     </AuthContext.Provider>
-  )
+  );
 };
 
 export default React.memo(App);

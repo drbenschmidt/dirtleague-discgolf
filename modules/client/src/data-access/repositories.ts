@@ -18,11 +18,11 @@ export class RepositoryServices {
     const result = await this.api.get('users');
 
     console.log(result);
-  }
+  };
 
   getUser = async (id: number) => {
     const result = await this.api.get(`users/${id}`);
 
     console.log(result);
-  }
+  };
 }

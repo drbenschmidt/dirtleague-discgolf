@@ -7,5 +7,5 @@ export const EventList = () => {
 export const EventDetails = () => {
   const { id } = useParams<any>();
 
-  return <h1>Event ID {id}</h1>; 
+  return <h1>Event ID {id}</h1>;
 };
