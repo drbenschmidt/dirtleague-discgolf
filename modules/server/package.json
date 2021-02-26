@@ -7,7 +7,8 @@
     "build": "tsc",
     "start": "ts-node src/index.ts",
     "start:dev": "ts-node-dev src/index.ts",
-    "seed": "node ./src/seed-db.js"
+    "seed": "node ./src/seed-db.js",
+    "test": ""
   },
   "dependencies": {
     "@databases/mysql": "5.0.0",
