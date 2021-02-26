@@ -1,5 +1,5 @@
-import DefaultConfig from './default-config.js';
-import EnvVarConfig from './envvar-config.js';
+import DefaultConfig from './default-config';
+import EnvVarConfig from './envvar-config';
 import { weakMerge } from '@dirtleague/common';
 
 class ConfigManager {
@@ -12,7 +12,7 @@ class ConfigManager {
 
 export default ConfigManager;
 
-let instance = null;
+let instance: ConfigManager = null;
 
 /**
  * @returns {ConfigManager}

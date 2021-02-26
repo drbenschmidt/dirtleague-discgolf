@@ -1,9 +1,9 @@
-import isNil from './isNil.js';
+import isNil from './isNil';
 
-const weakMerge = (left, right) => {
+const weakMerge = (left: any, right: any) => {
   return Object
     .keys(right)
-    .reduce((acc, keyName) => {
+    .reduce((acc: any, keyName) => {
       if (!isNil(right[keyName])) {
         acc[keyName] = right[keyName];
       } else if (!isNil(left[keyName])) {

@@ -1,7 +1,6 @@
-/** @typedef {import('../database').default} Database */
-import { sql } from '@databases/mysql';
+import { ConnectionPool, sql } from '@databases/mysql';
 
-export const createUsersTable = async (db) => {
+export const createUsersTable = async (db: ConnectionPool) => {
   await db.query(sql`
     CREATE TABLE 'users' (
       'id' int(11) NOT NULL AUTO_INCREMENT,

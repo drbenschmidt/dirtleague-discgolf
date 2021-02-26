@@ -1,10 +1,15 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { authenticate } from '../auth/handler.js';
+import { authenticate } from '../auth/handler';
 import { randomInt, sleep } from '@dirtleague/common';
-import corsHandler from '../http/cors-handler.js';
+import corsHandler from '../http/cors-handler';
+import RepositoryServices from '../data-access/repositories';
 
-const buildRoute = (services) => {
+interface RequestWithToken extends Request {
+  token: string;
+}
+
+const buildRoute = (services: RepositoryServices) => {
   const router = express.Router();
 
   router.post('/', corsHandler, async (req, res) => {
@@ -15,7 +20,7 @@ const buildRoute = (services) => {
     if (user) {
       // TODO: Remove private user props
       // TODO: Make secret key configurable or use certificate.
-      jwt.sign({ user }, 'secretkey', (error, token) => {
+      jwt.sign({ user }, 'secretkey', (error: Error | null, token: string | null) => {
         if (error) {
           res.status(500).json({
             success: false,
@@ -37,7 +42,7 @@ const buildRoute = (services) => {
   });
   
   // NOTE: This doesn't use requireToken because it's supposed to respond to anonymous requests.
-  router.get('/', corsHandler, async (req, res) => {
+  router.get('/', corsHandler, async (req: RequestWithToken, res: Response) => {
     jwt.verify(req.token, 'secretkey', (error, authData) => {
       if (error) {
         res.status(403)

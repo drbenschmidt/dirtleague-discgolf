@@ -13,7 +13,7 @@ const defaultModel: AuthModel = { email: '', password: '' };
 const AuthButton = (props: AuthButtonProps) => {
   const { fixed } = props;
   const context = useAuthContext();
-  const [isAuthenticated, setIsAuthenticated] = useState(context.isAuthenticated);
+  const [isAuthenticated, setIsAuthenticated] = useState(context?.isAuthenticated);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [shouldShowMessage, setShouldShowMessage] = useState(false);
@@ -31,9 +31,9 @@ const AuthButton = (props: AuthButtonProps) => {
 
     setShouldShowMessage(false);
     setIsAuthenticating(true);
-    const result = await context.authenticate(model.current);
+    const result = await context?.authenticate(model.current);
     setIsAuthenticating(false);
-    setIsAuthenticated(result.success);
+    setIsAuthenticated(result?.success);
     setShouldShowMessage(true);
   }, [context, model]);
 
@@ -43,7 +43,7 @@ const AuthButton = (props: AuthButtonProps) => {
   }, [revertModel]);
 
   const logoutOnClick = useCallback(async () => {
-    await context.logout();
+    await context?.logout();
     setIsAuthenticated(false);
   }, [context]);
 

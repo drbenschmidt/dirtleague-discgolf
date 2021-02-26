@@ -4,9 +4,9 @@ const hasher = hashBuilder({
   digest: 'sha256'
 });
 
-export const hashPassword = (password, salt) => {
+export const hashPassword = (password: string, salt: string): Promise<{hash: string, salt: string}> => {
   return new Promise((resolve, reject) => {
-    hasher({ password, salt }, (err, _pass, _salt, _hash) => {
+    hasher({ password, salt }, (err: object, _pass: string, _salt: string, _hash: string) => {
       if (err) {
         reject(err);
       }

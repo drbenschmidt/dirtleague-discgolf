@@ -2,20 +2,27 @@
   "name": "server",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "set DEBUG=express:* & node src/index.js",
-    "seed": "node ./src/seed-db.js"
+    "build": "tsc",
+    "start": "ts-node src/index.ts",
+    "start:dev": "ts-node-dev src/index.ts",
+    "seed": "node ./src/seed-db.js",
+    "test": ""
   },
   "dependencies": {
     "@databases/mysql": "5.0.0",
     "@dirtleague/common": "*",
     "cors": "^2.8.5",
-    "express-session": "1.17.1",
     "pbkdf2-password": "1.2.1",
     "jsonwebtoken": "8.5.1"
   },
   "devDependencies": {
-    "@databases/mysql-test": "^3.1.0"
+    "@databases/mysql-test": "^3.1.0",
+    "@types/express": "4.17.11",
+    "@types/jsonwebtoken": "8.5.0",
+    "@types/cors": "2.8.10",
+    "ts-node-dev": "1.1.6",
+    "ts-node": "9.1.1"
   }
 }

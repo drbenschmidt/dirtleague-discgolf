@@ -5,17 +5,24 @@
   "workspaces": [
     "modules/*"
   ],
-  "dependencies": {
-    
+  "devDependencies": {
+    "typescript": "4.2.2"
   },
   "scripts": {
-    "start": "concurrently -n client,server \"yarn client:start\" \"yarn server:start\"",
-    "client:start": "yarn workspace client start",
-    "client:build": "yarn workspace client build",
-    "client:test": "yarn workspace client test",
-    "server:start": "yarn workspace server start",
-    "server:mysql-start": "yarn mysql-test start",
-    "server:mysql-seed": "yarn workspace server seed"
+    "start": "concurrently -n client,server \"yarn start:client\" \"yarn start:server\"",
+    "start:client": "yarn workspace client start",
+    "start:server": "yarn workspace server start",
+    "start:dev": "concurrently -n client,server \"yarn start:dev:client\" \"yarn start:dev:server\"",
+    "start:dev:client": "yarn workspace client start:dev",
+    "start:dev:server": "yarn workspace server start:dev",
+    "build": "yarn build:client && yarn build:server",
+    "build:client": "yarn workspace client build",
+    "build:server": "yarn workspace server build",
+    "test": "yarn test:client && yarn test:server",
+    "test:client": "yarn workspace client test",
+    "test:server": "yarn workspace server test",
+    "mysql:start": "yarn mysql-test start",
+    "mysql:seed": "yarn workspace server seed"
   },
   "eslintConfig": {
     "extends": [
