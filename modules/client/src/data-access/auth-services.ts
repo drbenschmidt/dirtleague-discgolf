@@ -1,20 +1,20 @@
 import type ApiFetch from './api-fetch';
 
-interface AuthServicesProps {
+export interface AuthServicesProps {
   api: ApiFetch;
 }
 
-interface AuthRequest {
+export interface AuthRequest {
   email: string;
   password: string;
 }
 
-interface AuthResponse {
+export interface AuthResponse {
   success: boolean;
   token: string;
 }
 
-interface AuthCheckResponse {
+export interface AuthCheckResponse {
   isAuthenticated: boolean;
 }
 
@@ -27,7 +27,7 @@ class AuthServices {
     this.api = api;
   }
 
-  auth = async (request: AuthRequest) => {
+  auth = async (request: AuthRequest): Promise<AuthResponse> => {
     const response = await this.api.post<AuthResponse>('auth', request);
 
     if (response.token) {
@@ -37,11 +37,11 @@ class AuthServices {
     return response;
   };
 
-  logout = () => {
+  logout = (): void => {
     this.api.removeToken();
   };
 
-  isAuthenticated = async () => {
+  isAuthenticated = async (): Promise<boolean> => {
     const { isAuthenticated } = await this.api.get<AuthCheckResponse>('auth');
 
     return isAuthenticated;

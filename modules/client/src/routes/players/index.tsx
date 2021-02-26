@@ -1,3 +1,4 @@
+import { ReactElement } from 'react';
 import { Link, useRouteMatch, useParams } from 'react-router-dom';
 import { Table, Button, Menu, Icon } from 'semantic-ui-react';
 
@@ -7,7 +8,7 @@ const mockData = [
   { firstName: 'kyle', lastName: 'guy3', id: 3, rating: 1000 },
 ];
 
-export const PlayerList = () => {
+export const PlayerList = (): ReactElement => {
   const { url } = useRouteMatch();
 
   return (
@@ -63,7 +64,7 @@ export const PlayerList = () => {
   );
 };
 
-export const PlayerDetails = () => {
+export const PlayerDetails = (): ReactElement => {
   const { id } = useParams<any>();
 
   return <h1>Player ID {id}</h1>;

@@ -1,6 +1,12 @@
 import isNil from './isNil';
 
-const weakMerge = (left: any, right: any) => {
+const weakMerge = <
+  TLeft extends Record<string, unknown>,
+  TRight extends Record<string, unknown>
+>(
+  left: TLeft,
+  right: TRight
+): TLeft & TRight => {
   return Object.keys(right).reduce((acc: any, keyName) => {
     if (!isNil(right[keyName])) {
       acc[keyName] = right[keyName];

@@ -4,7 +4,7 @@ import { deepClone } from '@dirtleague/common';
 
 export interface Transaction<TModel> {
   model: React.RefObject<TModel>;
-  revertModel: Function;
+  revertModel: () => void;
 }
 
 export interface InputBinding {
@@ -20,7 +20,9 @@ export const useTransaction = <TModel>(
 ): Transaction<TModel> => {
   const clone = deepClone(original);
   const model = useRef<TModel>(clone);
-  const revert = () => (model.current = deepClone(original));
+  const revert = () => {
+    model.current = deepClone(original);
+  };
 
   return {
     model,
@@ -28,7 +30,7 @@ export const useTransaction = <TModel>(
   };
 };
 
-export const useInputBinding = <TModel>(
+export const useInputBinding = <TModel extends Record<string, any>>(
   modelRef: React.RefObject<TModel>,
   propName: string
 ): InputBinding => {
@@ -36,6 +38,8 @@ export const useInputBinding = <TModel>(
 
   const onChange = useCallback(
     (_event, { value }) => {
+      // TODO: Figure out how to get TS to like this.
+      // eslint-disable-next-line no-param-reassign
       (modelRef.current as any)[propName] = value;
     },
     [modelRef, propName]

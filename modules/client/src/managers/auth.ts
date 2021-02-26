@@ -1,4 +1,4 @@
-import AuthServices from '../data-access/auth-services';
+import AuthServices, { AuthResponse } from '../data-access/auth-services';
 import type ApiFetch from '../data-access/api-fetch';
 
 export interface AuthModel {
@@ -17,7 +17,10 @@ class AuthManager {
     this.service = new AuthServices({ api: apiFetch });
   }
 
-  authenticate = async ({ email, password }: AuthModel) => {
+  authenticate = async ({
+    email,
+    password,
+  }: AuthModel): Promise<AuthResponse> => {
     const result = await this.service.auth({ email, password });
 
     if (result.token) {
@@ -27,12 +30,12 @@ class AuthManager {
     return result;
   };
 
-  logout = async () => {
+  logout = async (): Promise<void> => {
     await this.service.logout();
     this.isAuthenticated = false;
   };
 
-  getIsAuthenticated = async () => {
+  getIsAuthenticated = async (): Promise<boolean> => {
     const result = await this.service.isAuthenticated();
 
     this.isAuthenticated = result;

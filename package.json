@@ -8,7 +8,7 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^4.15.2",
     "@typescript-eslint/parser": "^4.15.2",
-    "eslint-config-airbnb-typescript": "6.3.2",
+    "eslint-config-airbnb-typescript": "12.3.1",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jest": "^24.1.5",
@@ -62,10 +62,12 @@
         "jsx": true
       },
       "ecmaVersion": 2018,
-      "sourceType": "module"
+      "sourceType": "module",
+      "project": "tsconfig.json"
     },
     "rules": {
-      "react/react-in-jsx-scope": 0
+      "react/react-in-jsx-scope": 0,
+      "react/jsx-props-no-spreading": 0
     }
   },
   "prettier": {

@@ -1,15 +1,18 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, ReactElement } from 'react';
 import { Visibility, Segment, Menu, Container, Grid } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import AuthButton from './components/auth/button';
 
-export const MenuLink = (props: any) => (
-  <Menu.Item as={Link} {...props}>
-    {props.children}
-  </Menu.Item>
-);
+export const MenuLink = (props: any): ReactElement => {
+  const { children } = props;
+  return (
+    <Menu.Item as={Link} {...props}>
+      {children}
+    </Menu.Item>
+  );
+};
 
-export const Navigation = (props: any) => {
+export const Navigation = (props: any): ReactElement => {
   const { children } = props;
   const [fixed, setFixed] = useState(false);
   const showFixedMenu = useCallback(() => setFixed(true), []);

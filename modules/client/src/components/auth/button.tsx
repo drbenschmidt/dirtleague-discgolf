@@ -14,6 +14,7 @@ const AuthButton = (props: AuthButtonProps) => {
   const { fixed } = props;
   const context = useAuthContext();
   const [isAuthenticated, setIsAuthenticated] = useState(
+    // eslint-disable-next-line react/destructuring-assignment
     context?.isAuthenticated
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
