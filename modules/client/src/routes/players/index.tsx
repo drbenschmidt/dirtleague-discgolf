@@ -1,6 +1,7 @@
 import { ReactElement } from 'react';
 import { Link, useRouteMatch, useParams } from 'react-router-dom';
 import { Table, Button, Menu, Icon } from 'semantic-ui-react';
+import IfAdmin from '../../components/auth/if-admin';
 
 const mockData = [
   { firstName: 'ben', lastName: 'guy1', id: 1, rating: 1000 },
@@ -36,6 +37,9 @@ export const PlayerList = (): ReactElement => {
                   as={Link}
                   to={`${url}/${user.id}`}
                 />
+                <IfAdmin>
+                  <Button icon="edit" as={Link} to={`${url}/edit/${user.id}`} />
+                </IfAdmin>
               </Table.Cell>
             </Table.Row>
           ))}

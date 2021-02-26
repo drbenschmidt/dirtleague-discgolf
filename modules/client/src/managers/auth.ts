@@ -1,3 +1,4 @@
+import { UserModel } from '@dirtleague/common';
 import AuthServices, { AuthResponse } from '../data-access/auth-services';
 import type ApiFetch from '../data-access/api-fetch';
 
@@ -11,7 +12,7 @@ class AuthManager {
 
   isAuthenticated = false;
 
-  isAdmin = false;
+  user?: UserModel;
 
   constructor(apiFetch: ApiFetch) {
     this.service = new AuthServices({ api: apiFetch });
@@ -25,6 +26,7 @@ class AuthManager {
 
     if (result.token) {
       this.isAuthenticated = true;
+      this.user = result.user;
     }
 
     return result;
@@ -38,9 +40,13 @@ class AuthManager {
   getIsAuthenticated = async (): Promise<boolean> => {
     const result = await this.service.isAuthenticated();
 
-    this.isAuthenticated = result;
+    this.isAuthenticated = result.isAuthenticated;
 
-    return result;
+    if (result.userData) {
+      this.user = result.userData.user;
+    }
+
+    return result.isAuthenticated;
   };
 }
 
