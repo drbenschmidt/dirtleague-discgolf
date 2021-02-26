@@ -1,3 +1,4 @@
+import { UserModel } from '@dirtleague/common';
 import type ApiFetch from './api-fetch';
 
 export interface AuthServicesProps {
@@ -12,10 +13,15 @@ export interface AuthRequest {
 export interface AuthResponse {
   success: boolean;
   token: string;
+  user: UserModel;
 }
 
 export interface AuthCheckResponse {
   isAuthenticated: boolean;
+  userData: {
+    iat: number;
+    user: UserModel;
+  };
 }
 
 class AuthServices {
@@ -41,10 +47,10 @@ class AuthServices {
     this.api.removeToken();
   };
 
-  isAuthenticated = async (): Promise<boolean> => {
-    const { isAuthenticated } = await this.api.get<AuthCheckResponse>('auth');
+  isAuthenticated = async (): Promise<AuthCheckResponse> => {
+    const result = await this.api.get<AuthCheckResponse>('auth');
 
-    return isAuthenticated;
+    return result;
   };
 }
 

@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
+import { Roles, UserModel } from '@dirtleague/common';
 import hashPassword from '../crypto/hash';
 import RepositoryServices from '../data-access/repositories';
 
@@ -54,23 +55,43 @@ export const requireToken = (
   }
 };
 
+export const applyRoles = (user: any, isAdmin: boolean): void => {
+  if (!user.roles) {
+    // eslint-disable-next-line no-param-reassign
+    user.roles = [];
+  }
+
+  if (isAdmin) {
+    user.roles.push(Roles.Admin);
+  }
+
+  user.roles.push(Roles.User);
+};
+
 export const authenticate = async (
   email: string,
   password: string,
   services: RepositoryServices
-): Promise<any> => {
-  const user = await services.users.getByEmail(email);
+): Promise<UserModel> => {
+  const {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    passwordSalt: password_salt,
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    passwordHash: password_hash,
+    isAdmin,
+    ...user
+  } = await services.users.getByEmail(email);
 
-  // query the db for the given username
   if (!user) {
     return null;
   }
 
-  const { hash } = await hashPassword(password, user.password_salt);
+  const { hash } = await hashPassword(password, password_salt);
 
-  if (hash === user.password_hash) {
-    // TODO: Remove password hash and salt.
-    return user;
+  if (hash === password_hash) {
+    applyRoles(user, isAdmin);
+
+    return user as UserModel;
   }
 
   return null;

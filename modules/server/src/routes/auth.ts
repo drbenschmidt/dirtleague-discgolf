@@ -18,7 +18,6 @@ const buildRoute = (services: RepositoryServices): Router => {
     const user = await authenticate(email, password, services);
 
     if (user) {
-      // TODO: Remove private user props
       // TODO: Make secret key configurable or use certificate.
       jwt.sign(
         { user },
@@ -34,6 +33,7 @@ const buildRoute = (services: RepositoryServices): Router => {
           res.json({
             success: true,
             token,
+            user,
           });
         }
       );
@@ -47,7 +47,7 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   // NOTE: This doesn't use requireToken because it's supposed to respond to anonymous requests.
   router.get('/', corsHandler, async (req: RequestWithToken, res: Response) => {
-    jwt.verify(req.token, 'secretkey', (error, authData) => {
+    jwt.verify(req.token, 'secretkey', (error, userData) => {
       if (error) {
         res.status(403).json({
           success: true,
@@ -58,7 +58,7 @@ const buildRoute = (services: RepositoryServices): Router => {
         res.status(200).json({
           success: true,
           isAuthenticated: true,
-          userData: authData,
+          userData,
         });
       }
     });

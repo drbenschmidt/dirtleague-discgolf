@@ -7,7 +7,7 @@
     "build": "tsc",
     "start": "ts-node src/index.ts",
     "start:dev": "ts-node-dev src/index.ts",
-    "seed": "node ./src/seed-db.js",
+    "seed": "ts-node ./src/seed-db.ts",
     "test": ""
   },
   "dependencies": {
