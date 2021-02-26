@@ -1,18 +1,18 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, ReactElement } from 'react';
 import { Visibility, Segment, Menu, Container, Grid } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import AuthButton from './components/auth/button';
 
-export const MenuLink = (props: any) => (
-  <Menu.Item
-    as={Link}
-    {...props}
-  >
-    {props.children}
-  </Menu.Item>
-);
+export const MenuLink = (props: any): ReactElement => {
+  const { children } = props;
+  return (
+    <Menu.Item as={Link} {...props}>
+      {children}
+    </Menu.Item>
+  );
+};
 
-export const Navigation = (props: any) => {
+export const Navigation = (props: any): ReactElement => {
   const { children } = props;
   const [fixed, setFixed] = useState(false);
   const showFixedMenu = useCallback(() => setFixed(true), []);
@@ -27,7 +27,7 @@ export const Navigation = (props: any) => {
       >
         <Segment
           inverted
-          textAlign='center'
+          textAlign="center"
           style={{ padding: '1em 0em' }}
           vertical
         >
@@ -36,7 +36,7 @@ export const Navigation = (props: any) => {
             inverted={!fixed}
             pointing={!fixed}
             secondary={!fixed}
-            size='large'
+            size="large"
           >
             <Container>
               <MenuLink to="/">Home</MenuLink>
@@ -44,7 +44,7 @@ export const Navigation = (props: any) => {
               <MenuLink to="/courses">Courses</MenuLink>
               <MenuLink to="/events">Events</MenuLink>
               <MenuLink to="/seasons">Seasons</MenuLink>
-              <Menu.Item position='right'>
+              <Menu.Item position="right">
                 <AuthButton fixed={fixed} />
               </Menu.Item>
             </Container>
@@ -52,14 +52,12 @@ export const Navigation = (props: any) => {
         </Segment>
       </Visibility>
       <Segment style={{ padding: '2em 0em' }} vertical>
-      <Grid container stackable verticalAlign='middle'>
-        <Grid.Row>
-          <Grid.Column width={12}>
-          {children}
-          </Grid.Column>
-        </Grid.Row>
-      </Grid>
-    </Segment>
+        <Grid container stackable verticalAlign="middle">
+          <Grid.Row>
+            <Grid.Column width={12}>{children}</Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </Segment>
     </>
-  )
+  );
 };

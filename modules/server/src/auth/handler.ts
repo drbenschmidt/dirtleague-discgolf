@@ -1,24 +1,30 @@
 import jwt from 'jsonwebtoken';
-import { hashPassword } from '../crypto/hash';
 import { Request, Response, NextFunction } from 'express';
+import hashPassword from '../crypto/hash';
 import RepositoryServices from '../data-access/repositories';
 
 interface RequestWithToken extends Request {
   token: string;
 }
 
-export const extractToken = (req: Request) => {
-  const bearerHeader = req.headers['authorization'];
+export const extractToken = (req: Request): string => {
+  const bearerHeader = req.headers.authorization;
 
   if (typeof bearerHeader !== 'undefined') {
-      //split the space at the bearer
-      const [_bearer, token] = bearerHeader.split(' ');
-      
-      return token;
-  }
-}
+    // split the space at the bearer
+    const [, token] = bearerHeader.split(' ');
 
-export const applyToken = (req: RequestWithToken, res: Response, next: NextFunction) => {
+    return token;
+  }
+
+  return null;
+};
+
+export const applyToken = (
+  req: RequestWithToken,
+  res: Response,
+  next: NextFunction
+): void => {
   const token = extractToken(req);
 
   if (token) {
@@ -28,33 +34,31 @@ export const applyToken = (req: RequestWithToken, res: Response, next: NextFunct
   next();
 };
 
-export const requireToken = (req: RequestWithToken, res: Response, next: NextFunction) => {
+export const requireToken = (
+  req: RequestWithToken,
+  res: Response,
+  next: NextFunction
+): void => {
   if (req.token) {
-    jwt.verify(req.token, 'secretkey', (error, authData) => {
+    jwt.verify(req.token, 'secretkey', error => {
       if (error) {
-        res
-          .status(403)
-          .json({ error });
+        res.status(403).json({ error });
       } else {
-        //next middleware
+        // next middleware
         next();
       }
     });
   } else {
-      // Forbidden
-      res
-        .status(403)
-        .json({ error: 'Unauthorized' });
+    // Forbidden
+    res.status(403).json({ error: 'Unauthorized' });
   }
-}
+};
 
-/**
- * 
- * @param {string} email 
- * @param {string} password 
- * @param {RepositoryServices} services 
- */
-export const authenticate = async (email: string, password: string, services: RepositoryServices) => {
+export const authenticate = async (
+  email: string,
+  password: string,
+  services: RepositoryServices
+): Promise<any> => {
   const user = await services.users.getByEmail(email);
 
   // query the db for the given username

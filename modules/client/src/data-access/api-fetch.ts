@@ -2,6 +2,17 @@ const buildUrl = (baseUrl: string, url: string) => {
   return `${baseUrl}/${url}`;
 };
 
+const defaultRequestOptions = {
+  mode: 'cors', // no-cors, *cors, same-origin
+  cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+  credentials: 'same-origin', // include, *same-origin, omit
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  redirect: 'follow', // manual, *follow, error
+  referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+};
+
 const buildRequestOptions = (jwt: string | null, options: any) => {
   const reqOptions = {
     ...defaultRequestOptions,
@@ -9,21 +20,10 @@ const buildRequestOptions = (jwt: string | null, options: any) => {
   };
 
   if (jwt) {
-    reqOptions.headers['Authorization'] = `Bearer ${jwt}`;
+    reqOptions.headers.Authorization = `Bearer ${jwt}`;
   }
 
   return reqOptions;
-};
-
-const defaultRequestOptions = {
-  mode: 'cors', // no-cors, *cors, same-origin
-  cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-  credentials: 'same-origin', // include, *same-origin, omit
-  headers: {
-    'Content-Type': 'application/json'
-  },
-  redirect: 'follow', // manual, *follow, error
-  referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
 };
 
 /**
@@ -32,6 +32,7 @@ const defaultRequestOptions = {
  */
 class ApiFetch {
   jwt: string | null;
+
   // TODO: make this configurable and work by getting the window's current scheme.
   baseUrl = `${window.location.protocol}//localhost:8081`;
 
@@ -39,19 +40,19 @@ class ApiFetch {
     this.jwt = token;
   }
 
-  static CreateFromLocalStorage() {
+  static CreateFromLocalStorage(): ApiFetch {
     const token = window.localStorage.getItem('DIRTY_TOKEN');
     const instance = new ApiFetch(token);
 
     return instance;
   }
 
-  setToken = (token: string) => {
+  setToken = (token: string): void => {
     this.jwt = token;
     window.localStorage.setItem('DIRTY_TOKEN', token);
   };
 
-  removeToken = () => {
+  removeToken = (): void => {
     this.jwt = null;
     window.localStorage.removeItem('DIRTY_TOKEN');
   };
@@ -62,7 +63,7 @@ class ApiFetch {
       buildUrl(this.baseUrl, url),
       buildRequestOptions(this.jwt, {
         method: 'POST',
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       })
     );
 
@@ -73,7 +74,7 @@ class ApiFetch {
     const response = await fetch(
       buildUrl(this.baseUrl, url),
       buildRequestOptions(this.jwt, {
-        method: 'GET'
+        method: 'GET',
       })
     );
 

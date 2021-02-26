@@ -5,7 +5,7 @@ interface RepositoryServicesProps {
 }
 
 // TODO: Move users into user repository class.
-export class RepositoryServices {
+class RepositoryServices {
   api: ApiFetch;
 
   constructor(props: RepositoryServicesProps) {
@@ -14,15 +14,17 @@ export class RepositoryServices {
     this.api = api;
   }
 
-  getUsers = async () => {
+  getUsers = async (): Promise<void> => {
     const result = await this.api.get('users');
 
     console.log(result);
-  }
+  };
 
-  getUser = async (id: number) => {
+  getUser = async (id: number): Promise<void> => {
     const result = await this.api.get(`users/${id}`);
 
     console.log(result);
-  }
+  };
 }
+
+export default RepositoryServices;

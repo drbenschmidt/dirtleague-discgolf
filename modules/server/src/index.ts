@@ -32,8 +32,8 @@ const services = new RepositoryServices();
  */
 
 // Setup our handlers/middlewares.
-app.use(express.json()) // for parsing application/json
-app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+app.use(express.json()); // for parsing application/json
+app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(applyToken);
 app.use(genericErrorHandler);
 
@@ -45,5 +45,5 @@ app.use('/users', buildUsersRoute(services));
 app.use('/auth', buildAuthRoute(services));
 
 app.listen(port, async () => {
-  console.log(`DirtLeague API listening at http://localhost:${port}`);  
+  console.log(`DirtLeague API listening at http://localhost:${port}`);
 });

@@ -1,5 +1,6 @@
+import { ReactElement } from 'react';
 
-const Home = () => {
+const Home = (): ReactElement => {
   return <h1>Home</h1>;
 };
 

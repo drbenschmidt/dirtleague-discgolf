@@ -1,6 +1,6 @@
+import { weakMerge } from '@dirtleague/common';
 import DefaultConfig from './default-config';
 import EnvVarConfig from './envvar-config';
-import { weakMerge } from '@dirtleague/common';
 
 class ConfigManager {
   props = DefaultConfig;
@@ -17,10 +17,10 @@ let instance: ConfigManager = null;
 /**
  * @returns {ConfigManager}
  */
-export const getDefaultConfigManager = () => {
+export const getDefaultConfigManager = (): ConfigManager => {
   if (instance === null) {
     instance = new ConfigManager();
   }
 
   return instance;
-}
+};

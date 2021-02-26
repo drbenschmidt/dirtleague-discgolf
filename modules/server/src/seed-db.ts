@@ -1,11 +1,11 @@
-import db from './data-access/database.js';
-import { createUsersTable } from './data-access/schema/users.js';
-import RepositoryServices from './data-access/repositories.js';
-import { hashPassword } from './crypto/hash.js'
+import db from './data-access/database';
+import { createUsersTable } from './data-access/schema/users';
+import RepositoryServices from './data-access/repositories';
+import hashPassword from './crypto/hash';
 
 const services = new RepositoryServices();
 
-const insertUser = async (email, password) => {
+const insertUser = async (email: string, password: string): Promise<void> => {
   const { hash, salt } = await hashPassword(password);
 
   await services.users.insert(email, hash, salt);
