@@ -1,5 +1,5 @@
 const { parse, stringify } = JSON;
 
-const deepClone = (obj) => parse(stringify(obj));
+const deepClone = (obj: any) => parse(stringify(obj));
 
 export default deepClone;
