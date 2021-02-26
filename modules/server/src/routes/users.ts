@@ -1,8 +1,8 @@
-import express from 'express';
+import express, { Router } from 'express';
 import RepositoryServices from '../data-access/repositories';
 import corsHandler from '../http/cors-handler';
 
-const buildRoute = (services: RepositoryServices) => {
+const buildRoute = (services: RepositoryServices): Router => {
   const router = express.Router();
 
   router.get('/', corsHandler, async (req, res) => {

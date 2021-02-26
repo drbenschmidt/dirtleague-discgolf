@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, Router } from 'express';
 import jwt from 'jsonwebtoken';
 import { randomInt, sleep } from '@dirtleague/common';
 import { authenticate } from '../auth/handler';
@@ -9,7 +9,7 @@ interface RequestWithToken extends Request {
   token: string;
 }
 
-const buildRoute = (services: RepositoryServices) => {
+const buildRoute = (services: RepositoryServices): Router => {
   const router = express.Router();
 
   router.post('/', corsHandler, async (req, res) => {

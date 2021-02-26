@@ -8,28 +8,36 @@ class UsersRepository {
     this.db = db;
   }
 
-  insert = async (email: string, passwordHash: string, passwordSalt: string) => {
+  insert = async (
+    email: string,
+    passwordHash: string,
+    passwordSalt: string
+  ) => {
     await this.db.query(sql`
       INSERT INTO users (email, password_hash, password_salt)
       VALUES (${email}, ${passwordHash}, ${passwordSalt})
     `);
   };
 
-  update = async (email: string, passwordHash: string, passwordSalt: string) => {
+  update = async (
+    email: string,
+    passwordHash: string,
+    passwordSalt: string
+  ) => {
     await this.db.query(sql`
       UPDATE users
       SET password_hash=${passwordHash}, password_salt=${passwordSalt}
       WHERE email=${email}
     `);
   };
-  
+
   delete = async (id: number) => {
     await this.db.query(sql`
       DELETE FROM users
       WHERE id=${id}
     `);
   };
-  
+
   get = async (id: number) => {
     const users = await this.db.query(sql`
       SELECT * FROM users
@@ -50,7 +58,7 @@ class UsersRepository {
       return null;
     }
     return users[0];
-  }
+  };
 
   getAll = async () => {
     const users = await this.db.query(sql`
@@ -58,7 +66,7 @@ class UsersRepository {
     `);
 
     return users || [];
-  }
+  };
 }
 
 export default UsersRepository;

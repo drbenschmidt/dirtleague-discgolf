@@ -1,5 +1,6 @@
 import { ConnectionPool, sql } from '@databases/mysql';
 
+// eslint-disable-next-line import/prefer-default-export
 export const createUsersTable = async (db: ConnectionPool) => {
   await db.query(sql`
     CREATE TABLE 'users' (

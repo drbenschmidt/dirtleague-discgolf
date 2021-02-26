@@ -17,7 +17,7 @@ let instance: ConfigManager = null;
 /**
  * @returns {ConfigManager}
  */
-export const getDefaultConfigManager = () => {
+export const getDefaultConfigManager = (): ConfigManager => {
   if (instance === null) {
     instance = new ConfigManager();
   }
