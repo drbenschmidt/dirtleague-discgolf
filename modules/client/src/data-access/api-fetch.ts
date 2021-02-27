@@ -91,6 +91,19 @@ class ApiFetch {
 
     return response.json();
   };
+
+  patch = async <TResponse>(url = '', data = {}): Promise<TResponse> => {
+    // Default options are marked with *
+    const response = await fetch(
+      buildUrl(this.baseUrl, url),
+      buildRequestOptions(this.jwt, {
+        method: 'PATCH',
+        body: JSON.stringify(data),
+      })
+    );
+
+    return response.json();
+  };
 }
 
 export default ApiFetch;

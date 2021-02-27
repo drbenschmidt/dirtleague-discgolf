@@ -3,33 +3,13 @@ import { applyToken } from './auth/handler';
 import RepositoryServices from './data-access/repositories';
 import buildUsersRoute from './routes/users';
 import buildAuthRoute from './routes/auth';
+import buildProfilesRoute from './routes/profiles';
 import genericErrorHandler from './http/generic-error-handler';
 import corsHandler from './http/cors-handler';
 
 const app = express();
 const port = 8081; // TODO: Make configurable.
 const services = new RepositoryServices();
-
-/**
- * TODO: Need to add REST API support for
- * post(auth) - { username, password } // later add nonce
- * post(users) - UserModel
- * get(users) - Array<UserModel>
- * delete(users) - { id }
- * patch(users) - UserModel
- * post(profiles) - ProfileModel
- * get(profiles) - Array<ProfileModel>
- * post(courses) - CourseModel
- * get(courses) - Array<CourseModel>
- * delete(courses) - { id }
- * patch(courses) - CourseModel
- * post(seasons) - SeasonModel
- * post(events) - EventModel
- * get(events) - Array<EventModel>
- * delete(events) - { id }
- * patch(events) - EventModel
- * post(events/import) - { file: UDisc CSV }
- */
 
 // Setup our handlers/middlewares.
 app.use(express.json()); // for parsing application/json
@@ -43,6 +23,7 @@ app.options('*', corsHandler);
 // Add the routers for each area.
 app.use('/users', buildUsersRoute(services));
 app.use('/auth', buildAuthRoute(services));
+app.use('/profiles', buildProfilesRoute(services));
 
 app.listen(port, async () => {
   console.log(`DirtLeague API listening at http://localhost:${port}`);

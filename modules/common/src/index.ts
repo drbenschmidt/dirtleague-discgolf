@@ -7,3 +7,4 @@ export { default as deepClone } from './utils/deepClone';
 export { default as Roles } from './security/roles';
 
 export type { UserModel } from './model/user';
+export type { ProfileModel } from './model/profile';
