@@ -1,4 +1,4 @@
-import { ProfileModel } from '@dirtleague/common';
+import { isNil, ProfileModel } from '@dirtleague/common';
 import React, { ReactElement, useCallback, useEffect, useState } from 'react';
 import { Link, useRouteMatch, useParams } from 'react-router-dom';
 import { Table, Button, Menu, Icon, Form } from 'semantic-ui-react';
@@ -40,7 +40,7 @@ export const PlayerList = (): ReactElement => {
 
         <Table.Body>
           {result?.map(user => (
-            <Table.Row>
+            <Table.Row key={user.id}>
               <Table.Cell>{user.firstName}</Table.Cell>
               <Table.Cell>{user.lastName}</Table.Cell>
               <Table.Cell>{user.currentRating}</Table.Cell>
@@ -76,46 +76,110 @@ export const PlayerList = (): ReactElement => {
   );
 };
 
-export const PlayerDetails = (): ReactElement => {
+export const PlayerDetails = (): ReactElement | null => {
   const { id } = useParams<PlayerDetailsParams>();
+  const services = useRepositoryServices();
+  const [result, setResult] = useState<ProfileModel>();
 
-  return <h1>Player ID {id}</h1>;
+  useEffect(() => {
+    const doWork = async () => {
+      const profiles = await services?.profiles.get(parseInt(id, 10));
+
+      setResult(profiles);
+    };
+
+    doWork();
+  }, [id, services?.profiles]);
+
+  if (!result) {
+    return null;
+  }
+
+  return <h1>{`${result?.firstName} ${result?.lastName}`}</h1>;
 };
 
-export const PlayerCreate = (): ReactElement => {
+const StatefulInput = (props: any): ReactElement => {
+  const { value: originalValue, onChange: parentOnChange, ...rest } = props;
+  const [value, setValue] = useState(originalValue);
+
+  const onChange = useCallback(
+    (event, data) => {
+      const { value: newValue } = data;
+      setValue(newValue);
+      parentOnChange(event, data);
+    },
+    [parentOnChange]
+  );
+
+  const inputProps = {
+    ...rest,
+    value,
+    onChange,
+  };
+
+  return <Form.Input {...inputProps} />;
+};
+
+export const PlayerForm = (): ReactElement | null => {
+  const { id } = useParams<PlayerDetailsParams>();
+  const isEditing = !isNil(id);
   const services = useRepositoryServices();
-  const { model } = useTransaction<ProfileModel>({} as ProfileModel);
+  const [profileModel, setProfileModel] = useState<ProfileModel>();
+  const { model } = useTransaction<ProfileModel>(profileModel);
   const firstNameBinding = useInputBinding(model, 'firstName');
   const lastNameBinding = useInputBinding(model, 'lastName');
   const [isInFlight, setIsInFlight] = useState(false);
 
+  // Get the profile from the server if we're editing it.
+  useEffect(() => {
+    if (isEditing) {
+      const getProfile = async () => {
+        const response = await services?.profiles.get(parseInt(id, 10));
+
+        if (response) {
+          setProfileModel(response);
+        }
+      };
+
+      getProfile();
+    }
+  }, [id, isEditing, services?.profiles]);
+
   const onFormSubmit = useCallback(() => {
-    const doWork = async () => {
+    const submit = async () => {
       if (model.current) {
         try {
           setIsInFlight(true);
-          await services?.profiles.create(model.current);
+          if (isEditing) {
+            await services?.profiles.update(model.current);
+          } else {
+            await services?.profiles.create(model.current);
+          }
         } finally {
           setIsInFlight(false);
         }
       }
     };
 
-    doWork();
-  }, [model, services?.profiles]);
+    submit();
+  }, [isEditing, model, services?.profiles]);
+
+  if (isEditing && !profileModel) {
+    return null;
+  }
 
   return (
     <>
-      <h1>New Player</h1>
+      <h1>{isEditing ? 'Edit Player' : 'New Player'}</h1>
       <Form onSubmit={onFormSubmit} loading={isInFlight}>
         <Form.Group widths="equal">
-          <Form.Input
+          <StatefulInput
             {...firstNameBinding}
             fluid
             label="First name"
             placeholder="First name"
           />
-          <Form.Input
+          <StatefulInput
             {...lastNameBinding}
             fluid
             label="Last name"

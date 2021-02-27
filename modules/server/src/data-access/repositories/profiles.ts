@@ -3,7 +3,7 @@ import { ConnectionPool } from '@databases/mysql';
 
 interface Repository<TModel> {
   create(model: TModel): Promise<TModel>;
-  update(model: TModel): Promise<void>;
+  update(model: TModel): Promise<TModel>;
   delete(id: number): Promise<void>;
   get(id: number): Promise<TModel>;
   getAll(): Promise<TModel[]>;
@@ -33,15 +33,14 @@ class UsersRepository implements Repository<DbProfile> {
     return Promise.resolve(model);
   }
 
-  update(model: DbProfile): Promise<void> {
+  update(model: DbProfile): Promise<DbProfile> {
     const db = mockDb.find(i => i.id === model.id);
 
     if (db) {
       Object.assign(db, model);
     }
 
-    // eslint-disable-next-line no-useless-return
-    return;
+    return Promise.resolve(db);
   }
 
   delete(id: number): Promise<void> {
