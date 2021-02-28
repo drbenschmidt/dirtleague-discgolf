@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import RepositoryServices from './repositories';
+import RepositoryServices from './repository-services';
 
 const context = React.createContext<RepositoryServices | null>(null);
 

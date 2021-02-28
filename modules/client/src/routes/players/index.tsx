@@ -1,8 +1,16 @@
 import { isNil, ProfileModel } from '@dirtleague/common';
-import React, { ReactElement, useCallback, useEffect, useState } from 'react';
+import React, {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useState,
+  useRef,
+} from 'react';
 import { Link, useRouteMatch, useParams } from 'react-router-dom';
 import { Table, Button, Menu, Icon, Form } from 'semantic-ui-react';
 import IfAdmin from '../../components/auth/if-admin';
+import TextInput from '../../components/forms/text-input';
+import Collection from '../../components/forms/collection';
 import { useRepositoryServices } from '../../data-access/context';
 import { useInputBinding, useTransaction } from '../../hooks/forms';
 
@@ -98,26 +106,18 @@ export const PlayerDetails = (): ReactElement | null => {
   return <h1>{`${result?.firstName} ${result?.lastName}`}</h1>;
 };
 
-const StatefulInput = (props: any): ReactElement => {
-  const { value: originalValue, onChange: parentOnChange, ...rest } = props;
-  const [value, setValue] = useState(originalValue);
+export const AliasFormRow = (props: any): ReactElement => {
+  const { model } = props;
+  const modelRef = useRef(model);
+  const bindings = useInputBinding(modelRef, 'value');
 
-  const onChange = useCallback(
-    (event, data) => {
-      const { value: newValue } = data;
-      setValue(newValue);
-      parentOnChange(event, data);
-    },
-    [parentOnChange]
+  return (
+    <>
+      <Table.Cell>
+        <TextInput {...bindings} placeholder="Par Save Steve, etc." />
+      </Table.Cell>
+    </>
   );
-
-  const inputProps = {
-    ...rest,
-    value,
-    onChange,
-  };
-
-  return <Form.Input {...inputProps} />;
 };
 
 export const PlayerForm = (): ReactElement | null => {
@@ -134,7 +134,9 @@ export const PlayerForm = (): ReactElement | null => {
   useEffect(() => {
     if (isEditing) {
       const getProfile = async () => {
-        const response = await services?.profiles.get(parseInt(id, 10));
+        const response = await services?.profiles.get(parseInt(id, 10), {
+          include: ['aliases'],
+        });
 
         if (response) {
           setProfileModel(response);
@@ -153,6 +155,8 @@ export const PlayerForm = (): ReactElement | null => {
           if (isEditing) {
             await services?.profiles.update(model.current);
           } else {
+            // model.current.aliases = [{ value: 'test_alias' }];
+
             await services?.profiles.create(model.current);
           }
         } finally {
@@ -173,19 +177,26 @@ export const PlayerForm = (): ReactElement | null => {
       <h1>{isEditing ? 'Edit Player' : 'New Player'}</h1>
       <Form onSubmit={onFormSubmit} loading={isInFlight}>
         <Form.Group widths="equal">
-          <StatefulInput
+          <TextInput
             {...firstNameBinding}
             fluid
             label="First name"
             placeholder="First name"
           />
-          <StatefulInput
+          <TextInput
             {...lastNameBinding}
             fluid
             label="Last name"
             placeholder="Last name"
           />
         </Form.Group>
+        <Collection
+          model={model}
+          propName="aliases"
+          RowComponent={AliasFormRow}
+          label="Player Aliases"
+          buttonText="Add Alias"
+        />
         <Form.Button positive content="Submit" />
       </Form>
     </>

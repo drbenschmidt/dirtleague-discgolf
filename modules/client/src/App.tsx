@@ -6,7 +6,7 @@ import RepositoryContext from './data-access/context';
 import AuthManager from './managers/auth';
 import ApiFetch from './data-access/api-fetch';
 import Router from './router';
-import RepositoryServices from './data-access/repositories';
+import RepositoryServices from './data-access/repository-services';
 
 const App = () => {
   const apiFetch = useOnce(() => ApiFetch.CreateFromLocalStorage());

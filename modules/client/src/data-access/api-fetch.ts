@@ -1,5 +1,15 @@
-const buildUrl = (baseUrl: string, url: string) => {
-  return `${baseUrl}/${url}`;
+const buildUrl = (
+  baseUrl: string,
+  url: string,
+  options?: Record<string, any>
+) => {
+  const temp = new URL(url, baseUrl);
+
+  if (options) {
+    temp.search = new URLSearchParams(options).toString();
+  }
+
+  return temp.toString();
 };
 
 const defaultRequestOptions = {
@@ -57,10 +67,14 @@ class ApiFetch {
     window.localStorage.removeItem('DIRTY_TOKEN');
   };
 
-  post = async <TResponse>(url = '', data = {}): Promise<TResponse> => {
+  post = async <TResponse>(
+    url = '',
+    data = {},
+    queryParams = {}
+  ): Promise<TResponse> => {
     // Default options are marked with *
     const response = await fetch(
-      buildUrl(this.baseUrl, url),
+      buildUrl(this.baseUrl, url, queryParams),
       buildRequestOptions(this.jwt, {
         method: 'POST',
         body: JSON.stringify(data),
@@ -70,9 +84,9 @@ class ApiFetch {
     return response.json(); // parses JSON response into native JavaScript objects
   };
 
-  get = async <TResponse>(url = ''): Promise<TResponse> => {
+  get = async <TResponse>(url = '', queryParams = {}): Promise<TResponse> => {
     const response = await fetch(
-      buildUrl(this.baseUrl, url),
+      buildUrl(this.baseUrl, url, queryParams),
       buildRequestOptions(this.jwt, {
         method: 'GET',
       })

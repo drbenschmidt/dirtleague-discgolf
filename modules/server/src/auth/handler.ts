@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { Roles, UserModel } from '@dirtleague/common';
 import hashPassword from '../crypto/hash';
-import RepositoryServices from '../data-access/repositories';
+import RepositoryServices from '../data-access/repository-services';
 
 interface RequestWithToken extends Request {
   token: string;

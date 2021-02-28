@@ -1,6 +1,6 @@
 import db from './data-access/database';
 import { createUsersTable } from './data-access/schema/users';
-import RepositoryServices from './data-access/repositories';
+import RepositoryServices from './data-access/repository-services';
 import hashPassword from './crypto/hash';
 
 const services = new RepositoryServices();

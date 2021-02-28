@@ -1,5 +1,5 @@
 import express, { Router } from 'express';
-import RepositoryServices from '../data-access/repositories';
+import RepositoryServices from '../data-access/repository-services';
 import corsHandler from '../http/cors-handler';
 
 const buildRoute = (services: RepositoryServices): Router => {

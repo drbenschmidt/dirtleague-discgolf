@@ -1,9 +1,10 @@
 import express from 'express';
 import { applyToken } from './auth/handler';
-import RepositoryServices from './data-access/repositories';
+import RepositoryServices from './data-access/repository-services';
 import buildUsersRoute from './routes/users';
 import buildAuthRoute from './routes/auth';
 import buildProfilesRoute from './routes/profiles';
+import buildAliasesRoute from './routes/aliases';
 import genericErrorHandler from './http/generic-error-handler';
 import corsHandler from './http/cors-handler';
 
@@ -24,6 +25,7 @@ app.options('*', corsHandler);
 app.use('/users', buildUsersRoute(services));
 app.use('/auth', buildAuthRoute(services));
 app.use('/profiles', buildProfilesRoute(services));
+app.use('/aliases', buildAliasesRoute(services));
 
 app.listen(port, async () => {
   console.log(`DirtLeague API listening at http://localhost:${port}`);

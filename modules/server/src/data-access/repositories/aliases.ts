@@ -2,23 +2,22 @@
 import { ConnectionPool } from '@databases/mysql';
 import { Repository } from '../repository';
 
-interface DbProfile {
+export interface DbAlias {
   id?: number;
-  firstName: string;
-  lastName: string;
-  currentRating: number;
+  playerId: number;
+  value: string;
 }
 
-let mockDb: DbProfile[] = [];
+let mockDb: DbAlias[] = [];
 
-class UsersRepository implements Repository<DbProfile> {
+class AliasesRepository implements Repository<DbAlias> {
   db: ConnectionPool;
 
   constructor(db: ConnectionPool) {
     this.db = db;
   }
 
-  create(model: DbProfile): Promise<DbProfile> {
+  create(model: DbAlias): Promise<DbAlias> {
     mockDb.push(model);
     // eslint-disable-next-line no-param-reassign
     model.id = mockDb.length + 1;
@@ -26,7 +25,7 @@ class UsersRepository implements Repository<DbProfile> {
     return Promise.resolve(model);
   }
 
-  update(model: DbProfile): Promise<DbProfile> {
+  update(model: DbAlias): Promise<DbAlias> {
     const db = mockDb.find(i => i.id === model.id);
 
     if (db) {
@@ -47,15 +46,21 @@ class UsersRepository implements Repository<DbProfile> {
     return;
   }
 
-  get(id: number): Promise<DbProfile> {
+  get(id: number): Promise<DbAlias> {
     const db = mockDb.find(i => i.id === id);
 
     return Promise.resolve(db);
   }
 
-  getAll(): Promise<DbProfile[]> {
+  getAll(): Promise<DbAlias[]> {
     return Promise.resolve(mockDb);
+  }
+
+  getForUserId(id: number): Promise<DbAlias[]> {
+    const db = mockDb.filter(i => i.playerId === id);
+
+    return Promise.resolve(db);
   }
 }
 
-export default UsersRepository;
+export default AliasesRepository;
