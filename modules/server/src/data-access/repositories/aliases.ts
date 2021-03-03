@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import { ConnectionPool } from '@databases/mysql';
+import { ConnectionPool, sql } from '@databases/mysql';
 import { Repository } from '../repository';
 
 export interface DbAlias {
@@ -8,8 +8,6 @@ export interface DbAlias {
   value: string;
 }
 
-let mockDb: DbAlias[] = [];
-
 class AliasesRepository implements Repository<DbAlias> {
   db: ConnectionPool;
 
@@ -17,49 +15,62 @@ class AliasesRepository implements Repository<DbAlias> {
     this.db = db;
   }
 
-  create(model: DbAlias): Promise<DbAlias> {
-    mockDb.push(model);
+  async create(model: DbAlias): Promise<DbAlias> {
+    const [result] = await this.db.query(sql`
+      INSERT INTO aliases (playerId, value)
+      VALUES (${model.playerId}, ${model.value});
+      SELECT LAST_INSERT_ID();
+    `);
+
     // eslint-disable-next-line no-param-reassign
-    model.id = mockDb.length + 1;
+    model.id = result;
 
-    return Promise.resolve(model);
+    return model;
   }
 
-  update(model: DbAlias): Promise<DbAlias> {
-    const db = mockDb.find(i => i.id === model.id);
+  async update(model: DbAlias): Promise<void> {
+    await this.db.query(sql`
+      UPDATE profiles
+      SET playerId=${model.playerId}, value=${model.value}
+      WHERE id=${model.id}
+    `);
+  }
 
-    if (db) {
-      Object.assign(db, model);
+  async delete(id: number): Promise<void> {
+    await this.db.query(sql`
+      DELETE FROM aliases
+      WHERE id=${id}
+    `);
+  }
+
+  async get(id: number): Promise<DbAlias> {
+    const [entity] = await this.db.query(sql`
+      SELECT * FROM aliases
+      WHERE id=${id}
+    `);
+
+    if (entity) {
+      return entity;
     }
 
-    return Promise.resolve(db);
+    return null;
   }
 
-  delete(id: number): Promise<void> {
-    const db = mockDb.find(i => i.id === id);
+  async getAll(): Promise<DbAlias[]> {
+    const entities = await this.db.query(sql`
+      SELECT * FROM aliases
+    `);
 
-    if (db) {
-      mockDb = mockDb.filter(i => i !== db);
-    }
-
-    // eslint-disable-next-line no-useless-return
-    return;
+    return entities;
   }
 
-  get(id: number): Promise<DbAlias> {
-    const db = mockDb.find(i => i.id === id);
+  async getForUserId(playerId: number): Promise<DbAlias[]> {
+    const entities = await this.db.query(sql`
+      SELECT * FROM aliases
+      WHERE playerId=${playerId}
+    `);
 
-    return Promise.resolve(db);
-  }
-
-  getAll(): Promise<DbAlias[]> {
-    return Promise.resolve(mockDb);
-  }
-
-  getForUserId(id: number): Promise<DbAlias[]> {
-    const db = mockDb.filter(i => i.playerId === id);
-
-    return Promise.resolve(db);
+    return entities;
   }
 }
 

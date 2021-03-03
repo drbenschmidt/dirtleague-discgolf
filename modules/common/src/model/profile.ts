@@ -23,6 +23,7 @@ class ProfileModel
     firstName: '',
     lastName: '',
     aliases: [] as AliasAttributes[],
+    currentRating: 0,
   };
 
   get id(): number {

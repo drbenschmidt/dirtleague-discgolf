@@ -1,5 +1,5 @@
 import { isNil, ProfileModel, asyncForEach } from '@dirtleague/common';
-import express, { Router } from 'express';
+import express, { NextFunction, Router, Response, Request } from 'express';
 import { DbAlias } from '../data-access/repositories/aliases';
 import RepositoryServices from '../data-access/repository-services';
 import corsHandler from '../http/cors-handler';
@@ -14,6 +14,19 @@ const except = <T>(left: T[], right: T[]) => {
 
 const getById = <T extends { id?: number }>(arr: T[], ids: number[]) => {
   return arr.filter(i => ids.includes(i.id));
+};
+
+const withTryCatch = (
+  callback: (req: Request, res: Response, next: NextFunction) => void
+) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    try {
+      callback(req, res, next);
+    } catch (e) {
+      // TODO: Only return errors in dev mode.
+      res.status(500).json({ success: false, error: e });
+    }
+  };
 };
 
 const buildRoute = (services: RepositoryServices): Router => {
@@ -48,6 +61,8 @@ const buildRoute = (services: RepositoryServices): Router => {
   router.post('/', corsHandler, async (req, res) => {
     const model = new ProfileModel(req.body);
 
+    console.log('create profile', model);
+
     // TODO: create should only return an ID.
     const result = await services.profiles.create(model);
 
@@ -61,6 +76,8 @@ const buildRoute = (services: RepositoryServices): Router => {
         alias.playerId = result.id;
 
         const aliasJson = alias.toJson();
+
+        console.log('create alias', aliasJson);
 
         const dbAlias = await services.aliases.create(aliasJson as DbAlias);
         // eslint-disable-next-line no-param-reassign
@@ -95,7 +112,7 @@ const buildRoute = (services: RepositoryServices): Router => {
 
       asyncForEach(aliasesToCreate, async alias => {
         // eslint-disable-next-line no-param-reassign
-        alias.playerId = result.id;
+        alias.playerId = body.id;
 
         await services.aliases.create(alias);
       });

@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import { ConnectionPool } from '@databases/mysql';
+import { ConnectionPool, sql } from '@databases/mysql';
 import { Repository } from '../repository';
 
 interface DbProfile {
@@ -9,8 +9,6 @@ interface DbProfile {
   currentRating: number;
 }
 
-let mockDb: DbProfile[] = [];
-
 class UsersRepository implements Repository<DbProfile> {
   db: ConnectionPool;
 
@@ -18,50 +16,60 @@ class UsersRepository implements Repository<DbProfile> {
     this.db = db;
   }
 
-  create(model: DbProfile): Promise<DbProfile> {
+  async create(model: DbProfile): Promise<DbProfile> {
+    const [result] = await this.db.query(sql`
+      INSERT INTO profiles (firstName, lastName, currentRating)
+      VALUES (${model.firstName}, ${model.lastName}, ${model.currentRating});
+
+      SELECT LAST_INSERT_ID();
+    `);
+
     // eslint-disable-next-line no-param-reassign
-    model.id = mockDb.length + 1;
+    model.id = result['LAST_INSERT_ID()'];
 
-    // Do this because the model needs to convert itself to the db row.
-    mockDb.push({
-      firstName: model.firstName,
-      lastName: model.lastName,
-      id: model.id,
-      currentRating: 0,
-    });
-
-    return Promise.resolve(model);
+    return model;
   }
 
-  update(model: DbProfile): Promise<DbProfile> {
-    const db = mockDb.find(i => i.id === model.id);
+  async update(model: DbProfile): Promise<void> {
+    await this.db.query(sql`
+      UPDATE profiles
+      SET firstName=${model.firstName}, lastName=${model.lastName}, currentRating=${model.currentRating}
+      WHERE id=${model.id}
+    `);
+  }
 
-    if (db) {
-      Object.assign(db, model);
+  async delete(id: number): Promise<void> {
+    await this.db.query(sql`
+      DELETE FROM profiles
+      WHERE id=${id}
+    `);
+
+    // TODO: Re-learn how to make foreign keys so I can make cascading deletes.
+    await this.db.query(sql`
+      DELETE FROM aliases
+      WHERE playerId=${id}
+    `);
+  }
+
+  async get(id: number): Promise<DbProfile> {
+    const [entity] = await this.db.query(sql`
+      SELECT * FROM profiles
+      WHERE id=${id}
+    `);
+
+    if (entity) {
+      return entity;
     }
 
-    return Promise.resolve(db);
+    return null;
   }
 
-  delete(id: number): Promise<void> {
-    const db = mockDb.find(i => i.id === id);
+  async getAll(): Promise<DbProfile[]> {
+    const entities = await this.db.query(sql`
+      SELECT * FROM profiles
+    `);
 
-    if (db) {
-      mockDb = mockDb.filter(i => i.id !== db.id);
-    }
-
-    // eslint-disable-next-line no-useless-return
-    return;
-  }
-
-  get(id: number): Promise<DbProfile> {
-    const db = mockDb.find(i => i.id === id);
-
-    return Promise.resolve(db);
-  }
-
-  getAll(): Promise<DbProfile[]> {
-    return Promise.resolve(mockDb);
+    return entities;
   }
 }
 

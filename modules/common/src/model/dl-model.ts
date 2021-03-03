@@ -27,12 +27,22 @@ class DirtLeagueModel<TAttributes> {
   }
 
   get<T>(key: string): T {
-    return (this as any)[key] as T;
+    const value = (this as any)[key] as T;
+    const defaultValue = (this.defaults as any)[key] as T;
+
+    if (value === undefined && defaultValue !== undefined) {
+      return defaultValue;
+    }
+
+    return value;
   }
 
   toJson(): Record<string, any> {
     const result = {} as Record<string, any>;
-    const totalKeys = [...keys(this.attributes), ...keys(this.defaults)];
+    const totalKeys = new Set([
+      ...keys(this.attributes),
+      ...keys(this.defaults),
+    ]);
 
     totalKeys.forEach(key => {
       const value = this.get(key);
