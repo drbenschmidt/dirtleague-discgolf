@@ -73,6 +73,12 @@ export const authenticate = async (
   password: string,
   services: RepositoryServices
 ): Promise<UserModel> => {
+  const result = await services.users.getByEmail(email);
+
+  if (!result) {
+    return null;
+  }
+
   const {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     passwordSalt: password_salt,
@@ -80,11 +86,7 @@ export const authenticate = async (
     passwordHash: password_hash,
     isAdmin,
     ...user
-  } = await services.users.getByEmail(email);
-
-  if (!user) {
-    return null;
-  }
+  } = result;
 
   const { hash } = await hashPassword(password, password_salt);
 

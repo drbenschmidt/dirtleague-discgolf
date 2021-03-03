@@ -1,6 +1,8 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
+
 import { ReactElement, useCallback, useState } from 'react';
 import { Table, Menu, Button, Icon } from 'semantic-ui-react';
+import { ListNode, LinkedList, isNil } from '@dirtleague/common';
 
 interface CollectionProps<TModel> {
   RowComponent: (props: any) => ReactElement;
@@ -10,20 +12,32 @@ interface CollectionProps<TModel> {
   buttonText: string;
 }
 
-function Collection<TModel>(props: CollectionProps<TModel>): ReactElement {
+function CollectionComponent<TModel>(
+  props: CollectionProps<TModel>
+): ReactElement {
   const { RowComponent, model, propName, label, buttonText } = props;
-  let entities = (model.current as any)[propName] as TModel[];
+  let entities = (model.current as any)[propName] as LinkedList<TModel>;
   const [, setDummy] = useState(false);
 
-  if (!Array.isArray(entities)) {
-    (model.current as any)[propName] = [] as TModel[];
-    entities = [] as TModel[];
+  if (isNil(entities)) {
+    (model.current as any)[propName] = new LinkedList<TModel>();
+    entities = new LinkedList<TModel>();
   }
 
   const onAddClick = useCallback(() => {
-    entities.push({} as TModel);
+    entities.append({} as TModel);
     setDummy(v => !v);
   }, [entities]);
+
+  const onRemoveClick = useCallback(
+    (obj: ListNode<TModel>) => {
+      return () => {
+        entities.deleteNode(obj);
+        setDummy(v => !v);
+      };
+    },
+    [entities]
+  );
 
   return (
     <>
@@ -32,9 +46,23 @@ function Collection<TModel>(props: CollectionProps<TModel>): ReactElement {
       </div>
       <Table>
         <Table.Body>
-          {entities.map(entity => (
-            <Table.Row>
-              <RowComponent model={entity} />
+          {entities.mapReact((node, index) => (
+            // eslint-disable-next-line react/no-array-index-key
+            <Table.Row key={`collection_${index}`}>
+              <Table.Cell width="14">
+                <RowComponent model={node.data} />
+              </Table.Cell>
+              <Table.Cell textAlign="right" width="2">
+                <Button
+                  as="a"
+                  onClick={onRemoveClick(node)}
+                  negative
+                  size="mini"
+                >
+                  <Icon name="delete" />
+                  Remove
+                </Button>
+              </Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>
@@ -42,7 +70,7 @@ function Collection<TModel>(props: CollectionProps<TModel>): ReactElement {
           <Table.Row>
             <Table.HeaderCell colSpan="4">
               <Menu floated="right">
-                <Menu.Item as={Button} onClick={onAddClick} type="Button">
+                <Menu.Item as="a" onClick={onAddClick} type="Button">
                   <Icon name="add circle" /> {buttonText}
                 </Menu.Item>
               </Menu>
@@ -54,4 +82,4 @@ function Collection<TModel>(props: CollectionProps<TModel>): ReactElement {
   );
 }
 
-export default Collection;
+export default CollectionComponent;

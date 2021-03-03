@@ -19,9 +19,16 @@ class UsersRepository implements Repository<DbProfile> {
   }
 
   create(model: DbProfile): Promise<DbProfile> {
-    mockDb.push(model);
     // eslint-disable-next-line no-param-reassign
     model.id = mockDb.length + 1;
+
+    // Do this because the model needs to convert itself to the db row.
+    mockDb.push({
+      firstName: model.firstName,
+      lastName: model.lastName,
+      id: model.id,
+      currentRating: 0,
+    });
 
     return Promise.resolve(model);
   }

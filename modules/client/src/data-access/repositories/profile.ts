@@ -7,7 +7,7 @@ class ProfileRepository
   async create(model: ProfileModel): Promise<ProfileModel> {
     const result = await this.api.post<ProfileModel>('profiles', model);
 
-    return result;
+    return new ProfileModel(result);
   }
 
   async update(model: ProfileModel): Promise<void> {
@@ -21,13 +21,13 @@ class ProfileRepository
   async get(id: number, options?: ApiOptions): Promise<ProfileModel> {
     const result = await this.api.get<ProfileModel>(`profiles/${id}`, options);
 
-    return result;
+    return new ProfileModel(result);
   }
 
   async getAll(): Promise<ProfileModel[]> {
     const result = await this.api.get<ProfileModel[]>('profiles');
 
-    return result;
+    return result.map(obj => new ProfileModel(obj));
   }
 }
 

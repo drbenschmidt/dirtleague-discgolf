@@ -5,8 +5,13 @@ export { default as randomInt } from './utils/randomInt';
 export { default as deepClone } from './utils/deepClone';
 export { default as asyncForEach } from './utils/asyncForEach';
 
+export { default as LinkedList } from './collections/linkedList';
+export { default as ListNode } from './collections/listNode';
+
 export { default as Roles } from './security/roles';
 
 export type { UserModel } from './model/user';
-export type { ProfileModel } from './model/profile';
-export type { AliasModel } from './model/alias';
+export { default as ProfileModel } from './model/profile';
+export { default as AliasModel } from './model/alias';
+
+export type { default as Cloneable } from './interfaces/cloneable';

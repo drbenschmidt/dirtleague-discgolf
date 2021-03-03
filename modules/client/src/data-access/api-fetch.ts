@@ -1,3 +1,5 @@
+import DirtLeagueModel from '@dirtleague/common/src/model/dl-model';
+
 const buildUrl = (
   baseUrl: string,
   url: string,
@@ -69,7 +71,7 @@ class ApiFetch {
 
   post = async <TResponse>(
     url = '',
-    data = {},
+    data: DirtLeagueModel<unknown>,
     queryParams = {}
   ): Promise<TResponse> => {
     // Default options are marked with *
@@ -77,7 +79,7 @@ class ApiFetch {
       buildUrl(this.baseUrl, url, queryParams),
       buildRequestOptions(this.jwt, {
         method: 'POST',
-        body: JSON.stringify(data),
+        body: JSON.stringify(data?.toJson() || {}),
       })
     );
 
@@ -106,13 +108,16 @@ class ApiFetch {
     return response.json();
   };
 
-  patch = async <TResponse>(url = '', data = {}): Promise<TResponse> => {
-    // Default options are marked with *
+  patch = async <TResponse>(
+    url = '',
+    data: DirtLeagueModel<unknown>,
+    queryParams = {}
+  ): Promise<TResponse> => {
     const response = await fetch(
-      buildUrl(this.baseUrl, url),
+      buildUrl(this.baseUrl, url, queryParams),
       buildRequestOptions(this.jwt, {
         method: 'PATCH',
-        body: JSON.stringify(data),
+        body: JSON.stringify(data?.toJson() || {}),
       })
     );
 

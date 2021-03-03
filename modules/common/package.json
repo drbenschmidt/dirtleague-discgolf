@@ -7,6 +7,6 @@
     
   },
   "dependencies": {
-    
+    "typescript-memoize": "1.0.0"
   }
 }

@@ -1,10 +1,27 @@
-import { UserModel } from '@dirtleague/common';
-import AuthServices, { AuthResponse } from '../data-access/auth-services';
+/* eslint-disable max-classes-per-file */
+import { Cloneable, UserModel } from '@dirtleague/common';
+import DirtLeagueModel from '@dirtleague/common/src/model/dl-model';
+import AuthServices, {
+  AuthRequest,
+  AuthResponse,
+} from '../data-access/auth-services';
 import type ApiFetch from '../data-access/api-fetch';
 
-export interface AuthModel {
-  email: string;
-  password: string;
+export interface AuthModelAttributes {
+  email?: string;
+  password?: string;
+}
+
+export class AuthModel
+  extends DirtLeagueModel<AuthModelAttributes>
+  implements Cloneable<AuthModel> {
+  email?: string;
+
+  password?: string;
+
+  clone(): AuthModel {
+    return new AuthModel(this.toJson());
+  }
 }
 
 class AuthManager {
@@ -22,7 +39,9 @@ class AuthManager {
     email,
     password,
   }: AuthModel): Promise<AuthResponse> => {
-    const result = await this.service.auth({ email, password });
+    const result = await this.service.auth(
+      new AuthRequest({ email, password })
+    );
 
     if (result.token) {
       this.isAuthenticated = true;

@@ -42,7 +42,7 @@ export const PlayerList = (): ReactElement => {
             <Table.HeaderCell>First</Table.HeaderCell>
             <Table.HeaderCell>Last</Table.HeaderCell>
             <Table.HeaderCell>Current Rating</Table.HeaderCell>
-            <Table.HeaderCell>Actions</Table.HeaderCell>
+            <Table.HeaderCell textAlign="right">Actions</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
 
@@ -52,14 +52,20 @@ export const PlayerList = (): ReactElement => {
               <Table.Cell>{user.firstName}</Table.Cell>
               <Table.Cell>{user.lastName}</Table.Cell>
               <Table.Cell>{user.currentRating}</Table.Cell>
-              <Table.Cell>
-                <Button
-                  icon="address book"
-                  as={Link}
-                  to={`${url}/${user.id}`}
-                />
+              <Table.Cell textAlign="right">
+                <Button as={Link} to={`${url}/${user.id}`} size="mini">
+                  <Icon name="address book" />
+                  View
+                </Button>
                 <IfAdmin>
-                  <Button icon="edit" as={Link} to={`${url}/edit/${user.id}`} />
+                  <Button as={Link} to={`${url}/edit/${user.id}`} size="mini">
+                    <Icon name="edit" />
+                    Edit
+                  </Button>
+                  <Button negative size="mini">
+                    <Icon name="delete" />
+                    Delete
+                  </Button>
                 </IfAdmin>
               </Table.Cell>
             </Table.Row>
@@ -111,41 +117,15 @@ export const AliasFormRow = (props: any): ReactElement => {
   const modelRef = useRef(model);
   const bindings = useInputBinding(modelRef, 'value');
 
-  return (
-    <>
-      <Table.Cell>
-        <TextInput {...bindings} placeholder="Par Save Steve, etc." />
-      </Table.Cell>
-    </>
-  );
+  return <TextInput {...bindings} placeholder="Par Save Steve, etc." />;
 };
 
-export const PlayerForm = (): ReactElement | null => {
-  const { id } = useParams<PlayerDetailsParams>();
-  const isEditing = !isNil(id);
-  const services = useRepositoryServices();
-  const [profileModel, setProfileModel] = useState<ProfileModel>();
+export const PlayerForm = (props: any): ReactElement | null => {
+  const { profileModel, isEditing, services } = props;
   const { model } = useTransaction<ProfileModel>(profileModel);
   const firstNameBinding = useInputBinding(model, 'firstName');
   const lastNameBinding = useInputBinding(model, 'lastName');
   const [isInFlight, setIsInFlight] = useState(false);
-
-  // Get the profile from the server if we're editing it.
-  useEffect(() => {
-    if (isEditing) {
-      const getProfile = async () => {
-        const response = await services?.profiles.get(parseInt(id, 10), {
-          include: ['aliases'],
-        });
-
-        if (response) {
-          setProfileModel(response);
-        }
-      };
-
-      getProfile();
-    }
-  }, [id, isEditing, services?.profiles]);
 
   const onFormSubmit = useCallback(() => {
     const submit = async () => {
@@ -155,8 +135,6 @@ export const PlayerForm = (): ReactElement | null => {
           if (isEditing) {
             await services?.profiles.update(model.current);
           } else {
-            // model.current.aliases = [{ value: 'test_alias' }];
-
             await services?.profiles.create(model.current);
           }
         } finally {
@@ -167,10 +145,6 @@ export const PlayerForm = (): ReactElement | null => {
 
     submit();
   }, [isEditing, model, services?.profiles]);
-
-  if (isEditing && !profileModel) {
-    return null;
-  }
 
   return (
     <>
@@ -200,5 +174,45 @@ export const PlayerForm = (): ReactElement | null => {
         <Form.Button positive content="Submit" />
       </Form>
     </>
+  );
+};
+
+export const PlayerFormLoader = (): ReactElement | null => {
+  const { id } = useParams<PlayerDetailsParams>();
+  const isEditing = !isNil(id);
+  const services = useRepositoryServices();
+  const [profileModel, setProfileModel] = useState<ProfileModel>();
+
+  // Get the profile from the server if we're editing it.
+  useEffect(() => {
+    if (isEditing) {
+      const getProfile = async () => {
+        const response = await services?.profiles.get(parseInt(id, 10), {
+          include: ['aliases'],
+        });
+
+        if (response) {
+          setProfileModel(response);
+        }
+      };
+
+      getProfile();
+    } else {
+      const response = new ProfileModel();
+
+      setProfileModel(response);
+    }
+  }, [id, isEditing, services?.profiles]);
+
+  if (!profileModel) {
+    return null;
+  }
+
+  return (
+    <PlayerForm
+      profileModel={profileModel}
+      isEditing={isEditing}
+      services={services}
+    />
   );
 };

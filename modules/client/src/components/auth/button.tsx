@@ -8,7 +8,7 @@ interface AuthButtonProps {
   fixed: boolean;
 }
 
-const defaultModel: AuthModel = { email: '', password: '' };
+const defaultModel = new AuthModel({ email: '', password: '' });
 
 const AuthButton = (props: AuthButtonProps) => {
   const { fixed } = props;

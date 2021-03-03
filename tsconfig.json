@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es2015",
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -13,5 +13,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+    "experimentalDecorators": true,
   }
 }

@@ -1,6 +1,6 @@
 import { useRef, useCallback, ChangeEvent } from 'react';
 import { InputOnChangeData } from 'semantic-ui-react';
-import { deepClone } from '@dirtleague/common';
+import { Cloneable, deepClone } from '@dirtleague/common';
 
 export interface Transaction<TModel> {
   model: React.RefObject<TModel | undefined>;
@@ -19,10 +19,10 @@ function orDefault<T>(obj: T) {
   return obj || ({} as T);
 }
 
-export const useTransaction = <TModel>(
+export const useTransaction = <TModel extends Cloneable<TModel>>(
   original: TModel | undefined
 ): Transaction<TModel> => {
-  const clone = deepClone(orDefault(original));
+  const clone = original?.clone() ?? deepClone(orDefault(original));
   const model = useRef(clone);
   const revert = () => {
     model.current = deepClone(original);
