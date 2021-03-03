@@ -6,17 +6,72 @@ import React, {
   useState,
   useRef,
 } from 'react';
-import { Link, useRouteMatch, useParams } from 'react-router-dom';
-import { Table, Button, Menu, Icon, Form } from 'semantic-ui-react';
+import { Link, useRouteMatch, useParams, useHistory } from 'react-router-dom';
+import { Table, Button, Menu, Icon, Form, Modal } from 'semantic-ui-react';
 import IfAdmin from '../../components/auth/if-admin';
 import TextInput from '../../components/forms/text-input';
 import Collection from '../../components/forms/collection';
 import { useRepositoryServices } from '../../data-access/context';
 import { useInputBinding, useTransaction } from '../../hooks/forms';
+import RepositoryServices from '../../data-access/repository-services';
 
 interface PlayerDetailsParams {
   id: string;
 }
+
+interface DeletePlayerButtonProps {
+  player: ProfileModel;
+  services: RepositoryServices | null;
+}
+
+const DeletePlayerButton = (props: DeletePlayerButtonProps): ReactElement => {
+  const { player, services } = props;
+  const [isOpen, setIsOpen] = useState(false);
+  const [isInFlight, setIsInFlight] = useState(false);
+
+  const button = (
+    <Button negative size="mini">
+      <Icon name="delete" />
+      Delete
+    </Button>
+  );
+
+  const onYesClick = useCallback(() => {
+    const deleteProfile = async () => {
+      try {
+        setIsInFlight(true);
+        await services?.profiles.delete(player.id);
+        setIsOpen(false);
+      } finally {
+        setIsInFlight(false);
+      }
+    };
+
+    deleteProfile();
+  }, [services, player]);
+
+  return (
+    <Modal
+      open={isOpen}
+      onOpen={() => setIsOpen(true)}
+      onClose={() => setIsOpen(false)}
+      trigger={button}
+    >
+      <Modal.Header>{`Delete ${player.firstName} ${player.lastName}`}</Modal.Header>
+      <Modal.Content>
+        <p>Are you sure you want to delete this player?</p>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button disabled={isInFlight} onClick={() => setIsOpen(false)} negative>
+          No
+        </Button>
+        <Button loading={isInFlight} onClick={onYesClick} positive>
+          Yes
+        </Button>
+      </Modal.Actions>
+    </Modal>
+  );
+};
 
 export const PlayerList = (): ReactElement => {
   const { url } = useRouteMatch();
@@ -47,25 +102,22 @@ export const PlayerList = (): ReactElement => {
         </Table.Header>
 
         <Table.Body>
-          {result?.map(user => (
-            <Table.Row key={user.id}>
-              <Table.Cell>{user.firstName}</Table.Cell>
-              <Table.Cell>{user.lastName}</Table.Cell>
-              <Table.Cell>{user.currentRating}</Table.Cell>
+          {result?.map(player => (
+            <Table.Row key={player.id}>
+              <Table.Cell>{player.firstName}</Table.Cell>
+              <Table.Cell>{player.lastName}</Table.Cell>
+              <Table.Cell>{player.currentRating}</Table.Cell>
               <Table.Cell textAlign="right">
-                <Button as={Link} to={`${url}/${user.id}`} size="mini">
+                <Button as={Link} to={`${url}/${player.id}`} size="mini">
                   <Icon name="address book" />
                   View
                 </Button>
                 <IfAdmin>
-                  <Button as={Link} to={`${url}/edit/${user.id}`} size="mini">
+                  <Button as={Link} to={`${url}/edit/${player.id}`} size="mini">
                     <Icon name="edit" />
                     Edit
                   </Button>
-                  <Button negative size="mini">
-                    <Icon name="delete" />
-                    Delete
-                  </Button>
+                  <DeletePlayerButton player={player} services={services} />
                 </IfAdmin>
               </Table.Cell>
             </Table.Row>
@@ -126,6 +178,7 @@ export const PlayerForm = (props: any): ReactElement | null => {
   const firstNameBinding = useInputBinding(model, 'firstName');
   const lastNameBinding = useInputBinding(model, 'lastName');
   const [isInFlight, setIsInFlight] = useState(false);
+  const history = useHistory();
 
   const onFormSubmit = useCallback(() => {
     const submit = async () => {
@@ -134,8 +187,13 @@ export const PlayerForm = (props: any): ReactElement | null => {
           setIsInFlight(true);
           if (isEditing) {
             await services?.profiles.update(model.current);
+
+            history.push(`/players/${model.current.id}`);
           } else {
             await services?.profiles.create(model.current);
+
+            // TODO: Move to player view?
+            history.push('/players');
           }
         } finally {
           setIsInFlight(false);
@@ -144,7 +202,7 @@ export const PlayerForm = (props: any): ReactElement | null => {
     };
 
     submit();
-  }, [isEditing, model, services?.profiles]);
+  }, [isEditing, model, services?.profiles, history]);
 
   return (
     <>

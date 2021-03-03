@@ -6,14 +6,21 @@
 import ListNode from './listNode';
 
 class LinkedList<T> {
+  private nodeId = 0;
+
   private head: ListNode<T> | null = null;
 
   constructor(data: T[] = []) {
     data.forEach(i => this.append(i));
   }
 
+  private getNodeId(): number {
+    // eslint-disable-next-line no-plusplus
+    return ++this.nodeId;
+  }
+
   append(data: T): ListNode<T> {
-    const node = new ListNode(data);
+    const node = new ListNode(data, this.getNodeId());
     if (!this.head) {
       this.head = node;
     } else {
@@ -30,7 +37,7 @@ class LinkedList<T> {
   }
 
   prepend(data: T): ListNode<T> {
-    const node = new ListNode(data);
+    const node = new ListNode(data, this.getNodeId());
     if (!this.head) {
       this.head = node;
     } else {

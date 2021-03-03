@@ -46,9 +46,9 @@ function CollectionComponent<TModel>(
       </div>
       <Table>
         <Table.Body>
-          {entities.mapReact((node, index) => (
+          {entities.mapReact(node => (
             // eslint-disable-next-line react/no-array-index-key
-            <Table.Row key={`collection_${index}`}>
+            <Table.Row key={`collection_${node.id}`}>
               <Table.Cell width="14">
                 <RowComponent model={node.data} />
               </Table.Cell>

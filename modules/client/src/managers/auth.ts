@@ -15,6 +15,11 @@ export interface AuthModelAttributes {
 export class AuthModel
   extends DirtLeagueModel<AuthModelAttributes>
   implements Cloneable<AuthModel> {
+  defaults = {
+    email: '',
+    password: '',
+  };
+
   email?: string;
 
   password?: string;

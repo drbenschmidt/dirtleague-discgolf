@@ -47,7 +47,7 @@ class UsersRepository implements Repository<DbProfile> {
     const db = mockDb.find(i => i.id === id);
 
     if (db) {
-      mockDb = mockDb.filter(i => i !== db);
+      mockDb = mockDb.filter(i => i.id !== db.id);
     }
 
     // eslint-disable-next-line no-useless-return

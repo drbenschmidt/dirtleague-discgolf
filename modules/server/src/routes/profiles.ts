@@ -1,4 +1,4 @@
-import { isNil, ProfileModel } from '@dirtleague/common';
+import { isNil, ProfileModel, asyncForEach } from '@dirtleague/common';
 import express, { Router } from 'express';
 import { DbAlias } from '../data-access/repositories/aliases';
 import RepositoryServices from '../data-access/repository-services';
@@ -10,6 +10,10 @@ const intersect = <T>(left: T[], right: T[]) => {
 
 const except = <T>(left: T[], right: T[]) => {
   return left.filter(l => !right.includes(l));
+};
+
+const getById = <T extends { id?: number }>(arr: T[], ids: number[]) => {
+  return arr.filter(i => ids.includes(i.id));
 };
 
 const buildRoute = (services: RepositoryServices): Router => {
@@ -26,8 +30,12 @@ const buildRoute = (services: RepositoryServices): Router => {
     const { include } = req.query;
     const entity = await services.profiles.get(parseInt(id, 10));
 
+    if (!entity) {
+      res.status(404).json({ error: 'Entity Not Found' });
+    }
+
     // TODO: parse it and check for entity types.
-    if (include) {
+    if (include && entity) {
       const aliases = await services.aliases.getForUserId(parseInt(id, 10));
 
       (entity as any).aliases = aliases;
@@ -52,7 +60,9 @@ const buildRoute = (services: RepositoryServices): Router => {
         // eslint-disable-next-line no-param-reassign
         alias.playerId = result.id;
 
-        const dbAlias = await services.aliases.create(alias as DbAlias);
+        const aliasJson = alias.toJson();
+
+        const dbAlias = await services.aliases.create(aliasJson as DbAlias);
         // eslint-disable-next-line no-param-reassign
         alias.id = dbAlias.id;
       });
@@ -76,32 +86,26 @@ const buildRoute = (services: RepositoryServices): Router => {
 
     if (body.aliases) {
       const requestAliases = Array.from(body.aliases);
-
-      // TODO: Figure out what ones were deleted.
       const dbAliases = await services.aliases.getForUserId(body.id);
       const dbAliasIds = dbAliases.map(a => a.id);
-
-      // TODO: mapReact instead of map?!
-      const payloadAliasIds = requestAliases.map(a => a.id);
+      const requestAliasIds = requestAliases.map(a => a.id);
       const aliasesToCreate = requestAliases.filter(a => isNil(a.id));
-      const aliasesToUpdate = intersect(dbAliasIds, payloadAliasIds);
-      const aliasesToDelete = except(dbAliasIds, payloadAliasIds);
+      const aliasesToUpdate = intersect(dbAliasIds, requestAliasIds);
+      const aliasesToDelete = except(dbAliasIds, requestAliasIds);
 
-      body.aliases.forEach(alias => {
+      asyncForEach(aliasesToCreate, async alias => {
         // eslint-disable-next-line no-param-reassign
         alias.playerId = result.id;
+
+        await services.aliases.create(alias);
       });
 
-      // TODO: Write methods to loop through and update.
-      // TODO: Write methods to bulk delete by ID.
-      // TODO: Write method to loop and create.
+      asyncForEach(getById(requestAliases, aliasesToUpdate), async alias => {
+        await services.aliases.update(alias);
+      });
 
-      body.aliases.asyncForEach(async alias => {
-        if (alias.id) {
-          await services.aliases.update(alias as DbAlias);
-        } else {
-          await services.aliases.create(alias as DbAlias);
-        }
+      asyncForEach(getById(dbAliases, aliasesToDelete), async alias => {
+        await services.aliases.delete(alias.id);
       });
     }
 
