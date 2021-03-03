@@ -19,18 +19,19 @@ class AliasesRepository implements Repository<DbAlias> {
     const [result] = await this.db.query(sql`
       INSERT INTO aliases (playerId, value)
       VALUES (${model.playerId}, ${model.value});
+
       SELECT LAST_INSERT_ID();
     `);
 
     // eslint-disable-next-line no-param-reassign
-    model.id = result;
+    model.id = result['LAST_INSERT_ID()'];
 
     return model;
   }
 
   async update(model: DbAlias): Promise<void> {
     await this.db.query(sql`
-      UPDATE profiles
+      UPDATE aliases
       SET playerId=${model.playerId}, value=${model.value}
       WHERE id=${model.id}
     `);

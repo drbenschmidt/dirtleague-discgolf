@@ -9,7 +9,8 @@ const genericErrorHandler = (
   _next: NextFunction
 ) => {
   console.error(err.stack);
-  res.status(500).send('Something broke!');
+  // TODO: Make sure not to send this down in production.
+  res.status(500).json({ success: false, error: err });
 };
 
 export default genericErrorHandler;
