@@ -4,7 +4,7 @@ import AliasModel, { AliasAttributes } from './alias';
 import DirtLeagueModel from './dl-model';
 import LinkedList from '../collections/linkedList';
 
-interface PlayerAttributes {
+export interface PlayerAttributes {
   id?: number;
 
   firstName?: string;

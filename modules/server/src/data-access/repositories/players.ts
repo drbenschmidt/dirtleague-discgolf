@@ -16,7 +16,7 @@ class PlayerRepository implements Repository<DbPlayer> {
     this.db = db;
   }
 
-  async create(model: DbPlayer): Promise<DbPlayer> {
+  async create(model: DbPlayer): Promise<number> {
     const [result] = await this.db.query(sql`
       INSERT INTO players (firstName, lastName, currentRating)
       VALUES (${model.firstName}, ${model.lastName}, ${model.currentRating});
@@ -25,9 +25,9 @@ class PlayerRepository implements Repository<DbPlayer> {
     `);
 
     // eslint-disable-next-line no-param-reassign
-    model.id = result['LAST_INSERT_ID()'];
+    const id = result['LAST_INSERT_ID()'] as number;
 
-    return model;
+    return id;
   }
 
   async update(model: DbPlayer): Promise<void> {

@@ -56,24 +56,25 @@ const buildRoute = (services: RepositoryServices): Router => {
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const model = new PlayerModel(req.body);
+      const newId = await services.profiles.create(model);
 
-      // TODO: create should only return an ID.
-      const result = await services.profiles.create(model);
-
-      model.id = result.id;
+      model.id = newId;
 
       if (model.aliases) {
         // Create each alias if included.
         model.aliases.asyncForEach(async alias => {
           // Make sure the aliases relate to this player.
           // eslint-disable-next-line no-param-reassign
-          alias.playerId = result.id;
+          alias.playerId = newId;
 
           const aliasJson = alias.toJson();
 
-          const dbAlias = await services.aliases.create(aliasJson as DbAlias);
+          const newAliasId = await services.aliases.create(
+            aliasJson as DbAlias
+          );
+
           // eslint-disable-next-line no-param-reassign
-          alias.id = dbAlias.id;
+          alias.id = newAliasId;
         });
       }
 
@@ -99,9 +100,10 @@ const buildRoute = (services: RepositoryServices): Router => {
     corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
+      // TODO: Technically, this should be a transaction.
       const body = req.body as PlayerModel;
 
-      const result = await services.profiles.update(body);
+      await services.profiles.update(body);
 
       if (body.aliases) {
         const requestAliases = Array.from(body.aliases);
@@ -131,7 +133,7 @@ const buildRoute = (services: RepositoryServices): Router => {
         });
       }
 
-      res.json(result);
+      res.json(null);
     })
   );
 

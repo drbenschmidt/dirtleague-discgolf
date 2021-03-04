@@ -15,6 +15,8 @@ export { default as Roles } from './security/roles';
 
 export type { UserModel } from './model/user';
 export { default as PlayerModel } from './model/player';
+export type { PlayerAttributes } from './model/player';
 export { default as AliasModel } from './model/alias';
+export type { AliasAttributes } from './model/alias';
 
 export type { default as Cloneable } from './interfaces/cloneable';

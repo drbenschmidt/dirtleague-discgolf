@@ -15,7 +15,7 @@ class AliasesRepository implements Repository<DbAlias> {
     this.db = db;
   }
 
-  async create(model: DbAlias): Promise<DbAlias> {
+  async create(model: DbAlias): Promise<number> {
     const [result] = await this.db.query(sql`
       INSERT INTO aliases (playerId, value)
       VALUES (${model.playerId}, ${model.value});
@@ -24,9 +24,9 @@ class AliasesRepository implements Repository<DbAlias> {
     `);
 
     // eslint-disable-next-line no-param-reassign
-    model.id = result['LAST_INSERT_ID()'];
+    const id = result['LAST_INSERT_ID()'] as number;
 
-    return model;
+    return id;
   }
 
   async update(model: DbAlias): Promise<void> {

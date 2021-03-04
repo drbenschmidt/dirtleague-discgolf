@@ -1,15 +1,15 @@
-import { AliasModel } from '@dirtleague/common';
+import { AliasAttributes, AliasModel } from '@dirtleague/common';
 import { ApiRepository, Repository } from '../repository';
 
 class AliasRepository extends ApiRepository implements Repository<AliasModel> {
   async create(model: AliasModel): Promise<AliasModel> {
-    const result = await this.api.post<AliasModel>('aliases', model);
+    const result = await this.api.post<AliasAttributes>('aliases', model);
 
-    return result;
+    return new AliasModel(result);
   }
 
   async update(model: AliasModel): Promise<void> {
-    await this.api.patch<AliasModel>(`aliases/${model.id}`, model);
+    await this.api.patch<AliasAttributes>(`aliases/${model.id}`, model);
   }
 
   async delete(id: number): Promise<void> {
@@ -17,15 +17,15 @@ class AliasRepository extends ApiRepository implements Repository<AliasModel> {
   }
 
   async get(id: number): Promise<AliasModel> {
-    const result = await this.api.get<AliasModel>(`aliases/${id}`);
+    const result = await this.api.get<AliasAttributes>(`aliases/${id}`);
 
-    return result;
+    return new AliasModel(result);
   }
 
   async getAll(): Promise<AliasModel[]> {
-    const result = await this.api.get<AliasModel[]>('aliases');
+    const result = await this.api.get<AliasAttributes[]>('aliases');
 
-    return result;
+    return result.map(alias => new AliasModel(alias));
   }
 }
 
