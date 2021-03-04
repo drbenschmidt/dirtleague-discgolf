@@ -1,7 +1,9 @@
+import { Roles } from '@dirtleague/common';
 import express, { Router } from 'express';
 import { DbAlias } from '../data-access/repositories/aliases';
 import RepositoryServices from '../data-access/repository-services';
 import corsHandler from '../http/cors-handler';
+import { requireRoles } from '../auth/handler';
 
 const buildRoute = (services: RepositoryServices): Router => {
   const router = express.Router();
@@ -19,30 +21,44 @@ const buildRoute = (services: RepositoryServices): Router => {
     res.json(user);
   });
 
-  // TODO: add role requirement handler to block for admins only.
-  router.post('/', corsHandler, async (req, res) => {
-    const body = req.body as DbAlias;
+  router.post(
+    '/',
+    corsHandler,
+    requireRoles([Roles.Admin]),
+    async (req, res) => {
+      const body = req.body as DbAlias;
 
-    const result = await services.aliases.create(body);
+      const result = await services.aliases.create(body);
 
-    res.json(result);
-  });
+      res.json(result);
+    }
+  );
 
-  router.delete('/:id', corsHandler, async (req, res) => {
-    const { id } = req.params;
+  router.delete(
+    '/:id',
+    corsHandler,
+    requireRoles([Roles.Admin]),
+    async (req, res) => {
+      const { id } = req.params;
 
-    await services.aliases.delete(parseInt(id, 10));
+      await services.aliases.delete(parseInt(id, 10));
 
-    res.json({ success: true });
-  });
+      res.json({ success: true });
+    }
+  );
 
-  router.patch('/:id', corsHandler, async (req, res) => {
-    const body = req.body as DbAlias;
+  router.patch(
+    '/:id',
+    corsHandler,
+    requireRoles([Roles.Admin]),
+    async (req, res) => {
+      const body = req.body as DbAlias;
 
-    const result = await services.aliases.update(body);
+      const result = await services.aliases.update(body);
 
-    res.json(result);
-  });
+      res.json(result);
+    }
+  );
 
   return router;
 };

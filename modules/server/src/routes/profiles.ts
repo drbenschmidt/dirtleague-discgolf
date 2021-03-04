@@ -1,5 +1,6 @@
-import { isNil, ProfileModel, asyncForEach } from '@dirtleague/common';
+import { isNil, ProfileModel, asyncForEach, Roles } from '@dirtleague/common';
 import express, { NextFunction, Router, Response, Request } from 'express';
+import { requireRoles } from '../auth/handler';
 import { DbAlias } from '../data-access/repositories/aliases';
 import RepositoryServices from '../data-access/repository-services';
 import corsHandler from '../http/cors-handler';
@@ -66,14 +67,12 @@ const buildRoute = (services: RepositoryServices): Router => {
     })
   );
 
-  // TODO: add role requirement handler to block for admins only.
   router.post(
     '/',
     corsHandler,
+    requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const model = new ProfileModel(req.body);
-
-      console.log('create profile', model);
 
       // TODO: create should only return an ID.
       const result = await services.profiles.create(model);
@@ -89,8 +88,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
           const aliasJson = alias.toJson();
 
-          console.log('create alias', aliasJson);
-
           const dbAlias = await services.aliases.create(aliasJson as DbAlias);
           // eslint-disable-next-line no-param-reassign
           alias.id = dbAlias.id;
@@ -104,6 +101,7 @@ const buildRoute = (services: RepositoryServices): Router => {
   router.delete(
     '/:id',
     corsHandler,
+    requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const { id } = req.params;
 
@@ -116,6 +114,7 @@ const buildRoute = (services: RepositoryServices): Router => {
   router.patch(
     '/:id',
     corsHandler,
+    requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const body = req.body as ProfileModel;
 

@@ -8,6 +8,11 @@ interface RequestWithToken extends Request {
   token: string;
 }
 
+interface JsonWebToken {
+  user: UserModel;
+  iat: number;
+}
+
 export const extractToken = (req: Request): string => {
   const bearerHeader = req.headers.authorization;
 
@@ -66,6 +71,30 @@ export const applyRoles = (user: any, isAdmin: boolean): void => {
   }
 
   user.roles.push(Roles.User);
+};
+
+export const requireRoles = (roles: Roles[]) => (
+  req: RequestWithToken,
+  res: Response,
+  next: NextFunction
+): void => {
+  if (req.token) {
+    const { user } = jwt.decode(req.token, { json: true }) as JsonWebToken;
+    const isAdmin = user.roles.includes(Roles.Admin);
+    const isAuthorized = roles.every(role => user.roles.includes(role));
+
+    // NOTE: We're going to assume that Roles.Admin gets everything, no need to verify
+    // individual roles yet.
+    if (!isAuthorized && !isAdmin) {
+      // Forbidden
+      res.status(403).json({ error: 'Unauthorized' });
+    }
+
+    next();
+  } else {
+    // Forbidden
+    res.status(403).json({ error: 'Unauthorized' });
+  }
 };
 
 export const authenticate = async (
