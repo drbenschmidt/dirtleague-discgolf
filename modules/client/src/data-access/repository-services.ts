@@ -1,5 +1,5 @@
 import type ApiFetch from './api-fetch';
-import ProfileRepository from './repositories/profile';
+import PlayerRepository from './repositories/player';
 import AliasRepository from './repositories/alias';
 
 interface RepositoryServicesProps {
@@ -9,7 +9,7 @@ interface RepositoryServicesProps {
 class RepositoryServices {
   api: ApiFetch;
 
-  profiles: ProfileRepository;
+  players: PlayerRepository;
 
   aliases: AliasRepository;
 
@@ -17,7 +17,7 @@ class RepositoryServices {
     const { api } = props;
 
     this.api = api;
-    this.profiles = new ProfileRepository(this.api);
+    this.players = new PlayerRepository(this.api);
     this.aliases = new AliasRepository(this.api);
   }
 }

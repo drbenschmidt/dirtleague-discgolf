@@ -1,6 +1,6 @@
 import db from './database';
 import UsersRepository from './repositories/users';
-import ProfilesRepository from './repositories/profiles';
+import ProfilesRepository from './repositories/players';
 import AliasesRepository from './repositories/aliases';
 
 class RepositoryServices {

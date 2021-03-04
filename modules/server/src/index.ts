@@ -4,7 +4,7 @@ import { applyToken } from './auth/handler';
 import RepositoryServices from './data-access/repository-services';
 import buildUsersRoute from './routes/users';
 import buildAuthRoute from './routes/auth';
-import buildProfilesRoute from './routes/profiles';
+import buildProfilesRoute from './routes/players';
 import buildAliasesRoute from './routes/aliases';
 import genericErrorHandler from './http/generic-error-handler';
 import corsHandler from './http/cors-handler';
@@ -28,7 +28,7 @@ app.use(morgan('dev'));
 // Add the routers for each area.
 app.use('/users', buildUsersRoute(services));
 app.use('/auth', buildAuthRoute(services));
-app.use('/profiles', buildProfilesRoute(services));
+app.use('/players', buildProfilesRoute(services));
 app.use('/aliases', buildAliasesRoute(services));
 
 app.listen(port, async () => {

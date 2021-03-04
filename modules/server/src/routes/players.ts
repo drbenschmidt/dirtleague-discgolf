@@ -1,35 +1,18 @@
-import { isNil, ProfileModel, asyncForEach, Roles } from '@dirtleague/common';
-import express, { NextFunction, Router, Response, Request } from 'express';
+import {
+  isNil,
+  PlayerModel,
+  asyncForEach,
+  Roles,
+  intersect,
+  except,
+  getById,
+} from '@dirtleague/common';
+import express, { Router } from 'express';
+import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
 import { DbAlias } from '../data-access/repositories/aliases';
 import RepositoryServices from '../data-access/repository-services';
 import corsHandler from '../http/cors-handler';
-
-const intersect = <T>(left: T[], right: T[]) => {
-  return left.filter(l => right.includes(l));
-};
-
-const except = <T>(left: T[], right: T[]) => {
-  return left.filter(l => !right.includes(l));
-};
-
-const getById = <T extends { id?: number }>(arr: T[], ids: number[]) => {
-  return arr.filter(i => ids.includes(i.id));
-};
-
-const withTryCatch = (
-  callback: (req: Request, res: Response, next: NextFunction) => void
-) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      await callback(req, res, next);
-    } catch (e) {
-      // TODO: Only return errors in dev mode.
-      console.log(e.message);
-      res.status(500).json({ success: false, error: e });
-    }
-  };
-};
 
 const buildRoute = (services: RepositoryServices): Router => {
   const router = express.Router();
@@ -72,7 +55,7 @@ const buildRoute = (services: RepositoryServices): Router => {
     corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
-      const model = new ProfileModel(req.body);
+      const model = new PlayerModel(req.body);
 
       // TODO: create should only return an ID.
       const result = await services.profiles.create(model);
@@ -116,7 +99,7 @@ const buildRoute = (services: RepositoryServices): Router => {
     corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
-      const body = req.body as ProfileModel;
+      const body = req.body as PlayerModel;
 
       const result = await services.profiles.update(body);
 

@@ -1,4 +1,4 @@
-import { isNil, ProfileModel } from '@dirtleague/common';
+import { isNil, PlayerModel } from '@dirtleague/common';
 import React, {
   ReactElement,
   useCallback,
@@ -35,7 +35,7 @@ interface PlayerDetailsParams {
 }
 
 interface DeletePlayerButtonProps {
-  player: ProfileModel;
+  player: PlayerModel;
   services: RepositoryServices | null;
   onDelete: () => void;
 }
@@ -53,10 +53,10 @@ const DeletePlayerButton = (props: DeletePlayerButtonProps): ReactElement => {
   );
 
   const onYesClick = useCallback(() => {
-    const deleteProfile = async () => {
+    const deletePlayer = async () => {
       try {
         setIsInFlight(true);
-        await services?.profiles.delete(player.id);
+        await services?.players.delete(player.id);
         setIsOpen(false);
         onDelete();
       } finally {
@@ -64,7 +64,7 @@ const DeletePlayerButton = (props: DeletePlayerButtonProps): ReactElement => {
       }
     };
 
-    deleteProfile();
+    deletePlayer();
   }, [services, player, onDelete]);
 
   return (
@@ -93,7 +93,7 @@ const DeletePlayerButton = (props: DeletePlayerButtonProps): ReactElement => {
 export const PlayerList = (): ReactElement => {
   const { url } = useRouteMatch();
   const services = useRepositoryServices();
-  const [result, setResult] = useState<ProfileModel[]>();
+  const [result, setResult] = useState<PlayerModel[]>();
   const [dummy, setDummy] = useState(false);
 
   const onDelete = useCallback(() => {
@@ -105,10 +105,10 @@ export const PlayerList = (): ReactElement => {
     let isMounted = true;
 
     const doWork = async () => {
-      const profiles = await services?.profiles.getAll();
+      const players = await services?.players.getAll();
 
       if (isMounted) {
-        setResult(profiles);
+        setResult(players);
       }
     };
 
@@ -117,7 +117,7 @@ export const PlayerList = (): ReactElement => {
     return () => {
       isMounted = false;
     };
-  }, [services?.profiles, dummy]);
+  }, [services?.players, dummy]);
 
   return (
     <>
@@ -180,19 +180,19 @@ export const PlayerList = (): ReactElement => {
 export const PlayerDetails = (): ReactElement | null => {
   const { id } = useParams<PlayerDetailsParams>();
   const services = useRepositoryServices();
-  const [result, setResult] = useState<ProfileModel>();
+  const [result, setResult] = useState<PlayerModel>();
 
   useEffect(() => {
     const doWork = async () => {
-      const profiles = await services?.profiles.get(parseInt(id, 10), {
+      const players = await services?.players.get(parseInt(id, 10), {
         include: ['aliases'],
       });
 
-      setResult(profiles);
+      setResult(players);
     };
 
     doWork();
-  }, [id, services?.profiles]);
+  }, [id, services?.players]);
 
   if (!result) {
     return null;
@@ -260,8 +260,8 @@ export const AliasFormRow = (props: any): ReactElement => {
 };
 
 export const PlayerForm = (props: any): ReactElement | null => {
-  const { profileModel, isEditing, services } = props;
-  const { model } = useTransaction<ProfileModel>(profileModel);
+  const { playerModel, isEditing, services } = props;
+  const { model } = useTransaction<PlayerModel>(playerModel);
   const firstNameBinding = useInputBinding(model, 'firstName');
   const lastNameBinding = useInputBinding(model, 'lastName');
   const [isInFlight, setIsInFlight] = useState(false);
@@ -273,11 +273,11 @@ export const PlayerForm = (props: any): ReactElement | null => {
         try {
           setIsInFlight(true);
           if (isEditing) {
-            await services?.profiles.update(model.current);
+            await services?.players.update(model.current);
 
             history.push(`/players/${model.current.id}`);
           } else {
-            await services?.profiles.create(model.current);
+            await services?.players.create(model.current);
 
             // TODO: Move to player view?
             history.push('/players');
@@ -289,7 +289,7 @@ export const PlayerForm = (props: any): ReactElement | null => {
     };
 
     submit();
-  }, [isEditing, model, services?.profiles, history]);
+  }, [isEditing, model, services?.players, history]);
 
   return (
     <>
@@ -326,36 +326,36 @@ export const PlayerFormLoader = (): ReactElement | null => {
   const { id } = useParams<PlayerDetailsParams>();
   const isEditing = !isNil(id);
   const services = useRepositoryServices();
-  const [profileModel, setProfileModel] = useState<ProfileModel>();
+  const [playerModel, setPlayerModel] = useState<PlayerModel>();
 
-  // Get the profile from the server if we're editing it.
+  // Get the player from the server if we're editing it.
   useEffect(() => {
     if (isEditing) {
-      const getProfile = async () => {
-        const response = await services?.profiles.get(parseInt(id, 10), {
+      const getPlayer = async () => {
+        const response = await services?.players.get(parseInt(id, 10), {
           include: ['aliases'],
         });
 
         if (response) {
-          setProfileModel(response);
+          setPlayerModel(response);
         }
       };
 
-      getProfile();
+      getPlayer();
     } else {
-      const response = new ProfileModel();
+      const response = new PlayerModel();
 
-      setProfileModel(response);
+      setPlayerModel(response);
     }
-  }, [id, isEditing, services?.profiles]);
+  }, [id, isEditing, services?.players]);
 
-  if (!profileModel) {
+  if (!playerModel) {
     return null;
   }
 
   return (
     <PlayerForm
-      profileModel={profileModel}
+      playerModel={playerModel}
       isEditing={isEditing}
       services={services}
     />

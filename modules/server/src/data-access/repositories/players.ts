@@ -2,23 +2,23 @@
 import { ConnectionPool, sql } from '@databases/mysql';
 import { Repository } from '../repository';
 
-interface DbProfile {
+interface DbPlayer {
   id?: number;
   firstName: string;
   lastName: string;
   currentRating: number;
 }
 
-class UsersRepository implements Repository<DbProfile> {
+class PlayerRepository implements Repository<DbPlayer> {
   db: ConnectionPool;
 
   constructor(db: ConnectionPool) {
     this.db = db;
   }
 
-  async create(model: DbProfile): Promise<DbProfile> {
+  async create(model: DbPlayer): Promise<DbPlayer> {
     const [result] = await this.db.query(sql`
-      INSERT INTO profiles (firstName, lastName, currentRating)
+      INSERT INTO players (firstName, lastName, currentRating)
       VALUES (${model.firstName}, ${model.lastName}, ${model.currentRating});
 
       SELECT LAST_INSERT_ID();
@@ -30,9 +30,9 @@ class UsersRepository implements Repository<DbProfile> {
     return model;
   }
 
-  async update(model: DbProfile): Promise<void> {
+  async update(model: DbPlayer): Promise<void> {
     await this.db.query(sql`
-      UPDATE profiles
+      UPDATE players
       SET firstName=${model.firstName}, lastName=${model.lastName}, currentRating=${model.currentRating}
       WHERE id=${model.id}
     `);
@@ -40,7 +40,7 @@ class UsersRepository implements Repository<DbProfile> {
 
   async delete(id: number): Promise<void> {
     await this.db.query(sql`
-      DELETE FROM profiles
+      DELETE FROM players
       WHERE id=${id}
     `);
 
@@ -51,9 +51,9 @@ class UsersRepository implements Repository<DbProfile> {
     `);
   }
 
-  async get(id: number): Promise<DbProfile> {
+  async get(id: number): Promise<DbPlayer> {
     const [entity] = await this.db.query(sql`
-      SELECT * FROM profiles
+      SELECT * FROM players
       WHERE id=${id}
     `);
 
@@ -64,13 +64,13 @@ class UsersRepository implements Repository<DbProfile> {
     return null;
   }
 
-  async getAll(): Promise<DbProfile[]> {
+  async getAll(): Promise<DbPlayer[]> {
     const entities = await this.db.query(sql`
-      SELECT * FROM profiles
+      SELECT * FROM players
     `);
 
     return entities;
   }
 }
 
-export default UsersRepository;
+export default PlayerRepository;

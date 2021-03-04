@@ -4,7 +4,7 @@ import AliasModel, { AliasAttributes } from './alias';
 import DirtLeagueModel from './dl-model';
 import LinkedList from '../collections/linkedList';
 
-interface ProfileAttributes {
+interface PlayerAttributes {
   id?: number;
 
   firstName?: string;
@@ -16,9 +16,9 @@ interface ProfileAttributes {
   aliases?: AliasAttributes[];
 }
 
-class ProfileModel
-  extends DirtLeagueModel<ProfileAttributes>
-  implements Cloneable<ProfileModel> {
+class PlayerModel
+  extends DirtLeagueModel<PlayerAttributes>
+  implements Cloneable<PlayerModel> {
   defaults = {
     firstName: '',
     lastName: '',
@@ -65,11 +65,11 @@ class ProfileModel
     );
   }
 
-  clone(): ProfileModel {
+  clone(): PlayerModel {
     const obj = this.toJson();
 
-    return new ProfileModel(obj);
+    return new PlayerModel(obj);
   }
 }
 
-export default ProfileModel;
+export default PlayerModel;
