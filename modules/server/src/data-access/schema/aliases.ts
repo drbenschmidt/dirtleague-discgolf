@@ -3,7 +3,7 @@ import { ConnectionPool, sql } from '@databases/mysql';
 // eslint-disable-next-line import/prefer-default-export
 export const createAliasesTable = async (db: ConnectionPool): Promise<void> => {
   await db.query(sql`
-    CREATE TABLE IT NOT EXISTS aliases (
+    CREATE TABLE IF NOT EXISTS aliases (
       id INT NOT NULL AUTO_INCREMENT,
       playerId INT NOT NULL,
       value VARCHAR(45) NOT NULL,

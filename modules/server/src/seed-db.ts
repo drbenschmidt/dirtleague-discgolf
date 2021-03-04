@@ -2,6 +2,8 @@ import db from './data-access/database';
 import { createUsersTable } from './data-access/schema/users';
 import RepositoryServices from './data-access/repository-services';
 import hashPassword from './crypto/hash';
+import { createProfilesTable } from './data-access/schema/profiles';
+import { createAliasesTable } from './data-access/schema/aliases';
 
 const services = new RepositoryServices();
 
@@ -22,6 +24,8 @@ const insertUser = async (
 
 const work = async () => {
   await createUsersTable(db);
+  await createProfilesTable(db);
+  await createAliasesTable(db);
 
   await insertUser('ben@dirtleague.org', 'foobar', true);
   await insertUser('kyle@dirtleague.org', 'foobar');

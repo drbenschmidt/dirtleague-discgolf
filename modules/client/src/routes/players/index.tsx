@@ -37,10 +37,11 @@ interface PlayerDetailsParams {
 interface DeletePlayerButtonProps {
   player: ProfileModel;
   services: RepositoryServices | null;
+  onDelete: () => void;
 }
 
 const DeletePlayerButton = (props: DeletePlayerButtonProps): ReactElement => {
-  const { player, services } = props;
+  const { player, services, onDelete } = props;
   const [isOpen, setIsOpen] = useState(false);
   const [isInFlight, setIsInFlight] = useState(false);
 
@@ -57,13 +58,14 @@ const DeletePlayerButton = (props: DeletePlayerButtonProps): ReactElement => {
         setIsInFlight(true);
         await services?.profiles.delete(player.id);
         setIsOpen(false);
+        onDelete();
       } finally {
         setIsInFlight(false);
       }
     };
 
     deleteProfile();
-  }, [services, player]);
+  }, [services, player, onDelete]);
 
   return (
     <Modal
@@ -92,16 +94,30 @@ export const PlayerList = (): ReactElement => {
   const { url } = useRouteMatch();
   const services = useRepositoryServices();
   const [result, setResult] = useState<ProfileModel[]>();
+  const [dummy, setDummy] = useState(false);
 
+  const onDelete = useCallback(() => {
+    setDummy(v => !v);
+  }, []);
+
+  // Node: Check `dummy` so if it changes we requery data.
   useEffect(() => {
+    let isMounted = true;
+
     const doWork = async () => {
       const profiles = await services?.profiles.getAll();
 
-      setResult(profiles);
+      if (isMounted) {
+        setResult(profiles);
+      }
     };
 
     doWork();
-  }, [services?.profiles]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [services?.profiles, dummy]);
 
   return (
     <>
@@ -132,7 +148,11 @@ export const PlayerList = (): ReactElement => {
                     <Icon name="edit" />
                     Edit
                   </Button>
-                  <DeletePlayerButton player={player} services={services} />
+                  <DeletePlayerButton
+                    player={player}
+                    services={services}
+                    onDelete={onDelete}
+                  />
                 </IfAdmin>
               </Table.Cell>
             </Table.Row>
