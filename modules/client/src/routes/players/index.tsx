@@ -5,15 +5,30 @@ import React, {
   useEffect,
   useState,
   useRef,
+  Suspense,
 } from 'react';
 import { Link, useRouteMatch, useParams, useHistory } from 'react-router-dom';
-import { Table, Button, Menu, Icon, Form, Modal } from 'semantic-ui-react';
+import {
+  Table,
+  Button,
+  Menu,
+  Icon,
+  Form,
+  Modal,
+  Label,
+  Grid,
+  Image,
+  Card,
+  Statistic,
+} from 'semantic-ui-react';
 import IfAdmin from '../../components/auth/if-admin';
 import TextInput from '../../components/forms/text-input';
 import Collection from '../../components/forms/collection';
 import { useRepositoryServices } from '../../data-access/context';
 import { useInputBinding, useTransaction } from '../../hooks/forms';
 import RepositoryServices from '../../data-access/repository-services';
+
+const LazyRatingChart = React.lazy(() => import('./rating-chart'));
 
 interface PlayerDetailsParams {
   id: string;
@@ -149,7 +164,9 @@ export const PlayerDetails = (): ReactElement | null => {
 
   useEffect(() => {
     const doWork = async () => {
-      const profiles = await services?.profiles.get(parseInt(id, 10));
+      const profiles = await services?.profiles.get(parseInt(id, 10), {
+        include: ['aliases'],
+      });
 
       setResult(profiles);
     };
@@ -161,7 +178,57 @@ export const PlayerDetails = (): ReactElement | null => {
     return null;
   }
 
-  return <h1>{`${result?.firstName} ${result?.lastName}`}</h1>;
+  return (
+    <Grid>
+      <Grid.Row>
+        <Grid.Column width="4">
+          <Card>
+            <Label color="red" ribbon style={{ left: '-1rem' }}>
+              3rd Place
+            </Label>
+            <Image src="http://placekitten.com/300/300" wrapped ui={false} />
+            <Card.Content>
+              <Card.Header>{`${result.firstName} ${result.lastName}`}</Card.Header>
+              <Card.Meta>Joined in 2021</Card.Meta>
+              <Card.Description>
+                Lorem Ipsum or something, idk man.
+              </Card.Description>
+            </Card.Content>
+            <Card.Content extra>
+              {result.aliases.mapReact(alias => (
+                <Label key={alias.id} as="a" tag>
+                  {alias.data.value}
+                </Label>
+              ))}
+            </Card.Content>
+          </Card>
+        </Grid.Column>
+        <Grid.Column width="12">
+          <Statistic.Group>
+            <Statistic>
+              <Statistic.Value>{result.currentRating}</Statistic.Value>
+              <Statistic.Label>Current Rating</Statistic.Label>
+            </Statistic>
+            <Statistic>
+              <Statistic.Value>230</Statistic.Value>
+              <Statistic.Label>Rounds Played</Statistic.Label>
+            </Statistic>
+            <Statistic>
+              <Statistic.Value>-4</Statistic.Value>
+              <Statistic.Label>Best Round (singles)</Statistic.Label>
+            </Statistic>
+            <Statistic>
+              <Statistic.Value>-12</Statistic.Value>
+              <Statistic.Label>Best Round (doubles)</Statistic.Label>
+            </Statistic>
+          </Statistic.Group>
+          <Suspense fallback={<div>Loading...</div>}>
+            <LazyRatingChart />
+          </Suspense>
+        </Grid.Column>
+      </Grid.Row>
+    </Grid>
+  );
 };
 
 export const AliasFormRow = (props: any): ReactElement => {

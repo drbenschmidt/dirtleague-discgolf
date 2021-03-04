@@ -112,7 +112,7 @@ class ApiFetch {
     url = '',
     data: DirtLeagueModel<unknown>,
     queryParams = {}
-  ): Promise<TResponse> => {
+  ): Promise<TResponse | null> => {
     const response = await fetch(
       buildUrl(this.baseUrl, url, queryParams),
       buildRequestOptions(this.jwt, {
@@ -121,7 +121,13 @@ class ApiFetch {
       })
     );
 
-    return response.json();
+    const length = response.headers.get('Content-Length');
+
+    if (length && parseInt(length, 10) > 0) {
+      return response.json();
+    }
+
+    return null;
   };
 }
 
