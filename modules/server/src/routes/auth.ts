@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { randomInt, sleep } from '@dirtleague/common';
 import { authenticate } from '../auth/handler';
 import corsHandler from '../http/cors-handler';
-import RepositoryServices from '../data-access/repositories';
+import RepositoryServices from '../data-access/repository-services';
 
 interface RequestWithToken extends Request {
   token: string;

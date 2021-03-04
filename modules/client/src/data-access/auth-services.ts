@@ -1,13 +1,26 @@
+/* eslint-disable max-classes-per-file */
+
 import { UserModel } from '@dirtleague/common';
+import DirtLeagueModel from '@dirtleague/common/src/model/dl-model';
 import type ApiFetch from './api-fetch';
 
 export interface AuthServicesProps {
   api: ApiFetch;
 }
 
-export interface AuthRequest {
-  email: string;
-  password: string;
+export interface AuthRequestAttributes {
+  email?: string;
+  password?: string;
+}
+
+export class AuthRequest extends DirtLeagueModel<AuthRequestAttributes> {
+  get email(): string {
+    return this.attributes.email;
+  }
+
+  get password(): string {
+    return this.attributes.password;
+  }
 }
 
 export interface AuthResponse {

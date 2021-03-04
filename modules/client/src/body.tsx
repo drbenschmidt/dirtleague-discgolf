@@ -54,7 +54,7 @@ export const Navigation = (props: any): ReactElement => {
       <Segment style={{ padding: '2em 0em' }} vertical>
         <Grid container stackable verticalAlign="middle">
           <Grid.Row>
-            <Grid.Column width={12}>{children}</Grid.Column>
+            <Grid.Column width={16}>{children}</Grid.Column>
           </Grid.Row>
         </Grid>
       </Segment>
