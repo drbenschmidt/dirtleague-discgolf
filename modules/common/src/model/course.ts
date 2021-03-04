@@ -17,6 +17,7 @@ export default class CourseModel
   implements Cloneable<CourseModel> {
   defaults = {
     name: '',
+    courseLayouts: [] as CourseLayoutAttributes[],
   };
 
   get id(): number {
