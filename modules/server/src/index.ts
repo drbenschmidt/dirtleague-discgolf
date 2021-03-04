@@ -1,4 +1,5 @@
 import express from 'express';
+import morgan from 'morgan';
 import { applyToken } from './auth/handler';
 import RepositoryServices from './data-access/repository-services';
 import buildUsersRoute from './routes/users';
@@ -20,6 +21,9 @@ app.use(genericErrorHandler);
 
 // For now, just tell express that any OPTIONS request should follow the same CORS rules.
 app.options('*', corsHandler);
+
+// TODO: Switch this between dev/prod.
+app.use(morgan('dev'));
 
 // Add the routers for each area.
 app.use('/users', buildUsersRoute(services));
