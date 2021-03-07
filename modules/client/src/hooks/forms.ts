@@ -1,4 +1,4 @@
-import { useRef, useCallback, useMemo, ChangeEvent } from 'react';
+import React, { useRef, useCallback, useMemo, ChangeEvent } from 'react';
 import { InputOnChangeData } from 'semantic-ui-react';
 import { Cloneable, deepClone } from '@dirtleague/common';
 
@@ -46,6 +46,29 @@ export const useInputBinding = <TModel extends Record<string, any> | undefined>(
 
   const onChange = useCallback(
     (_event, { value }) => {
+      // TODO: Figure out how to get TS to like this.
+      // eslint-disable-next-line no-param-reassign
+      (modelRef.current as any)[propName] = value;
+    },
+    [modelRef, propName]
+  );
+
+  return {
+    onChange,
+    value: originalValue,
+  };
+};
+
+export const useSelectBinding = <
+  TModel extends Record<string, any> | undefined
+>(
+  modelRef: React.RefObject<TModel>,
+  propName: string
+): InputBinding => {
+  const originalValue = (modelRef.current as any)[propName];
+
+  const onChange = useCallback(
+    (_event, value) => {
       // TODO: Figure out how to get TS to like this.
       // eslint-disable-next-line no-param-reassign
       (modelRef.current as any)[propName] = value;

@@ -14,16 +14,22 @@ function isIterable(obj: any) {
   return typeof obj[Symbol.iterator] === 'function';
 }
 
+let cidCounter = 0;
+
 class DirtLeagueModel<TAttributes> {
   attributes: TAttributes | Record<string, any> = {};
 
   defaults: TAttributes | Record<string, any> = {};
+
+  cid = 0;
 
   constructor(obj: Record<string, any> = {}) {
     this.attributes = {
       ...this.defaults,
       ...obj,
     };
+
+    this.cid = ++cidCounter;
   }
 
   get<T>(key: string): T {
