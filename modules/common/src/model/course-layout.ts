@@ -5,8 +5,14 @@ import LinkedList from '../collections/linkedList';
 import DirtLeagueModel from './dl-model';
 import { CourseHoleModel } from '..';
 
+const filledArray = (start: number, size: number): number[] => {
+  return new Array(size).fill(true).map((v, index) => start + index);
+};
+
 export interface CourseLayoutAttributes {
   id?: number;
+
+  courseId?: number;
 
   name?: string;
 
@@ -17,7 +23,7 @@ export default class CourseLayoutModel
   extends DirtLeagueModel<CourseLayoutAttributes>
   implements Cloneable<CourseLayoutModel> {
   defaults = {
-    name: '',
+    name: 'Default Layout',
     holes: [] as CourseHoleAttributes[],
   };
 
@@ -27,6 +33,14 @@ export default class CourseLayoutModel
 
   set id(value: number) {
     this.attributes.id = value;
+  }
+
+  get courseId(): number {
+    return this.attributes.courseId;
+  }
+
+  set courseId(value: number) {
+    this.attributes.courseId = value;
   }
 
   get name(): string {
@@ -41,7 +55,7 @@ export default class CourseLayoutModel
   get holes(): LinkedList<CourseHoleModel> {
     return new LinkedList<CourseHoleModel>(
       this.attributes?.holes?.map(
-        (v: CourseHoleAttributes) => new CourseLayoutModel(v)
+        (v: CourseHoleAttributes) => new CourseHoleModel(v)
       )
     );
   }
@@ -50,5 +64,14 @@ export default class CourseLayoutModel
     const obj = this.toJson();
 
     return new CourseLayoutModel(obj);
+  }
+
+  static createDefault(): CourseLayoutModel {
+    return new CourseLayoutModel({
+      name: 'New Layout',
+      holes: filledArray(1, 18).map(val => ({
+        number: val,
+      })),
+    });
   }
 }

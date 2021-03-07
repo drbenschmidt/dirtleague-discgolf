@@ -1,4 +1,4 @@
-import { PlayerModel } from '@dirtleague/common';
+import { CourseModel } from '@dirtleague/common';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { Link, useRouteMatch } from 'react-router-dom';
 import { Table, Button, Menu, Icon, Modal } from 'semantic-ui-react';
@@ -6,14 +6,14 @@ import IfAdmin from '../../components/auth/if-admin';
 import RepositoryServices from '../../data-access/repository-services';
 import { useRepositoryServices } from '../../data-access/context';
 
-interface DeletePlayerButtonProps {
-  player: PlayerModel;
+interface DeleteCourseButtonProps {
+  course: CourseModel;
   services: RepositoryServices | null;
   onDelete: () => void;
 }
 
-const DeletePlayerButton = (props: DeletePlayerButtonProps): ReactElement => {
-  const { player, services, onDelete } = props;
+const DeletePlayerButton = (props: DeleteCourseButtonProps): ReactElement => {
+  const { course, services, onDelete } = props;
   const [isOpen, setIsOpen] = useState(false);
   const [isInFlight, setIsInFlight] = useState(false);
 
@@ -25,10 +25,10 @@ const DeletePlayerButton = (props: DeletePlayerButtonProps): ReactElement => {
   );
 
   const onYesClick = useCallback(() => {
-    const deletePlayer = async () => {
+    const deleteEntity = async () => {
       try {
         setIsInFlight(true);
-        await services?.players.delete(player.id);
+        await services?.courses.delete(course.id);
         setIsOpen(false);
         onDelete();
       } finally {
@@ -36,8 +36,8 @@ const DeletePlayerButton = (props: DeletePlayerButtonProps): ReactElement => {
       }
     };
 
-    deletePlayer();
-  }, [services, player, onDelete]);
+    deleteEntity();
+  }, [services, course, onDelete]);
 
   return (
     <Modal
@@ -46,9 +46,9 @@ const DeletePlayerButton = (props: DeletePlayerButtonProps): ReactElement => {
       onClose={() => setIsOpen(false)}
       trigger={button}
     >
-      <Modal.Header>{`Delete ${player.firstName} ${player.lastName}`}</Modal.Header>
+      <Modal.Header>{`Delete ${course.name}`}</Modal.Header>
       <Modal.Content>
-        <p>Are you sure you want to delete this player?</p>
+        <p>Are you sure you want to delete this course?</p>
       </Modal.Content>
       <Modal.Actions>
         <Button disabled={isInFlight} onClick={() => setIsOpen(false)} negative>
@@ -62,10 +62,10 @@ const DeletePlayerButton = (props: DeletePlayerButtonProps): ReactElement => {
   );
 };
 
-const PlayerList = (): ReactElement => {
+const CourseList = (): ReactElement => {
   const { url } = useRouteMatch();
   const services = useRepositoryServices();
-  const [result, setResult] = useState<PlayerModel[]>();
+  const [result, setResult] = useState<CourseModel[]>();
   const [dummy, setDummy] = useState(false);
 
   const onDelete = useCallback(() => {
@@ -77,10 +77,10 @@ const PlayerList = (): ReactElement => {
     let isMounted = true;
 
     const doWork = async () => {
-      const players = await services?.players.getAll();
+      const entities = await services?.courses.getAll();
 
       if (isMounted) {
-        setResult(players);
+        setResult(entities);
       }
     };
 
@@ -89,39 +89,35 @@ const PlayerList = (): ReactElement => {
     return () => {
       isMounted = false;
     };
-  }, [services?.players, dummy]);
+  }, [services?.courses, dummy]);
 
   return (
     <>
-      <h1>Players</h1>
+      <h1>Courses</h1>
       <Table celled>
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell>First</Table.HeaderCell>
-            <Table.HeaderCell>Last</Table.HeaderCell>
-            <Table.HeaderCell>Current Rating</Table.HeaderCell>
+            <Table.HeaderCell>Name</Table.HeaderCell>
             <Table.HeaderCell textAlign="right">Actions</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
 
         <Table.Body>
-          {result?.map(player => (
-            <Table.Row key={player.id}>
-              <Table.Cell>{player.firstName}</Table.Cell>
-              <Table.Cell>{player.lastName}</Table.Cell>
-              <Table.Cell>{player.currentRating}</Table.Cell>
+          {result?.map(course => (
+            <Table.Row key={course.id}>
+              <Table.Cell>{course.name}</Table.Cell>
               <Table.Cell textAlign="right">
-                <Button as={Link} to={`${url}/${player.id}`} size="mini">
+                <Button as={Link} to={`${url}/${course.id}`} size="mini">
                   <Icon name="address book" />
                   View
                 </Button>
                 <IfAdmin>
-                  <Button as={Link} to={`${url}/edit/${player.id}`} size="mini">
+                  <Button as={Link} to={`${url}/edit/${course.id}`} size="mini">
                     <Icon name="edit" />
                     Edit
                   </Button>
                   <DeletePlayerButton
-                    player={player}
+                    course={course}
                     services={services}
                     onDelete={onDelete}
                   />
@@ -137,7 +133,7 @@ const PlayerList = (): ReactElement => {
               <Menu floated="right">
                 <IfAdmin>
                   <Menu.Item as={Link} to={`${url}/new`}>
-                    <Icon name="add circle" /> New Player
+                    <Icon name="add circle" /> New Course
                   </Menu.Item>
                 </IfAdmin>
               </Menu>
@@ -149,4 +145,4 @@ const PlayerList = (): ReactElement => {
   );
 };
 
-export default PlayerList;
+export default CourseList;

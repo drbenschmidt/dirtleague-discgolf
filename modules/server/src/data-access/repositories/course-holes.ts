@@ -74,6 +74,13 @@ class CourseHolesRepository implements Repository<DbCourseHole> {
 
     return entities;
   }
+
+  /* async deleteForCourseId(id: number): Promise<void> {
+    await this.db.query(sql`
+      DELETE FROM courseHoles
+      WHERE 
+    `);
+  } */
 }
 
 export default CourseHolesRepository;

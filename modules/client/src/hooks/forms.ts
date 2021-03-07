@@ -1,4 +1,4 @@
-import { useRef, useCallback, ChangeEvent } from 'react';
+import { useRef, useCallback, useMemo, ChangeEvent } from 'react';
 import { InputOnChangeData } from 'semantic-ui-react';
 import { Cloneable, deepClone } from '@dirtleague/common';
 
@@ -22,7 +22,9 @@ function orDefault<T>(obj: T) {
 export const useTransaction = <TModel extends Cloneable<TModel>>(
   original: TModel | undefined
 ): Transaction<TModel> => {
-  const clone = original?.clone() ?? deepClone(orDefault(original));
+  const clone = useMemo(() => {
+    return original?.clone() ?? deepClone(orDefault(original));
+  }, [original]);
   const model = useRef(clone);
   const revert = () => {
     model.current = deepClone(original);

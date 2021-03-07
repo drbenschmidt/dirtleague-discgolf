@@ -9,7 +9,7 @@ export interface CourseAttributes {
 
   name?: string;
 
-  courseLayouts?: CourseLayoutAttributes[];
+  layouts?: CourseLayoutAttributes[];
 }
 
 export default class CourseModel
@@ -17,7 +17,7 @@ export default class CourseModel
   implements Cloneable<CourseModel> {
   defaults = {
     name: '',
-    courseLayouts: [] as CourseLayoutAttributes[],
+    layouts: [] as CourseLayoutAttributes[],
   };
 
   get id(): number {
@@ -37,9 +37,9 @@ export default class CourseModel
   }
 
   @Memoize()
-  get courseLayouts(): LinkedList<CourseLayoutModel> {
+  get layouts(): LinkedList<CourseLayoutModel> {
     return new LinkedList<CourseLayoutModel>(
-      this.attributes?.courseLayouts?.map(
+      this.attributes?.layouts?.map(
         (v: CourseLayoutAttributes) => new CourseLayoutModel(v)
       )
     );

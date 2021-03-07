@@ -4,6 +4,8 @@ import DirtLeagueModel from './dl-model';
 export interface CourseHoleAttributes {
   id?: number;
 
+  courseLayoutId?: number;
+
   number?: number;
 
   distance?: number;
@@ -14,12 +16,18 @@ export interface CourseHoleAttributes {
 export default class CourseHoleModel
   extends DirtLeagueModel<CourseHoleAttributes>
   implements Cloneable<CourseHoleModel> {
-  defaults = {
-    name: '',
+  static defaults = {
     number: 0,
     distance: 0,
     par: 3,
   };
+
+  constructor(obj: Record<string, any>) {
+    super({
+      ...CourseHoleModel.defaults,
+      ...obj,
+    });
+  }
 
   get id(): number {
     return this.attributes.id;
@@ -27,6 +35,14 @@ export default class CourseHoleModel
 
   set id(value: number) {
     this.attributes.id = value;
+  }
+
+  get courseLayoutId(): number {
+    return this.attributes.courseLayoutId;
+  }
+
+  set courseLayoutId(value: number) {
+    this.attributes.courseLayoutId = value;
   }
 
   get number(): number {

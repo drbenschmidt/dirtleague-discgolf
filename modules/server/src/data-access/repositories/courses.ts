@@ -38,8 +38,11 @@ class CoursesRepository implements Repository<DbCourse> {
 
   async delete(id: number): Promise<void> {
     await this.db.query(sql`
-      DELETE FROM courses
-      WHERE id=${id}
+      DELETE courses, courseLayouts, courseHoles
+      FROM courses
+      INNER JOIN courseLayouts ON courses.id = courseLayouts.courseId
+      INNER JOIN courseHoles ON courseLayouts.id = courseHoles.courseLayoutId
+      WHERE courses.id=${id}
     `);
   }
 

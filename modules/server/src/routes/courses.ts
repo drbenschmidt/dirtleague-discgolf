@@ -6,13 +6,15 @@ import {
   intersect,
   except,
   getById,
+  CourseModel,
 } from '@dirtleague/common';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
-import { DbAlias } from '../data-access/repositories/aliases';
 import RepositoryServices from '../data-access/repository-services';
 import corsHandler from '../http/cors-handler';
+import { DbCourseLayout } from '../data-access/repositories/course-layouts';
+import { DbCourseHole } from '../data-access/repositories/course-holes';
 
 const buildRoute = (services: RepositoryServices): Router => {
   const router = express.Router();
@@ -21,7 +23,7 @@ const buildRoute = (services: RepositoryServices): Router => {
     '/',
     corsHandler,
     withTryCatch(async (req, res) => {
-      const users = await services.profiles.getAll();
+      const users = await services.courses.getAll();
 
       res.json(users);
     })
@@ -33,7 +35,7 @@ const buildRoute = (services: RepositoryServices): Router => {
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const { include } = req.query;
-      const entity = await services.profiles.get(parseInt(id, 10));
+      const entity = await services.courses.get(parseInt(id, 10));
 
       if (!entity) {
         res.status(404).json({ error: 'Entity Not Found' });
@@ -41,9 +43,20 @@ const buildRoute = (services: RepositoryServices): Router => {
 
       // TODO: parse it and check for entity types.
       if (include && entity) {
-        const aliases = await services.aliases.getForUserId(parseInt(id, 10));
+        const courseLayouts = await services.courseLayouts.getAllForCourse(
+          parseInt(id, 10)
+        );
 
-        (entity as any).aliases = aliases;
+        (entity as any).layouts = courseLayouts;
+
+        await asyncForEach(courseLayouts, async courseLayout => {
+          const holes = await services.courseHoles.getAllForCourseLayout(
+            courseLayout.id
+          );
+
+          // eslint-disable-next-line no-param-reassign
+          (courseLayout as any).holes = holes;
+        });
       }
 
       res.json(entity);
@@ -55,26 +68,36 @@ const buildRoute = (services: RepositoryServices): Router => {
     corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
-      const model = new PlayerModel(req.body);
-      const newId = await services.profiles.create(model);
+      const model = new CourseModel(req.body);
+      const newId = await services.courses.create(model);
 
       model.id = newId;
 
-      if (model.aliases) {
+      if (model.layouts) {
         // Create each alias if included.
-        await model.aliases.asyncForEach(async alias => {
+        await model.layouts.asyncForEach(async layout => {
           // Make sure the aliases relate to this player.
           // eslint-disable-next-line no-param-reassign
-          alias.playerId = newId;
+          layout.courseId = newId;
 
-          const aliasJson = alias.toJson();
+          const layoutJson = layout.toJson();
 
-          const newAliasId = await services.aliases.create(
-            aliasJson as DbAlias
+          const newLayoutId = await services.courseLayouts.create(
+            layoutJson as DbCourseLayout
           );
 
           // eslint-disable-next-line no-param-reassign
-          alias.id = newAliasId;
+          layout.id = newLayoutId;
+          layoutJson.id = newLayoutId;
+
+          await layout.holes.asyncForEach(async hole => {
+            // eslint-disable-next-line no-param-reassign
+            hole.courseLayoutId = newLayoutId;
+
+            const holeJson = hole.toJson();
+
+            await services.courseHoles.create(holeJson as DbCourseHole);
+          });
         });
       }
 
@@ -88,8 +111,11 @@ const buildRoute = (services: RepositoryServices): Router => {
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const { id } = req.params;
+      const entityId = parseInt(id, 10);
 
-      await services.profiles.delete(parseInt(id, 10));
+      // await services.courseHoles.deleteForCourseId(entityId);
+      // await services.courseLayouts.deleteForCourseId(entityId);
+      await services.courses.delete(entityId);
 
       res.json({ success: true });
     })
