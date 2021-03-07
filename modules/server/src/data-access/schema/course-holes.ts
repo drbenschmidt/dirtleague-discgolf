@@ -14,3 +14,19 @@ export const createCourseHolesTable = async (
       PRIMARY KEY (id));
   `);
 };
+
+export const alterCourseHolesTable = async (
+  db: ConnectionPool
+): Promise<void> => {
+  await db.query(sql`
+    ALTER TABLE courseHoles 
+      ADD INDEX fk_courseLayout_idx (courseLayoutId ASC);
+      ;
+    ALTER TABLE courseHoles 
+      ADD CONSTRAINT fk_courseLayout
+        FOREIGN KEY (courseLayoutId)
+        REFERENCES courseLayouts (id)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION;
+  `);
+};

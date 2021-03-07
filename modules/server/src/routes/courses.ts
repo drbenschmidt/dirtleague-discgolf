@@ -82,8 +82,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
           const layoutJson = layout.toJson();
 
-          console.log('layout', layoutJson);
-
           const newLayoutId = await services.courseLayouts.create(
             layoutJson as DbCourseLayout
           );
@@ -97,8 +95,6 @@ const buildRoute = (services: RepositoryServices): Router => {
             hole.courseLayoutId = newLayoutId;
 
             const holeJson = hole.toJson();
-
-            console.log('hole', holeJson);
 
             await services.courseHoles.create(holeJson as DbCourseHole);
           });

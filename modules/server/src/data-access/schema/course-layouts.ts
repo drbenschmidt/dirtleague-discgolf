@@ -12,3 +12,19 @@ export const createCourseLayoutsTable = async (
       PRIMARY KEY (id));
   `);
 };
+
+export const alterCourseLayoutsTable = async (
+  db: ConnectionPool
+): Promise<void> => {
+  await db.query(sql`
+    ALTER TABLE courseLayouts 
+      ADD INDEX fk_courses_idx (courseId ASC);
+      ;
+    ALTER TABLE courseLayouts 
+      ADD CONSTRAINT fk_courses
+        FOREIGN KEY (courseId)
+        REFERENCES courses (id)
+        ON DELETE CASCADE
+        ON UPDATE NO ACTION;
+  `);
+};

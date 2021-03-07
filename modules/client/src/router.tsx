@@ -7,7 +7,7 @@ import PlayerList from './routes/players/list';
 import PlayerDetails from './routes/players/details';
 import CourseForm from './routes/courses/form';
 import CourseList from './routes/courses/list';
-import { CourseDetails } from './routes/courses/index';
+import CourseDetails from './routes/courses/details';
 import { EventList, EventDetails } from './routes/events/index';
 import { SeasonList, SeasonDetails } from './routes/seasons/index';
 
