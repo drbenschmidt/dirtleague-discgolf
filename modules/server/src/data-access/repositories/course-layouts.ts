@@ -5,6 +5,7 @@ import { Repository } from '../repository';
 export interface DbCourseLayout {
   id?: number;
   name: string;
+  courseId: number;
 }
 
 class CourseLayoutsRepository implements Repository<DbCourseLayout> {
@@ -16,8 +17,8 @@ class CourseLayoutsRepository implements Repository<DbCourseLayout> {
 
   async create(model: DbCourseLayout): Promise<number> {
     const [result] = await this.db.query(sql`
-      INSERT INTO courseLayouts (name)
-      VALUES (${model.name});
+      INSERT INTO courseLayouts (name, courseId)
+      VALUES (${model.name}, ${model.courseId});
 
       SELECT LAST_INSERT_ID();
     `);

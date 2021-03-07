@@ -7,6 +7,7 @@ export interface DbCourseHole {
   number: number;
   distance: number;
   par: number;
+  courseLayoutId: number;
 }
 
 class CourseHolesRepository implements Repository<DbCourseHole> {
@@ -18,8 +19,8 @@ class CourseHolesRepository implements Repository<DbCourseHole> {
 
   async create(model: DbCourseHole): Promise<number> {
     const [result] = await this.db.query(sql`
-      INSERT INTO courseHoles (number, distance, par)
-      VALUES (${model.number}, ${model.distance}, ${model.par});
+      INSERT INTO courseHoles (number, distance, par, courseLayoutId)
+      VALUES (${model.number}, ${model.distance}, ${model.par}, ${model.courseLayoutId});
 
       SELECT LAST_INSERT_ID();
     `);

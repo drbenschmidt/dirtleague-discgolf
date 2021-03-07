@@ -1,9 +1,8 @@
 import { Memoize } from 'typescript-memoize';
 import { LinkedList } from 'linked-list-typescript';
 import Cloneable from '../interfaces/cloneable';
-import { CourseHoleAttributes } from './course-hole';
 import DirtLeagueModel from './dl-model';
-import { CourseHoleModel } from '..';
+import CourseHoleModel, { CourseHoleAttributes } from './course-hole';
 
 const filledArray = (start: number, size: number): number[] => {
   return new Array(size).fill(true).map((v, index) => start + index);
