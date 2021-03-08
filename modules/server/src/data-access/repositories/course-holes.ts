@@ -71,6 +71,7 @@ class CourseHolesRepository implements Repository<DbCourseHole> {
     const entities = await this.db.query(sql`
       SELECT * FROM courseHoles
       WHERE courseLayoutId=${id}
+      ORDER BY number ASC
     `);
 
     return entities;
@@ -78,29 +79,3 @@ class CourseHolesRepository implements Repository<DbCourseHole> {
 }
 
 export default CourseHolesRepository;
-
-/**
- *
-ALTER TABLE `test-db`.`courseLayouts` 
-ADD INDEX `fk_courses_idx` (`courseId` ASC);
-;
-ALTER TABLE `test-db`.`courseLayouts` 
-ADD CONSTRAINT `fk_courses`
-  FOREIGN KEY (`courseId`)
-  REFERENCES `test-db`.`courses` (`id`)
-  ON DELETE CASCADE
-  ON UPDATE NO ACTION;
- */
-
-/**
- * ALTER TABLE `test-db`.`courseHoles` 
-ADD INDEX `fk_courseLayout_idx` (`courseLayoutId` ASC);
-;
-ALTER TABLE `test-db`.`courseHoles` 
-ADD CONSTRAINT `fk_courseLayout`
-  FOREIGN KEY (`courseLayoutId`)
-  REFERENCES `test-db`.`courseLayouts` (`id`)
-  ON DELETE CASCADE
-  ON UPDATE NO ACTION;
-
- */

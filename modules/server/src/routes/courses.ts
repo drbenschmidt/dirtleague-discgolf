@@ -37,6 +37,8 @@ const buildRoute = (services: RepositoryServices): Router => {
       const { include } = req.query;
       const entity = await services.courses.get(parseInt(id, 10));
 
+      console.log(include);
+
       if (!entity) {
         res.status(404).json({ error: 'Entity Not Found' });
       }
@@ -113,8 +115,6 @@ const buildRoute = (services: RepositoryServices): Router => {
       const { id } = req.params;
       const entityId = parseInt(id, 10);
 
-      // await services.courseHoles.deleteForCourseId(entityId);
-      // await services.courseLayouts.deleteForCourseId(entityId);
       await services.courses.delete(entityId);
 
       res.json({ success: true });
@@ -127,36 +127,59 @@ const buildRoute = (services: RepositoryServices): Router => {
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       // TODO: Technically, this should be a transaction.
-      const body = req.body as PlayerModel;
+      const body = req.body as CourseModel;
 
-      await services.profiles.update(body);
+      await services.courses.update(body);
 
-      if (body.aliases) {
-        const requestAliases = Array.from(body.aliases);
-        const dbAliases = await services.aliases.getForUserId(body.id);
-        const dbAliasIds = dbAliases.map(a => a.id);
-        const requestAliasIds = requestAliases.map(a => a.id);
-        const aliasesToCreate = requestAliases.filter(a => isNil(a.id));
-        const aliasesToUpdate = intersect(dbAliasIds, requestAliasIds);
-        const aliasesToDelete = except(dbAliasIds, requestAliasIds);
+      if (body.layouts) {
+        const requestLayouts = Array.from(body.layouts);
+        const dbLayouts = await services.courseLayouts.getAllForCourse(body.id);
+        const dbLayoutIds = dbLayouts.map(a => a.id);
+        const requestLayoutIds = requestLayouts.map(a => a.id);
+        const layoutsToCreate = requestLayouts.filter(a => isNil(a.id));
+        const layoutsToUpdate = intersect(dbLayoutIds, requestLayoutIds);
+        const layoutsToDelete = except(dbLayoutIds, requestLayoutIds);
 
-        await asyncForEach(aliasesToCreate, async alias => {
+        await asyncForEach(layoutsToCreate, async entity => {
           // eslint-disable-next-line no-param-reassign
-          alias.playerId = body.id;
+          entity.courseId = body.id;
+          const layoutJson = entity.toJson();
 
-          await services.aliases.create(alias);
+          const newLayoutId = await services.courseLayouts.create(
+            layoutJson as DbCourseLayout
+          );
+
+          // eslint-disable-next-line no-param-reassign
+          entity.id = newLayoutId;
+          layoutJson.id = newLayoutId;
+
+          await asyncForEach(entity.holes.toArray(), async hole => {
+            // eslint-disable-next-line no-param-reassign
+            hole.courseLayoutId = newLayoutId;
+
+            const holeJson = hole.toJson();
+
+            await services.courseHoles.create(holeJson as DbCourseHole);
+          });
         });
 
         await asyncForEach(
-          getById(requestAliases, aliasesToUpdate),
-          async alias => {
-            await services.aliases.update(alias);
+          getById(requestLayouts, layoutsToUpdate),
+          async entity => {
+            await services.courseLayouts.update(entity);
+
+            // TODO: Should we allow them to update the lengths/par?
+            // That would affect old records.
+            // Might have to archive them or have revisions. Ugh.
           }
         );
 
-        await asyncForEach(getById(dbAliases, aliasesToDelete), async alias => {
-          await services.aliases.delete(alias.id);
-        });
+        await asyncForEach(
+          getById(dbLayouts, layoutsToDelete),
+          async entity => {
+            await services.courseLayouts.delete(entity.id);
+          }
+        );
       }
 
       res.json(null);

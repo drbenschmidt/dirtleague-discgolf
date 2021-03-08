@@ -23,6 +23,7 @@ const Router = (): ReactElement => {
           <Route exact path="/players/:id" component={PlayerDetails} />
           <Route exact path="/courses" component={CourseList} />
           <Route exact path="/courses/new" component={CourseForm} />
+          <Route exact path="/courses/edit/:id" component={CourseForm} />
           <Route exact path="/courses/:id" component={CourseDetails} />
           <Route exact path="/events" component={EventList} />
           <Route exact path="/events/:id" component={EventDetails} />
