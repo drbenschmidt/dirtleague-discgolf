@@ -166,6 +166,9 @@ const buildRoute = (services: RepositoryServices): Router => {
           );
 
           await asyncForEach(holesToCreate, async hole => {
+            // eslint-disable-next-line no-param-reassign
+            hole.courseLayoutId = entity.id;
+
             await services.courseHoles.create(hole);
           });
 
