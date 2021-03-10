@@ -37,8 +37,6 @@ const buildRoute = (services: RepositoryServices): Router => {
       const { include } = req.query;
       const entity = await services.courses.get(parseInt(id, 10));
 
-      console.log(include);
-
       if (!entity) {
         res.status(404).json({ error: 'Entity Not Found' });
       }

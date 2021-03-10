@@ -13,6 +13,8 @@ export interface CourseLayoutAttributes {
 
   courseId?: number;
 
+  dgcrSse?: number;
+
   name?: string;
 
   holes?: CourseHoleAttributes[];
@@ -40,6 +42,14 @@ export default class CourseLayoutModel
 
   set courseId(value: number) {
     this.attributes.courseId = value;
+  }
+
+  get dgcrSse(): number {
+    return this.attributes.dgcrSse;
+  }
+
+  set dgcrSse(value: number) {
+    this.attributes.dgcrSse = value;
   }
 
   get name(): string {

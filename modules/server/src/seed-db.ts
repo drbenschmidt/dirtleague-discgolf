@@ -5,8 +5,14 @@ import { createUsersTable } from './data-access/schema/users';
 import { createPlayersTable } from './data-access/schema/players';
 import { createAliasesTable } from './data-access/schema/aliases';
 import { createCoursesTable } from './data-access/schema/courses';
-import { createCourseLayoutsTable } from './data-access/schema/course-layouts';
-import { createCourseHolesTable } from './data-access/schema/course-holes';
+import {
+  createCourseLayoutsTable,
+  alterCourseLayoutsTable,
+} from './data-access/schema/course-layouts';
+import {
+  createCourseHolesTable,
+  alterCourseHolesTable,
+} from './data-access/schema/course-holes';
 
 const services = new RepositoryServices();
 
@@ -32,6 +38,9 @@ const work = async () => {
   await createCoursesTable(db);
   await createCourseLayoutsTable(db);
   await createCourseHolesTable(db);
+
+  await alterCourseLayoutsTable(db);
+  await alterCourseHolesTable(db);
 
   await insertUser('ben@dirtleague.org', 'foobar', true);
   await insertUser('kyle@dirtleague.org', 'foobar');

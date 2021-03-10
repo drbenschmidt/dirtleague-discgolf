@@ -57,6 +57,7 @@ const CourseLayoutForm = (props: {
   const { model } = props;
   const modelRef = useRef(model);
   const nameBindings = useInputBinding(modelRef, 'name');
+  const dgcrSseBindings = useInputBinding(modelRef, 'dgcrSse');
   const [holesArray, setHolesArray] = useState(Array.from(model.holes));
   const [holesArrayLength, setHolesArrayLength] = useState(model.holes.length);
   const onCountChange = useCallback(
@@ -102,6 +103,7 @@ const CourseLayoutForm = (props: {
               value={holesArrayLength}
               label="Length"
             />
+            <TextInput {...dgcrSseBindings} label="DGCR SSE" />
           </Form.Group>
         </Grid.Column>
       </Grid.Row>
