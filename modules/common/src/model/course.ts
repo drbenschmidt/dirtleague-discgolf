@@ -10,6 +10,8 @@ export interface CourseAttributes {
   name?: string;
 
   layouts?: CourseLayoutAttributes[];
+
+  dgcrSse?: number;
 }
 
 export default class CourseModel
@@ -34,6 +36,14 @@ export default class CourseModel
 
   set name(val: string) {
     this.attributes.name = val;
+  }
+
+  get dgcrSse(): number {
+    return this.attributes.dgcrSse;
+  }
+
+  set dgcrSse(value: number) {
+    this.attributes.dgcrSse = value;
   }
 
   @Memoize()

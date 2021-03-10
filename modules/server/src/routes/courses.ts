@@ -1,13 +1,4 @@
-import {
-  isNil,
-  PlayerModel,
-  asyncForEach,
-  Roles,
-  intersect,
-  except,
-  getById,
-  CourseModel,
-} from '@dirtleague/common';
+import { asyncForEach, Roles, CourseModel } from '@dirtleague/common';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
@@ -15,6 +6,7 @@ import RepositoryServices from '../data-access/repository-services';
 import corsHandler from '../http/cors-handler';
 import { DbCourseLayout } from '../data-access/repositories/course-layouts';
 import { DbCourseHole } from '../data-access/repositories/course-holes';
+import getCrud from '../utils/getCrud';
 
 const buildRoute = (services: RepositoryServices): Router => {
   const router = express.Router();
@@ -132,11 +124,11 @@ const buildRoute = (services: RepositoryServices): Router => {
       if (body.layouts) {
         const requestLayouts = Array.from(body.layouts);
         const dbLayouts = await services.courseLayouts.getAllForCourse(body.id);
-        const dbLayoutIds = dbLayouts.map(a => a.id);
-        const requestLayoutIds = requestLayouts.map(a => a.id);
-        const layoutsToCreate = requestLayouts.filter(a => isNil(a.id));
-        const layoutsToUpdate = intersect(dbLayoutIds, requestLayoutIds);
-        const layoutsToDelete = except(dbLayoutIds, requestLayoutIds);
+
+        const [layoutsToCreate, layoutsToUpdate, layoutsToDelete] = getCrud(
+          requestLayouts,
+          dbLayouts
+        );
 
         await asyncForEach(layoutsToCreate, async entity => {
           // eslint-disable-next-line no-param-reassign
@@ -161,23 +153,34 @@ const buildRoute = (services: RepositoryServices): Router => {
           });
         });
 
-        await asyncForEach(
-          getById(requestLayouts, layoutsToUpdate),
-          async entity => {
-            await services.courseLayouts.update(entity);
+        await asyncForEach(layoutsToUpdate, async entity => {
+          await services.courseLayouts.update(entity);
 
-            // TODO: Should we allow them to update the lengths/par?
-            // That would affect old records.
-            // Might have to archive them or have revisions. Ugh.
-          }
-        );
+          const dbHoles = await services.courseHoles.getAllForCourseLayout(
+            entity.id
+          );
 
-        await asyncForEach(
-          getById(dbLayouts, layoutsToDelete),
-          async entity => {
-            await services.courseLayouts.delete(entity.id);
-          }
-        );
+          const [holesToCreate, holesToUpdate, holesToDelete] = getCrud(
+            Array.from(entity.holes),
+            dbHoles
+          );
+
+          await asyncForEach(holesToCreate, async hole => {
+            await services.courseHoles.create(hole);
+          });
+
+          await asyncForEach(holesToUpdate, async hole => {
+            await services.courseHoles.update(hole);
+          });
+
+          await asyncForEach(holesToDelete, async hole => {
+            await services.courseHoles.delete(hole.id);
+          });
+        });
+
+        await asyncForEach(layoutsToDelete, async entity => {
+          await services.courseLayouts.delete(entity.id);
+        });
       }
 
       res.json(null);
