@@ -6,6 +6,7 @@ import buildUsersRoute from './routes/users';
 import buildAuthRoute from './routes/auth';
 import buildProfilesRoute from './routes/players';
 import buildAliasesRoute from './routes/aliases';
+import buildCoursesRoute from './routes/courses';
 import genericErrorHandler from './http/generic-error-handler';
 import corsHandler from './http/cors-handler';
 
@@ -30,6 +31,7 @@ app.use('/users', buildUsersRoute(services));
 app.use('/auth', buildAuthRoute(services));
 app.use('/players', buildProfilesRoute(services));
 app.use('/aliases', buildAliasesRoute(services));
+app.use('/courses', buildCoursesRoute(services));
 
 app.listen(port, async () => {
   console.log(`DirtLeague API listening at http://localhost:${port}`);

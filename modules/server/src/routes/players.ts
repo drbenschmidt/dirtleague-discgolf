@@ -62,7 +62,7 @@ const buildRoute = (services: RepositoryServices): Router => {
 
       if (model.aliases) {
         // Create each alias if included.
-        model.aliases.asyncForEach(async alias => {
+        await model.aliases.asyncForEach(async alias => {
           // Make sure the aliases relate to this player.
           // eslint-disable-next-line no-param-reassign
           alias.playerId = newId;

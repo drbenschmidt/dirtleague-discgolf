@@ -404,6 +404,8 @@ module.exports = function (webpackEnv) {
                     require.resolve('babel-preset-react-app'),
                     {
                       runtime: hasJsxRuntime ? 'automatic' : 'classic',
+                      development: isEnvDevelopment,
+                      importSource: '@welldone-software/why-did-you-render',
                     },
                   ],
                 ],

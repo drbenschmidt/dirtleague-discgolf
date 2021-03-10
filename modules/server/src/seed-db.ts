@@ -1,9 +1,18 @@
 import db from './data-access/database';
-import { createUsersTable } from './data-access/schema/users';
 import RepositoryServices from './data-access/repository-services';
 import hashPassword from './crypto/hash';
+import { createUsersTable } from './data-access/schema/users';
 import { createPlayersTable } from './data-access/schema/players';
 import { createAliasesTable } from './data-access/schema/aliases';
+import { createCoursesTable } from './data-access/schema/courses';
+import {
+  createCourseLayoutsTable,
+  alterCourseLayoutsTable,
+} from './data-access/schema/course-layouts';
+import {
+  createCourseHolesTable,
+  alterCourseHolesTable,
+} from './data-access/schema/course-holes';
 
 const services = new RepositoryServices();
 
@@ -26,6 +35,12 @@ const work = async () => {
   await createUsersTable(db);
   await createPlayersTable(db);
   await createAliasesTable(db);
+  await createCoursesTable(db);
+  await createCourseLayoutsTable(db);
+  await createCourseHolesTable(db);
+
+  await alterCourseLayoutsTable(db);
+  await alterCourseHolesTable(db);
 
   await insertUser('ben@dirtleague.org', 'foobar', true);
   await insertUser('kyle@dirtleague.org', 'foobar');

@@ -9,6 +9,7 @@
     "test": "node scripts/test.js"
   },
   "dependencies": {
+    "@welldone-software/why-did-you-render": "6.1.0",
     "@dirtleague/common": "*",
     "@babel/core": "7.12.3",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",

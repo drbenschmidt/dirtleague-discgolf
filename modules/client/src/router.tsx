@@ -1,11 +1,13 @@
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import { Navigation } from './body';
 import Home from './routes/home/index';
 import PlayerForm from './routes/players/form';
 import PlayerList from './routes/players/list';
 import PlayerDetails from './routes/players/details';
-import { CourseList, CourseDetails } from './routes/courses/index';
+import CourseForm from './routes/courses/form';
+import CourseList from './routes/courses/list';
+import CourseDetails from './routes/courses/details';
 import { EventList, EventDetails } from './routes/events/index';
 import { SeasonList, SeasonDetails } from './routes/seasons/index';
 
@@ -20,6 +22,8 @@ const Router = (): ReactElement => {
           <Route exact path="/players/edit/:id" component={PlayerForm} />
           <Route exact path="/players/:id" component={PlayerDetails} />
           <Route exact path="/courses" component={CourseList} />
+          <Route exact path="/courses/new" component={CourseForm} />
+          <Route exact path="/courses/edit/:id" component={CourseForm} />
           <Route exact path="/courses/:id" component={CourseDetails} />
           <Route exact path="/events" component={EventList} />
           <Route exact path="/events/:id" component={EventDetails} />
