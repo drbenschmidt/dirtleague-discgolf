@@ -67,7 +67,7 @@ const buildRoute = (services: RepositoryServices): Router => {
 
       if (model.layouts) {
         // Create each alias if included.
-        await model.layouts.asyncForEach(async layout => {
+        await asyncForEach(model.layouts.toArray(), async layout => {
           // Make sure the aliases relate to this player.
           // eslint-disable-next-line no-param-reassign
           layout.courseId = newId;

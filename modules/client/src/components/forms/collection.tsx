@@ -1,8 +1,9 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-
 import { ReactElement, useCallback, useState } from 'react';
 import { Table, Menu, Button, Icon } from 'semantic-ui-react';
-import { ListNode, LinkedList, isNil } from '@dirtleague/common';
+import { isNil } from '@dirtleague/common';
+import { LinkedList } from 'linked-list-typescript';
+import DirtLeagueModel from '@dirtleague/common/src/model/dl-model';
 
 interface CollectionProps<TModel> {
   RowComponent: (props: any) => ReactElement;
@@ -12,7 +13,7 @@ interface CollectionProps<TModel> {
   buttonText: string;
 }
 
-function CollectionComponent<TModel>(
+function CollectionComponent<TModel extends DirtLeagueModel<void>>(
   props: CollectionProps<TModel>
 ): ReactElement {
   const { RowComponent, model, propName, label, buttonText } = props;
@@ -30,9 +31,9 @@ function CollectionComponent<TModel>(
   }, [entities]);
 
   const onRemoveClick = useCallback(
-    (obj: ListNode<TModel>) => {
+    (obj: TModel) => {
       return () => {
-        entities.deleteNode(obj);
+        entities.remove(obj);
         setDummy(v => !v);
       };
     },
@@ -46,16 +47,16 @@ function CollectionComponent<TModel>(
       </div>
       <Table>
         <Table.Body>
-          {entities.mapReact(node => (
+          {entities.toArray().map(entity => (
             // eslint-disable-next-line react/no-array-index-key
-            <Table.Row key={`collection_${node.id}`}>
+            <Table.Row key={`collection_${entity.cid}`}>
               <Table.Cell width="14">
-                <RowComponent model={node.data} />
+                <RowComponent model={entity} />
               </Table.Cell>
               <Table.Cell textAlign="right" width="2">
                 <Button
                   as="a"
-                  onClick={onRemoveClick(node)}
+                  onClick={onRemoveClick(entity)}
                   negative
                   size="mini"
                 >

@@ -5,6 +5,7 @@ import AliasesRepository from './repositories/aliases';
 import CoursesRepository from './repositories/courses';
 import CourseLayoutsRepository from './repositories/course-layouts';
 import CourseHolesRepository from './repositories/course-holes';
+import SeasonsRepository from './repositories/seasons';
 
 class RepositoryServices {
   users: UsersRepository = null;
@@ -19,6 +20,8 @@ class RepositoryServices {
 
   courseHoles: CourseHolesRepository = null;
 
+  seasons: SeasonsRepository = null;
+
   constructor() {
     this.users = new UsersRepository(db);
     this.profiles = new ProfilesRepository(db);
@@ -26,6 +29,7 @@ class RepositoryServices {
     this.courses = new CoursesRepository(db);
     this.courseLayouts = new CourseLayoutsRepository(db);
     this.courseHoles = new CourseHolesRepository(db);
+    this.seasons = new SeasonsRepository(db);
   }
 }
 

@@ -2,6 +2,7 @@ import type ApiFetch from './api-fetch';
 import PlayerRepository from './repositories/player';
 import AliasRepository from './repositories/alias';
 import CourseRepository from './repositories/courses';
+import SeasonsRepository from './repositories/seasons';
 
 interface RepositoryServicesProps {
   api: ApiFetch;
@@ -16,6 +17,8 @@ class RepositoryServices {
 
   courses: CourseRepository;
 
+  seasons: SeasonsRepository;
+
   constructor(props: RepositoryServicesProps) {
     const { api } = props;
 
@@ -23,6 +26,7 @@ class RepositoryServices {
     this.players = new PlayerRepository(this.api);
     this.aliases = new AliasRepository(this.api);
     this.courses = new CourseRepository(this.api);
+    this.seasons = new SeasonsRepository(this.api);
   }
 }
 

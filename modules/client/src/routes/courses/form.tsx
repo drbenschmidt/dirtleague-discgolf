@@ -179,7 +179,7 @@ const CourseFormComponent = (props: any): ReactElement | null => {
       style={{ marginLeft: '5px', lineHeight: 'inherit', marginBottom: '5px' }}
       onClick={() => {
         model.current?.layouts.append(CourseLayoutModel.createDefault());
-        const newSize = model.current?.layouts.size() || 1;
+        const newSize = model.current?.layouts.length || 1;
         setActiveIndex(newSize - 1);
       }}
     >
@@ -192,16 +192,16 @@ const CourseFormComponent = (props: any): ReactElement | null => {
   }, []);
 
   const layoutPanes =
-    model.current?.layouts.mapReact(layout => {
+    model.current?.layouts.toArray().map(layout => {
       return {
         menuItem: (
-          <Menu.Item onClick={onMenuClick} key={`menu_${layout.id}`}>
-            {layout.data.name}
+          <Menu.Item onClick={onMenuClick} key={`menu_${layout.cid}`}>
+            {layout.name}
           </Menu.Item>
         ),
         render: () => (
           <Tab.Pane>
-            <CourseLayoutForm key={layout.id} model={layout.data} />
+            <CourseLayoutForm key={layout.cid} model={layout} />
           </Tab.Pane>
         ),
       };

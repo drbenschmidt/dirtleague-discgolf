@@ -14,6 +14,14 @@ function isIterable(obj: any) {
   return typeof obj[Symbol.iterator] === 'function';
 }
 
+function isDate(obj: any): boolean {
+  if (obj instanceof Date) {
+    return true;
+  }
+
+  return false;
+}
+
 let cidCounter = 0;
 
 class DirtLeagueModel<TAttributes> {
@@ -67,6 +75,11 @@ export const getModelValue = (value: any): any => {
 
   if (isIterable(value)) {
     return Array.from(value, v => getModelValue(v));
+  }
+
+  if (isDate(value)) {
+    // Return in a MySQL friendly way.
+    return (value as Date).toISOString().slice(0, 19).replace('T', ' ');
   }
 
   return value;
