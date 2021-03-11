@@ -77,12 +77,12 @@ const CourseDetails = (): ReactElement | null => {
   }
 
   const panes =
-    result.layouts.mapReact(layout => {
+    result.layouts.toArray().map(layout => {
       return {
-        menuItem: layout.data.name,
+        menuItem: layout.name,
         render: () => (
           <Tab.Pane>
-            <CourseLayoutDetails key={layout.id} model={layout.data} />
+            <CourseLayoutDetails key={layout.cid} model={layout} />
           </Tab.Pane>
         ),
       };

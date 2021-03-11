@@ -1,3 +1,4 @@
+import Cloneable from '../interfaces/cloneable';
 import DirtLeagueModel from './dl-model';
 
 export interface SeasonAttributes {
@@ -10,7 +11,9 @@ export interface SeasonAttributes {
   endDate?: Date;
 }
 
-export default class SeasonModel extends DirtLeagueModel<SeasonAttributes> {
+export default class SeasonModel
+  extends DirtLeagueModel<SeasonAttributes>
+  implements Cloneable<SeasonModel> {
   get id(): number {
     return this.attributes.id;
   }
@@ -41,5 +44,11 @@ export default class SeasonModel extends DirtLeagueModel<SeasonAttributes> {
 
   set endDate(val: Date) {
     this.attributes.endDate = val;
+  }
+
+  clone(): SeasonModel {
+    const obj = this.toJson();
+
+    return new SeasonModel(obj);
   }
 }

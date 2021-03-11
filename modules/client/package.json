@@ -9,6 +9,7 @@
     "test": "node scripts/test.js"
   },
   "dependencies": {
+    "linked-list-typescript": "1.0.15",
     "@welldone-software/why-did-you-render": "6.1.0",
     "@dirtleague/common": "*",
     "@babel/core": "7.12.3",

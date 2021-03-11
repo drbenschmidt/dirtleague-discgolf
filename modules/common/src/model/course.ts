@@ -17,10 +17,17 @@ export interface CourseAttributes {
 export default class CourseModel
   extends DirtLeagueModel<CourseAttributes>
   implements Cloneable<CourseModel> {
-  defaults = {
+  static defaults = {
     name: '',
     layouts: [] as CourseLayoutAttributes[],
   };
+
+  constructor(obj: Record<string, any>) {
+    super({
+      ...CourseModel.defaults,
+      ...obj,
+    });
+  }
 
   get id(): number {
     return this.attributes.id;

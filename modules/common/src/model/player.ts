@@ -19,12 +19,19 @@ export interface PlayerAttributes {
 class PlayerModel
   extends DirtLeagueModel<PlayerAttributes>
   implements Cloneable<PlayerModel> {
-  defaults = {
+  static defaults = {
     firstName: '',
     lastName: '',
     aliases: [] as AliasAttributes[],
     currentRating: 0,
   };
+
+  constructor(obj: Record<string, any>) {
+    super({
+      ...PlayerModel.defaults,
+      ...obj,
+    });
+  }
 
   get id(): number {
     return this.attributes.id;

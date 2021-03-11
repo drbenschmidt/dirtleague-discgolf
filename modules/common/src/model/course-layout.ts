@@ -23,10 +23,17 @@ export interface CourseLayoutAttributes {
 export default class CourseLayoutModel
   extends DirtLeagueModel<CourseLayoutAttributes>
   implements Cloneable<CourseLayoutModel> {
-  defaults = {
+  static defaults = {
     name: 'Default Layout',
     holes: [] as CourseHoleAttributes[],
   };
+
+  constructor(obj: Record<string, any>) {
+    super({
+      ...CourseLayoutModel.defaults,
+      ...obj,
+    });
+  }
 
   get id(): number {
     return this.attributes.id;

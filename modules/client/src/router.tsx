@@ -9,7 +9,9 @@ import CourseForm from './routes/courses/form';
 import CourseList from './routes/courses/list';
 import CourseDetails from './routes/courses/details';
 import { EventList, EventDetails } from './routes/events/index';
-import { SeasonList, SeasonDetails } from './routes/seasons/index';
+import { SeasonDetails } from './routes/seasons/index';
+import SeasonList from './routes/seasons/list';
+import SeasonForm from './routes/seasons/form';
 
 const Router = (): ReactElement => {
   return (
@@ -28,6 +30,7 @@ const Router = (): ReactElement => {
           <Route exact path="/events" component={EventList} />
           <Route exact path="/events/:id" component={EventDetails} />
           <Route exact path="/seasons" component={SeasonList} />
+          <Route exact path="/seasons/new" component={SeasonForm} />
           <Route exact path="/seasons/:id" component={SeasonDetails} />
         </Switch>
       </Navigation>

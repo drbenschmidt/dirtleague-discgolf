@@ -45,9 +45,9 @@ const PlayerDetails = (): ReactElement | null => {
               </Card.Description>
             </Card.Content>
             <Card.Content extra>
-              {result.aliases.mapReact(alias => (
-                <Label key={alias.id} as="a" tag>
-                  {alias.data.value}
+              {result.aliases.toArray().map(alias => (
+                <Label key={alias.cid} as="a" tag>
+                  {alias.value}
                 </Label>
               ))}
             </Card.Content>
