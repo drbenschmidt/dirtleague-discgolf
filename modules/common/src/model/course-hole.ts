@@ -22,7 +22,7 @@ export default class CourseHoleModel
     par: 3,
   };
 
-  constructor(obj: Record<string, any>) {
+  constructor(obj: Record<string, any> = {}) {
     super({
       ...CourseHoleModel.defaults,
       ...obj,

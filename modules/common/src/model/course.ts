@@ -22,7 +22,7 @@ export default class CourseModel
     layouts: [] as CourseLayoutAttributes[],
   };
 
-  constructor(obj: Record<string, any>) {
+  constructor(obj: Record<string, any> = {}) {
     super({
       ...CourseModel.defaults,
       ...obj,

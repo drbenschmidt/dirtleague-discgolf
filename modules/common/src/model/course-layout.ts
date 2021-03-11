@@ -28,7 +28,7 @@ export default class CourseLayoutModel
     holes: [] as CourseHoleAttributes[],
   };
 
-  constructor(obj: Record<string, any>) {
+  constructor(obj: Record<string, any> = {}) {
     super({
       ...CourseLayoutModel.defaults,
       ...obj,

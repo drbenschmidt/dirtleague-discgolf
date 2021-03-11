@@ -26,7 +26,7 @@ class PlayerModel
     currentRating: 0,
   };
 
-  constructor(obj: Record<string, any>) {
+  constructor(obj: Record<string, any> = {}) {
     super({
       ...PlayerModel.defaults,
       ...obj,

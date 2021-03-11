@@ -31,7 +31,11 @@ export default class SeasonModel
   }
 
   get startDate(): Date {
-    return this.attributes.startDate;
+    if (this.attributes.startDate instanceof Date) {
+      return this.attributes.startDate;
+    }
+
+    return new Date(this.attributes.startDate);
   }
 
   set startDate(val: Date) {
@@ -39,7 +43,11 @@ export default class SeasonModel
   }
 
   get endDate(): Date {
-    return this.attributes.endDate;
+    if (this.attributes.endDate instanceof Date) {
+      return this.attributes.endDate;
+    }
+
+    return new Date(this.attributes.endDate);
   }
 
   set endDate(val: Date) {

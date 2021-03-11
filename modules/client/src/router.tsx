@@ -31,6 +31,7 @@ const Router = (): ReactElement => {
           <Route exact path="/events/:id" component={EventDetails} />
           <Route exact path="/seasons" component={SeasonList} />
           <Route exact path="/seasons/new" component={SeasonForm} />
+          <Route exact path="/seasons/edit/:id" component={SeasonForm} />
           <Route exact path="/seasons/:id" component={SeasonDetails} />
         </Switch>
       </Navigation>

@@ -15,6 +15,11 @@ export interface InputBinding {
   value: string;
 }
 
+export interface DateBinding {
+  onChange: (value: Date) => void;
+  value: string;
+}
+
 function orDefault<T>(obj: T) {
   return obj || ({} as T);
 }
@@ -69,6 +74,27 @@ export const useSelectBinding = <
 
   const onChange = useCallback(
     (_event, value) => {
+      // TODO: Figure out how to get TS to like this.
+      // eslint-disable-next-line no-param-reassign
+      (modelRef.current as any)[propName] = value;
+    },
+    [modelRef, propName]
+  );
+
+  return {
+    onChange,
+    value: originalValue,
+  };
+};
+
+export const useDateBinding = <TModel extends Record<string, any> | undefined>(
+  modelRef: React.RefObject<TModel>,
+  propName: string
+): DateBinding => {
+  const originalValue = (modelRef.current as any)[propName];
+
+  const onChange = useCallback(
+    (value: Date) => {
       // TODO: Figure out how to get TS to like this.
       // eslint-disable-next-line no-param-reassign
       (modelRef.current as any)[propName] = value;
