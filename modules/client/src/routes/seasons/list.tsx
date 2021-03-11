@@ -98,6 +98,8 @@ const SeasonList = (): ReactElement => {
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>Name</Table.HeaderCell>
+            <Table.HeaderCell>Start Date</Table.HeaderCell>
+            <Table.HeaderCell>End Date</Table.HeaderCell>
             <Table.HeaderCell textAlign="right">Actions</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
@@ -106,11 +108,9 @@ const SeasonList = (): ReactElement => {
           {result?.map(season => (
             <Table.Row key={season.id}>
               <Table.Cell>{season.name}</Table.Cell>
+              <Table.Cell>{season.startDate.toDateString()}</Table.Cell>
+              <Table.Cell>{season.endDate.toDateString()}</Table.Cell>
               <Table.Cell textAlign="right">
-                <Button as={Link} to={`${url}/${season.id}`} size="mini">
-                  <Icon name="address book" />
-                  View
-                </Button>
                 <IfAdmin>
                   <Button as={Link} to={`${url}/edit/${season.id}`} size="mini">
                     <Icon name="edit" />

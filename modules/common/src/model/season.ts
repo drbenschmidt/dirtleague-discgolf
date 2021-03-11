@@ -14,6 +14,19 @@ export interface SeasonAttributes {
 export default class SeasonModel
   extends DirtLeagueModel<SeasonAttributes>
   implements Cloneable<SeasonModel> {
+  static defaults = {
+    name: '',
+    startDate: new Date(),
+    endDate: new Date(),
+  };
+
+  constructor(obj: Record<string, any> = {}) {
+    super({
+      ...SeasonModel.defaults,
+      ...obj,
+    });
+  }
+
   get id(): number {
     return this.attributes.id;
   }
