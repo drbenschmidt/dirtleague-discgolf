@@ -1,18 +1,11 @@
-import {
-  isNil,
-  PlayerModel,
-  asyncForEach,
-  Roles,
-  intersect,
-  except,
-  getById,
-} from '@dirtleague/common';
+import { PlayerModel, asyncForEach, Roles } from '@dirtleague/common';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
 import { DbAlias } from '../data-access/repositories/aliases';
 import RepositoryServices from '../data-access/repository-services';
 import corsHandler from '../http/cors-handler';
+import getCrud from '../utils/getCrud';
 
 const buildRoute = (services: RepositoryServices): Router => {
   const router = express.Router();
@@ -62,7 +55,7 @@ const buildRoute = (services: RepositoryServices): Router => {
 
       if (model.aliases) {
         // Create each alias if included.
-        await model.aliases.asyncForEach(async alias => {
+        await asyncForEach(model.aliases.toArray(), async alias => {
           // Make sure the aliases relate to this player.
           // eslint-disable-next-line no-param-reassign
           alias.playerId = newId;
@@ -108,11 +101,11 @@ const buildRoute = (services: RepositoryServices): Router => {
       if (body.aliases) {
         const requestAliases = Array.from(body.aliases);
         const dbAliases = await services.aliases.getForUserId(body.id);
-        const dbAliasIds = dbAliases.map(a => a.id);
-        const requestAliasIds = requestAliases.map(a => a.id);
-        const aliasesToCreate = requestAliases.filter(a => isNil(a.id));
-        const aliasesToUpdate = intersect(dbAliasIds, requestAliasIds);
-        const aliasesToDelete = except(dbAliasIds, requestAliasIds);
+
+        const [aliasesToCreate, aliasesToUpdate, aliasesToDelete] = getCrud(
+          requestAliases,
+          dbAliases
+        );
 
         await asyncForEach(aliasesToCreate, async alias => {
           // eslint-disable-next-line no-param-reassign
@@ -121,14 +114,11 @@ const buildRoute = (services: RepositoryServices): Router => {
           await services.aliases.create(alias);
         });
 
-        await asyncForEach(
-          getById(requestAliases, aliasesToUpdate),
-          async alias => {
-            await services.aliases.update(alias);
-          }
-        );
+        await asyncForEach(aliasesToUpdate, async alias => {
+          await services.aliases.update(alias);
+        });
 
-        await asyncForEach(getById(dbAliases, aliasesToDelete), async alias => {
+        await asyncForEach(aliasesToDelete, async alias => {
           await services.aliases.delete(alias.id);
         });
       }

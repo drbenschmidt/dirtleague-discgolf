@@ -1,5 +1,5 @@
 import { Memoize } from 'typescript-memoize';
-import LinkedList from '../collections/linkedList';
+import { LinkedList } from 'linked-list-typescript';
 import Cloneable from '../interfaces/cloneable';
 import CourseLayoutModel, { CourseLayoutAttributes } from './course-layout';
 import DirtLeagueModel from './dl-model';
@@ -49,7 +49,7 @@ export default class CourseModel
   @Memoize()
   get layouts(): LinkedList<CourseLayoutModel> {
     return new LinkedList<CourseLayoutModel>(
-      this.attributes?.layouts?.map(
+      ...this.attributes?.layouts?.map(
         (v: CourseLayoutAttributes) => new CourseLayoutModel(v)
       )
     );

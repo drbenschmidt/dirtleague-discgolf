@@ -1,8 +1,8 @@
 import { Memoize } from 'typescript-memoize';
+import { LinkedList } from 'linked-list-typescript';
 import Cloneable from '../interfaces/cloneable';
 import AliasModel, { AliasAttributes } from './alias';
 import DirtLeagueModel from './dl-model';
-import LinkedList from '../collections/linkedList';
 
 export interface PlayerAttributes {
   id?: number;
@@ -61,7 +61,9 @@ class PlayerModel
   @Memoize()
   get aliases(): LinkedList<AliasModel> {
     return new LinkedList<AliasModel>(
-      this.attributes?.aliases?.map((v: AliasAttributes) => new AliasModel(v))
+      ...this.attributes?.aliases?.map(
+        (v: AliasAttributes) => new AliasModel(v)
+      )
     );
   }
 
