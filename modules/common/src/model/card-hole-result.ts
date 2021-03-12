@@ -3,9 +3,8 @@ import DirtLeagueModel from './dl-model';
 
 export interface CardHoleResultAttributes {
   id?: number;
-
+  cardThrowerId?: number;
   courseHoleId?: number;
-
   score?: number;
 }
 
@@ -27,6 +26,14 @@ export default class CardHoleResultModel
 
   set id(value: number) {
     this.attributes.id = value;
+  }
+
+  get cardThrowerId(): number {
+    return this.attributes.cardThrowerId;
+  }
+
+  set cardThrowerId(value: number) {
+    this.attributes.cardThrowerId = value;
   }
 
   get courseHoleId(): number {

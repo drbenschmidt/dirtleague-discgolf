@@ -4,9 +4,7 @@ import DirtLeagueModel from './dl-model';
 
 export interface CardAttributes {
   id?: number;
-
   roundId?: number;
-
   cardThrowers?: CardThrowerAttributes[];
 }
 

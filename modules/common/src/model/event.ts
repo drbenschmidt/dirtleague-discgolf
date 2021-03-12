@@ -4,15 +4,10 @@ import { RoundAttributes } from './round';
 
 export interface EventAttributes {
   id?: number;
-
   courseId?: number;
-
   seasonId?: string;
-
   rounds?: RoundAttributes[];
-
   name?: string;
-
   startDate?: Date;
 }
 

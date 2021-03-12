@@ -4,13 +4,9 @@ import DirtLeagueModel from './dl-model';
 
 export interface RoundAttributes {
   id?: number;
-
   eventId?: number;
-
   courseLayoutId?: number;
-
   cards?: CardAttributes[];
-
   name?: string;
 }
 

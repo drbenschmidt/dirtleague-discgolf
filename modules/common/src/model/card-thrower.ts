@@ -3,9 +3,7 @@ import DirtLeagueModel from './dl-model';
 
 export interface CardThrowerAttributes {
   id?: number;
-
   teamName?: string;
-
   playerIds?: number[];
 }
 
