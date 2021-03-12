@@ -18,7 +18,7 @@ export default class EventModel
   extends DirtLeagueModel<EventAttributes>
   implements Cloneable<EventModel> {
   static defaults = {
-    name: 'New Round',
+    name: '',
     startDate: new Date(),
     rounds: [] as RoundAttributes[],
   };

@@ -1,12 +1,5 @@
-import {
-  ReactElement,
-  useCallback,
-  useEffect,
-  useState,
-  useRef,
-  memo,
-} from 'react';
-import { isNil, EventModel } from '@dirtleague/common';
+import { ReactElement, useCallback, useEffect, useState, memo } from 'react';
+import { isNil, EventModel, RoundModel } from '@dirtleague/common';
 import { useParams, useHistory } from 'react-router-dom';
 import { Form, TextArea } from 'semantic-ui-react';
 import TextInput from '../../components/forms/text-input';
@@ -19,12 +12,13 @@ import {
 import { EntityDetailsParams } from '../types';
 import DatePicker from '../../components/forms/date-picker';
 import TabCollection from '../../components/forms/tab-collection';
+import EntitySearch from '../../components/forms/entity-search';
 
 const RoundForm = (): ReactElement => {
   return <div>Round</div>;
 };
 
-const EntityFormComponent = (props: any): ReactElement | null => {
+const EventFormComponent = (props: any): ReactElement | null => {
   const { entityModel, isEditing, services } = props;
   const { model } = useTransaction<EventModel>(entityModel);
   const nameBinding = useInputBinding(model, 'name');
@@ -57,6 +51,10 @@ const EntityFormComponent = (props: any): ReactElement | null => {
     submit();
   }, [isEditing, model, services?.events, history]);
 
+  const seasonSearch = useCallback(async (query: string) => {
+    return [{ title: query }];
+  }, []);
+
   return (
     <>
       <h1>{isEditing ? 'Edit Event' : 'New Event'}</h1>
@@ -69,6 +67,7 @@ const EntityFormComponent = (props: any): ReactElement | null => {
             placeholder="Event Name"
           />
           <DatePicker {...startDateBinding} label="Event Date" />
+          <EntitySearch label="Season" searcher={seasonSearch} value={null} />
         </Form.Group>
         <TextInput
           {...descriptionBinding}
@@ -80,7 +79,7 @@ const EntityFormComponent = (props: any): ReactElement | null => {
         <TabCollection
           TabComponent={RoundForm}
           list={model.current?.rounds}
-          modelFactory={() => new EventModel()}
+          modelFactory={() => new RoundModel()}
         />
         <Form.Button positive content="Submit" />
       </Form>
@@ -88,7 +87,7 @@ const EntityFormComponent = (props: any): ReactElement | null => {
   );
 };
 
-const EntityForm = (): ReactElement | null => {
+const EventForm = (): ReactElement | null => {
   const { id } = useParams<EntityDetailsParams>();
   const isEditing = !isNil(id);
   const services = useRepositoryServices();
@@ -120,7 +119,7 @@ const EntityForm = (): ReactElement | null => {
   }
 
   return (
-    <EntityFormComponent
+    <EventFormComponent
       entityModel={entityModel}
       isEditing={isEditing}
       services={services}
@@ -128,4 +127,4 @@ const EntityForm = (): ReactElement | null => {
   );
 };
 
-export default memo(EntityForm);
+export default memo(EventForm);

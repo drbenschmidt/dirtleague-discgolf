@@ -1,6 +1,6 @@
 import { LinkedList } from 'linked-list-typescript';
 import { memo, ReactElement, useCallback, useState } from 'react';
-import { Tab, Button, Menu } from 'semantic-ui-react';
+import { Tab, Button, Menu, Label, Icon } from 'semantic-ui-react';
 
 export interface TabCollectionProps<TModel> {
   list?: LinkedList<TModel>;
@@ -46,6 +46,9 @@ function TabCollection<TModel extends TabModelProps>(
         menuItem: (
           <Menu.Item onClick={onMenuClick} key={`menu_${entity.cid}`}>
             {entity.name}
+            <Label color="red" floating>
+              <Icon name="x" />
+            </Label>
           </Menu.Item>
         ),
         render: () => (

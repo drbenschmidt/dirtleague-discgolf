@@ -14,7 +14,7 @@ export default class RoundModel
   extends DirtLeagueModel<RoundAttributes>
   implements Cloneable<RoundModel> {
   static defaults = {
-    name: '',
+    name: 'New Round',
     startDate: new Date(),
     cards: [] as CardAttributes[],
   };
