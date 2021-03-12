@@ -1,21 +1,24 @@
+import { LinkedList } from 'linked-list-typescript';
+import { Memoize } from 'typescript-memoize';
 import Cloneable from '../interfaces/cloneable';
 import DirtLeagueModel from './dl-model';
-import { RoundAttributes } from './round';
+import RoundModel, { RoundAttributes } from './round';
 
 export interface EventAttributes {
   id?: number;
-  courseId?: number;
-  seasonId?: string;
-  rounds?: RoundAttributes[];
   name?: string;
+  description?: string;
+  courseId?: number;
+  seasonId?: number;
   startDate?: Date;
+  rounds?: RoundAttributes[];
 }
 
 export default class EventModel
   extends DirtLeagueModel<EventAttributes>
   implements Cloneable<EventModel> {
   static defaults = {
-    name: '',
+    name: 'New Round',
     startDate: new Date(),
     rounds: [] as RoundAttributes[],
   };
@@ -59,12 +62,31 @@ export default class EventModel
     this.attributes.name = val;
   }
 
+  get description(): string {
+    return this.attributes.description;
+  }
+
+  set description(val: string) {
+    this.attributes.description = val;
+  }
+
   get startDate(): Date {
-    return this.attributes.startDate;
+    if (this.attributes.startDate instanceof Date) {
+      return this.attributes.startDate;
+    }
+
+    return new Date(this.attributes.startDate);
   }
 
   set startDate(val: Date) {
     this.attributes.startDate = val;
+  }
+
+  @Memoize()
+  get rounds(): LinkedList<RoundModel> {
+    return new LinkedList<RoundModel>(
+      ...this.attributes?.rounds?.map((v: RoundAttributes) => new RoundModel(v))
+    );
   }
 
   clone(): EventModel {

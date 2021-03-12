@@ -10,18 +10,30 @@ export { default as intersect } from './utils/intersect';
 
 export { default as Roles } from './security/roles';
 
+export { default as DirtLeagueModel } from './model/dl-model';
 export { default as AliasModel } from './model/alias';
 export { default as CourseModel } from './model/course';
 export { default as CourseHoleModel } from './model/course-hole';
 export { default as CourseLayoutModel } from './model/course-layout';
 export { default as PlayerModel } from './model/player';
 export { default as SeasonModel } from './model/season';
+export { default as EventModel } from './model/event';
+export { default as RoundModel } from './model/round';
+export { default as CardModel } from './model/card';
+export { default as CardThrowerModel } from './model/card-thrower';
+export { default as CardHoleResultModel } from './model/card-hole-result';
 export type { AliasAttributes } from './model/alias';
 export type { CourseAttributes } from './model/course';
 export type { CourseHoleAttributes } from './model/course-hole';
 export type { CourseLayoutAttributes } from './model/course-layout';
 export type { PlayerAttributes } from './model/player';
 export type { SeasonAttributes } from './model/season';
+export type { EventAttributes } from './model/event';
+export type { RoundAttributes } from './model/round';
+export type { CardAttributes } from './model/card';
+export type { CardThrowerAttributes } from './model/card-thrower';
+export type { CardHoleResultAttributes } from './model/card-hole-result';
+
 export type { UserModel } from './model/user';
 
 export type { default as Cloneable } from './interfaces/cloneable';

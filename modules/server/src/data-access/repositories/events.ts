@@ -6,7 +6,7 @@ export interface DbEvent {
   id?: number;
   name: string;
   courseId: number;
-  seasonId: string;
+  seasonId: number;
   startDate: Date;
 }
 

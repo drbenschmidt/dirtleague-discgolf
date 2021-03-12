@@ -8,8 +8,9 @@ import PlayerDetails from './routes/players/details';
 import CourseForm from './routes/courses/form';
 import CourseList from './routes/courses/list';
 import CourseDetails from './routes/courses/details';
-import { EventList, EventDetails } from './routes/events/index';
-import { SeasonDetails } from './routes/seasons/index';
+import EventList from './routes/events/list';
+import EventDetails from './routes/events/details';
+import EventForm from './routes/events/form';
 import SeasonList from './routes/seasons/list';
 import SeasonForm from './routes/seasons/form';
 
@@ -28,11 +29,11 @@ const Router = (): ReactElement => {
           <Route exact path="/courses/edit/:id" component={CourseForm} />
           <Route exact path="/courses/:id" component={CourseDetails} />
           <Route exact path="/events" component={EventList} />
+          <Route exact path="/events/new" component={EventForm} />
           <Route exact path="/events/:id" component={EventDetails} />
           <Route exact path="/seasons" component={SeasonList} />
           <Route exact path="/seasons/new" component={SeasonForm} />
           <Route exact path="/seasons/edit/:id" component={SeasonForm} />
-          <Route exact path="/seasons/:id" component={SeasonDetails} />
         </Switch>
       </Navigation>
     </BrowserRouter>
