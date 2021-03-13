@@ -1,5 +1,11 @@
 import { ReactElement, useCallback, useEffect, useState, memo } from 'react';
-import { isNil, EventModel, RoundModel } from '@dirtleague/common';
+import {
+  isNil,
+  EventModel,
+  RoundModel,
+  SeasonModel,
+  CourseModel,
+} from '@dirtleague/common';
 import { useParams, useHistory } from 'react-router-dom';
 import { Form, TextArea } from 'semantic-ui-react';
 import TextInput from '../../components/forms/text-input';
@@ -8,22 +14,34 @@ import {
   useDateBinding,
   useInputBinding,
   useTransaction,
+  useSelectBinding,
 } from '../../hooks/forms';
 import { EntityDetailsParams } from '../types';
 import DatePicker from '../../components/forms/date-picker';
 import TabCollection from '../../components/forms/tab-collection';
 import EntitySearch from '../../components/forms/entity-search';
+import RepositoryServices from '../../data-access/repository-services';
 
 const RoundForm = (): ReactElement => {
   return <div>Round</div>;
 };
 
-const EventFormComponent = (props: any): ReactElement | null => {
+export interface EventFormComponentProps {
+  entityModel: EventModel;
+  isEditing: boolean;
+  services: RepositoryServices | null;
+}
+
+const EventFormComponent = (
+  props: EventFormComponentProps
+): ReactElement | null => {
   const { entityModel, isEditing, services } = props;
   const { model } = useTransaction<EventModel>(entityModel);
   const nameBinding = useInputBinding(model, 'name');
   const descriptionBinding = useInputBinding(model, 'description');
   const startDateBinding = useDateBinding(model, 'startDate');
+  const seasonBinding = useSelectBinding(model, 'seasonId');
+  const courseBinding = useSelectBinding(model, 'courseId');
   const [isInFlight, setIsInFlight] = useState(false);
   const history = useHistory();
 
@@ -51,9 +69,58 @@ const EventFormComponent = (props: any): ReactElement | null => {
     submit();
   }, [isEditing, model, services?.events, history]);
 
-  const seasonSearch = useCallback(async (query: string) => {
-    return [{ title: query }];
-  }, []);
+  // TODO: This is a terrible design but I don't have time to make
+  // this work correctly right now.
+  const seasonSearch = useCallback(
+    async (query: string) => {
+      const seasons = await services?.seasons.getAll();
+      const mapper = (season: SeasonModel) => ({
+        text: season.name,
+        value: season.id,
+      });
+
+      if (!seasons) {
+        return [];
+      }
+
+      if (query.length === 0) {
+        return seasons.map(mapper);
+      }
+
+      return seasons
+        ?.filter(season =>
+          season.name.toLocaleLowerCase().startsWith(query.toLocaleLowerCase())
+        )
+        .map(mapper);
+    },
+    [services?.seasons]
+  );
+
+  // TODO: Same as above, baby just pooped so I don't have time.
+  const courseSearch = useCallback(
+    async (query: string) => {
+      const courses = await services?.courses.getAll();
+      const mapper = (course: CourseModel) => ({
+        text: course.name,
+        value: course.id,
+      });
+
+      if (!courses) {
+        return [];
+      }
+
+      if (query.length === 0) {
+        return courses.map(mapper);
+      }
+
+      return courses
+        ?.filter(course =>
+          course.name.toLocaleLowerCase().startsWith(query.toLocaleLowerCase())
+        )
+        .map(mapper);
+    },
+    [services?.courses]
+  );
 
   return (
     <>
@@ -67,8 +134,17 @@ const EventFormComponent = (props: any): ReactElement | null => {
             placeholder="Event Name"
           />
           <DatePicker {...startDateBinding} label="Event Date" />
-          <EntitySearch label="Season" searcher={seasonSearch} value={null} />
+          <EntitySearch
+            {...seasonBinding}
+            label="Season"
+            searcher={seasonSearch}
+          />
         </Form.Group>
+        <EntitySearch
+          {...courseBinding}
+          label="Course"
+          searcher={courseSearch}
+        />
         <TextInput
           {...descriptionBinding}
           fluid
@@ -77,6 +153,7 @@ const EventFormComponent = (props: any): ReactElement | null => {
           control={TextArea}
         />
         <TabCollection
+          label="Rounds"
           TabComponent={RoundForm}
           list={model.current?.rounds}
           modelFactory={() => new RoundModel()}

@@ -1,47 +1,64 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { memo, useState, useRef, useCallback, useEffect } from 'react';
-import { Search, Label } from 'semantic-ui-react';
-
-const resultRenderer = (props: any) => <Label content={props.title} />;
+import { Form } from 'semantic-ui-react';
+import useOnce from '../../hooks/useOnce';
 
 export interface AsyncSearcherResult {
-  title: string;
+  text: string;
+  value: string | number;
 }
 
 export interface EntitySearchProps {
   value: any;
   searcher: (query: string) => Promise<AsyncSearcherResult[]>;
   label: string;
+  onChange: (event: any, value: any) => void;
 }
 
 const EntitySearch = (props: EntitySearchProps) => {
-  const { value, searcher, label } = props;
+  const {
+    value: originalValue,
+    onChange: parentOnChange,
+    searcher,
+    label,
+  } = props;
+  const [value, setValue] = useState(originalValue);
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<AsyncSearcherResult[]>();
-  const timeoutRef = useRef<number>();
 
   const handleSearchChange = useCallback(
     async (e, data) => {
-      clearTimeout(timeoutRef.current);
       setIsLoading(true);
-      const searchResults = await searcher(data.value);
+      const searchResults = await searcher(data.searchQuery);
       setIsLoading(false);
       setResults(searchResults);
     },
     [searcher]
   );
 
+  const onChange = useCallback(
+    (e, data) => {
+      parentOnChange(e, data.value);
+      setValue(data.value);
+    },
+    [parentOnChange]
+  );
+
+  useOnce(() => {
+    handleSearchChange(null, { searchQuery: '' });
+  });
+
   return (
     <div className="field">
       <label>{label}</label>
-      <Search
+      <Form.Dropdown
+        clearable
+        search
+        selection
         loading={isLoading}
-        onResultSelect={(e, data) =>
-          console.log({ type: 'UPDATE_SELECTION', selection: data.result.name })
-        }
+        onChange={onChange}
         onSearchChange={handleSearchChange}
-        resultRenderer={resultRenderer}
-        results={results}
+        options={results}
         value={value}
       />
     </div>
