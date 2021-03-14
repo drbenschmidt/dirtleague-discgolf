@@ -1,3 +1,5 @@
+import { Subject } from 'rxjs';
+
 const { keys } = Object;
 
 // eslint-disable-next-line max-classes-per-file
@@ -24,10 +26,17 @@ function isDate(obj: any): boolean {
 
 let cidCounter = 0;
 
+interface OnChangeProps {
+  key: string;
+  value: any;
+}
+
 class DirtLeagueModel<TAttributes> {
   attributes: TAttributes | Record<string, any> = {};
 
   defaults: TAttributes | Record<string, any> = {};
+
+  onChange = new Subject<OnChangeProps>();
 
   cid = 0;
 
@@ -53,6 +62,7 @@ class DirtLeagueModel<TAttributes> {
 
   set<T>(key: string, value: T): void {
     (this.attributes as any)[key] = value;
+    this.onChange.next({ key, value });
   }
 
   toJson(): Record<string, any> {
@@ -82,6 +92,7 @@ export const getModelValue = (value: any): any => {
   }
 
   if (isDate(value)) {
+    // TODO: Handle this on the server, also make sure it's UTC if it isn't already.
     // Return in a MySQL friendly way.
     return (value as Date).toISOString().slice(0, 19).replace('T', ' ');
   }

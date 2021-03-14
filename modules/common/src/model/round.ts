@@ -48,7 +48,7 @@ export default class RoundModel
   }
 
   set courseId(value: number) {
-    this.attributes.courseId = value;
+    this.set('courseId', value);
   }
 
   get courseLayoutId(): number {

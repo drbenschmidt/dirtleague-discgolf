@@ -13,6 +13,7 @@ import {
   SeasonModel,
   CourseModel,
   CourseLayoutModel,
+  DirtLeagueModel,
 } from '@dirtleague/common';
 import { useParams, useHistory } from 'react-router-dom';
 import { Form, TextArea } from 'semantic-ui-react';
@@ -34,12 +35,30 @@ export interface RoundFormComponentProps {
   model: RoundModel;
 }
 
+const useSubscription = (
+  model: DirtLeagueModel<any>,
+  keyWatch: string,
+  setter: (v: any) => void
+) => {
+  useEffect(() => {
+    const test = model.onChange.subscribe(props => {
+      if (keyWatch === props.key) {
+        setter(props.value);
+      }
+    });
+
+    return () => test.unsubscribe();
+  });
+};
+
 const RoundForm = (props: RoundFormComponentProps): ReactElement => {
   const { model } = props;
   const modelRef = useRef(model);
   const layoutBinding = useSelectBinding(modelRef, 'courseLayoutId');
   const courseBinding = useSelectBinding(modelRef, 'courseId');
   const services = useRepositoryServices();
+  const [courseId, setCourseId] = useState(modelRef.current.courseId);
+  useSubscription(modelRef.current, 'courseId', setCourseId);
 
   // TODO: Gross.
   const courseSearch = useCallback(
@@ -70,12 +89,12 @@ const RoundForm = (props: RoundFormComponentProps): ReactElement => {
   // TODO: Same as above, baby just pooped so I don't have time.
   const courseLayoutSearch = useCallback(
     async (query: string) => {
-      if (!modelRef.current.courseId) {
+      if (isNil(courseId)) {
         return [];
       }
 
       const courseLayouts = await services?.courses.getLayoutsForCourse(
-        modelRef.current.courseId
+        courseId
       );
       const mapper = (course: CourseLayoutModel) => ({
         text: course.name,
@@ -96,10 +115,8 @@ const RoundForm = (props: RoundFormComponentProps): ReactElement => {
         )
         .map(mapper);
     },
-    [services?.courses]
+    [courseId, services?.courses]
   );
-
-  const isCourseLayoutDisabled = isNil(modelRef.current.courseId);
 
   return (
     <>
@@ -113,7 +130,7 @@ const RoundForm = (props: RoundFormComponentProps): ReactElement => {
           {...layoutBinding}
           label="Course Layout"
           searcher={courseLayoutSearch}
-          disabled={isCourseLayoutDisabled}
+          disabled={isNil(courseId)}
         />
       </Form.Group>
     </>

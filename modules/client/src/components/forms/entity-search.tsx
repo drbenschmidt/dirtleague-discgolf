@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { memo, useState, useRef, useCallback, useEffect } from 'react';
+import { memo, useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { Form } from 'semantic-ui-react';
 import useOnce from '../../hooks/useOnce';
 
@@ -46,9 +46,10 @@ const EntitySearch = (props: EntitySearchProps) => {
     [parentOnChange]
   );
 
-  useOnce(() => {
+  useMemo(() => {
     handleSearchChange(null, { searchQuery: '' });
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [disabled, handleSearchChange]);
 
   return (
     <div className="field">
