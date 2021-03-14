@@ -1,3 +1,5 @@
+import { LinkedList } from 'linked-list-typescript';
+import { Memoize } from 'typescript-memoize';
 import Cloneable from '../interfaces/cloneable';
 import DirtLeagueModel from './dl-model';
 
@@ -38,12 +40,9 @@ export default class CardThrowerModel
     this.attributes.teamName = value;
   }
 
-  get playerIds(): number[] {
-    return this.attributes.playerIds;
-  }
-
-  set playerIds(value: number[]) {
-    this.attributes.playerIds = value;
+  @Memoize()
+  get playerIds(): LinkedList<number> {
+    return new LinkedList<number>(...this.attributes?.playerIds);
   }
 
   clone(): CardThrowerModel {

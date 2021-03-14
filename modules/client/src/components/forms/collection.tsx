@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { ReactElement, useCallback, useState } from 'react';
-import { Table, Menu, Button, Icon } from 'semantic-ui-react';
+import { Table, Menu, Button, Icon, SemanticCOLORS } from 'semantic-ui-react';
 import { isNil } from '@dirtleague/common';
 import { LinkedList } from 'linked-list-typescript';
 import DirtLeagueModel from '@dirtleague/common/src/model/dl-model';
@@ -11,12 +11,20 @@ interface CollectionProps<TModel> {
   propName: string;
   label: string;
   buttonText: string;
+  tableColor?: SemanticCOLORS;
 }
 
 function CollectionComponent<TModel extends DirtLeagueModel<void>>(
   props: CollectionProps<TModel>
 ): ReactElement {
-  const { RowComponent, model, propName, label, buttonText } = props;
+  const {
+    RowComponent,
+    model,
+    propName,
+    label,
+    buttonText,
+    tableColor,
+  } = props;
   let entities = (model.current as any)[propName] as LinkedList<TModel>;
   const [, setDummy] = useState(false);
 
@@ -33,7 +41,11 @@ function CollectionComponent<TModel extends DirtLeagueModel<void>>(
   const onRemoveClick = useCallback(
     (obj: TModel) => {
       return () => {
-        entities.remove(obj);
+        if (entities?.length === 1) {
+          entities?.removeHead();
+        } else {
+          entities?.remove(obj);
+        }
         setDummy(v => !v);
       };
     },
@@ -45,7 +57,7 @@ function CollectionComponent<TModel extends DirtLeagueModel<void>>(
       <div className="field">
         <label>{label}</label>
       </div>
-      <Table>
+      <Table color={tableColor}>
         <Table.Body>
           {entities.toArray().map(entity => (
             // eslint-disable-next-line react/no-array-index-key

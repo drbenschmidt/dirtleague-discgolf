@@ -1,7 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { memo, useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { memo, useState, useCallback, useMemo } from 'react';
 import { Form } from 'semantic-ui-react';
-import useOnce from '../../hooks/useOnce';
 
 export interface AsyncSearcherResult {
   text: string;
@@ -11,9 +10,10 @@ export interface AsyncSearcherResult {
 export interface EntitySearchProps {
   value: any;
   searcher: (query: string) => Promise<AsyncSearcherResult[]>;
-  label: string;
+  label?: string;
   onChange: (event: any, value: any) => void;
   disabled?: boolean;
+  [key: string]: any;
 }
 
 const EntitySearch = (props: EntitySearchProps) => {
@@ -23,6 +23,7 @@ const EntitySearch = (props: EntitySearchProps) => {
     searcher,
     label,
     disabled,
+    ...rest
   } = props;
   const [value, setValue] = useState(originalValue);
   const [isLoading, setIsLoading] = useState(false);
@@ -53,7 +54,7 @@ const EntitySearch = (props: EntitySearchProps) => {
 
   return (
     <div className="field">
-      <label>{label}</label>
+      {label && <label>{label}</label>}
       <Form.Dropdown
         clearable
         search
@@ -64,6 +65,7 @@ const EntitySearch = (props: EntitySearchProps) => {
         options={results}
         value={value}
         disabled={disabled}
+        {...rest}
       />
     </div>
   );

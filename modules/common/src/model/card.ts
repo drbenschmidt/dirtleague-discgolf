@@ -1,5 +1,7 @@
+import { LinkedList } from 'linked-list-typescript';
+import { Memoize } from 'typescript-memoize';
 import Cloneable from '../interfaces/cloneable';
-import { CardThrowerAttributes } from './card-thrower';
+import CardThrowerModel, { CardThrowerAttributes } from './card-thrower';
 import DirtLeagueModel from './dl-model';
 
 export interface CardAttributes {
@@ -36,6 +38,15 @@ export default class CardModel
 
   set roundId(value: number) {
     this.attributes.roundId = value;
+  }
+
+  @Memoize()
+  get cardThrowers(): LinkedList<CardThrowerModel> {
+    return new LinkedList<CardThrowerModel>(
+      ...this.attributes?.cardThrowers?.map(
+        (v: CardThrowerAttributes) => new CardThrowerModel(v)
+      )
+    );
   }
 
   clone(): CardModel {

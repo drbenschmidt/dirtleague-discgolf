@@ -1,5 +1,7 @@
+import { LinkedList } from 'linked-list-typescript';
+import { Memoize } from 'typescript-memoize';
 import Cloneable from '../interfaces/cloneable';
-import { CardAttributes } from './card';
+import CardModel, { CardAttributes } from './card';
 import DirtLeagueModel from './dl-model';
 
 export interface RoundAttributes {
@@ -65,6 +67,13 @@ export default class RoundModel
 
   set name(val: string) {
     this.attributes.name = val;
+  }
+
+  @Memoize()
+  get cards(): LinkedList<CardModel> {
+    return new LinkedList<CardModel>(
+      ...this.attributes?.cards?.map((v: CardAttributes) => new CardModel(v))
+    );
   }
 
   clone(): RoundModel {

@@ -1,4 +1,5 @@
-import {
+/* eslint-disable jsx-a11y/label-has-associated-control */
+import React, {
   ReactElement,
   useCallback,
   useEffect,
@@ -14,9 +15,20 @@ import {
   CourseModel,
   CourseLayoutModel,
   DirtLeagueModel,
+  CardModel,
+  PlayerModel,
+  CardThrowerModel,
 } from '@dirtleague/common';
 import { useParams, useHistory } from 'react-router-dom';
-import { Form, TextArea } from 'semantic-ui-react';
+import {
+  Form,
+  TextArea,
+  Segment,
+  Header,
+  Icon,
+  Button,
+} from 'semantic-ui-react';
+import { LinkedList } from 'linked-list-typescript';
 import TextInput from '../../components/forms/text-input';
 import { useRepositoryServices } from '../../data-access/context';
 import {
@@ -29,11 +41,136 @@ import { EntityDetailsParams } from '../types';
 import DatePicker from '../../components/forms/date-picker';
 import TabCollection from '../../components/forms/tab-collection';
 import EntitySearch from '../../components/forms/entity-search';
+import Collection from '../../components/forms/collection';
 import RepositoryServices from '../../data-access/repository-services';
 
 export interface RoundFormComponentProps {
   model: RoundModel;
 }
+
+export interface CardFormComponentProps {
+  model: CardModel;
+}
+
+export interface PlayerGroupFormRowComponentProps {
+  model: CardThrowerModel;
+}
+
+const PlayerFormRow = (): ReactElement => {
+  const services = useRepositoryServices();
+
+  const playerSearch = useCallback(
+    async (query: string) => {
+      const players = await services?.players.getAll();
+      const mapper = (course: PlayerModel) => ({
+        text: course.fullName,
+        value: course.id,
+      });
+
+      if (!players) {
+        return [];
+      }
+
+      if (query.length === 0) {
+        return players.map(mapper);
+      }
+
+      return players
+        ?.filter(player =>
+          player.fullName
+            .toLocaleLowerCase()
+            .includes(query.toLocaleLowerCase())
+        )
+        .map(mapper);
+    },
+    [services?.players]
+  );
+
+  return (
+    <EntitySearch value={null} onChange={console.log} searcher={playerSearch} />
+  );
+};
+
+const PlayerGroupFormRow = (
+  props: PlayerGroupFormRowComponentProps
+): ReactElement => {
+  const { model } = props;
+  const modelRef = useRef(model);
+  const teamNameBinding = useInputBinding(modelRef, 'teamName');
+
+  return (
+    <>
+      <Form.Group widths="equal">
+        <TextInput {...teamNameBinding} label="Team Name (optional)" />
+      </Form.Group>
+      <Collection
+        tableColor="green"
+        buttonText="Add Player"
+        model={modelRef}
+        propName="playerIds"
+        label="Players"
+        RowComponent={PlayerFormRow}
+      />
+    </>
+  );
+};
+
+const CardForm = (props: CardFormComponentProps): ReactElement => {
+  const { model } = props;
+  const modelRef = useRef(model);
+
+  return (
+    <Collection
+      tableColor="blue"
+      buttonText="Add Player Group"
+      model={modelRef}
+      propName="cardThrowers"
+      label="Card"
+      RowComponent={PlayerGroupFormRow}
+    />
+  );
+};
+
+export interface CardListComponentProps {
+  model: LinkedList<CardModel>;
+}
+
+const CardList = (props: CardListComponentProps): ReactElement => {
+  const { model } = props;
+  const [, setDummy] = useState(false);
+
+  const addButton = useCallback(() => {
+    model.append(new CardModel());
+    setDummy(d => !d);
+  }, [model]);
+
+  if (model.length === 0) {
+    return (
+      <Segment placeholder>
+        <Header icon>
+          <Icon name="id card outline" />
+          No Cards have been added for this round.
+        </Header>
+        <Button primary as="a" onClick={addButton}>
+          Add Card
+        </Button>
+      </Segment>
+    );
+  }
+
+  return (
+    <>
+      <Segment>
+        {model.toArray().map(card => (
+          <CardForm model={card} />
+        ))}
+        <Button primary as="a" onClick={addButton}>
+          Add Card
+        </Button>
+      </Segment>
+    </>
+  );
+};
 
 const useSubscription = (
   model: DirtLeagueModel<any>,
@@ -133,6 +270,7 @@ const RoundForm = (props: RoundFormComponentProps): ReactElement => {
           disabled={isNil(courseId)}
         />
       </Form.Group>
+      <CardList model={model.cards} />
     </>
   );
 };
@@ -165,7 +303,11 @@ const EventFormComponent = (
 
             history.push(`/events/${model.current.id}`);
           } else {
-            await services?.events.create(model.current);
+            // await services?.events.create(model.current);
+
+            (window as any).testing = model.current;
+            console.log('updated testing', model.current);
+            return;
 
             // TODO: Move to course view?
             history.push('/events');
@@ -206,6 +348,14 @@ const EventFormComponent = (
     [services?.seasons]
   );
 
+  const modelFactory = useCallback(() => {
+    const length = model.current?.rounds.length || 0;
+
+    return new RoundModel({
+      name: `Round ${length + 1}`,
+    });
+  }, [model]);
+
   return (
     <>
       <h1>{isEditing ? 'Edit Event' : 'New Event'}</h1>
@@ -235,7 +385,7 @@ const EventFormComponent = (
           label="Rounds"
           TabComponent={RoundForm}
           list={model.current?.rounds}
-          modelFactory={() => new RoundModel()}
+          modelFactory={modelFactory}
         />
         <Form.Button positive content="Submit" />
       </Form>
