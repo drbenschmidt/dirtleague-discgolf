@@ -5,7 +5,6 @@ import {
   useState,
   useRef,
   memo,
-  useMemo,
 } from 'react';
 import {
   isNil,
@@ -33,20 +32,50 @@ import RepositoryServices from '../../data-access/repository-services';
 
 export interface RoundFormComponentProps {
   model: RoundModel;
-  courseId: number;
 }
 
 const RoundForm = (props: RoundFormComponentProps): ReactElement => {
-  const { model, courseId } = props;
+  const { model } = props;
   const modelRef = useRef(model);
   const layoutBinding = useSelectBinding(modelRef, 'courseLayoutId');
+  const courseBinding = useSelectBinding(modelRef, 'courseId');
   const services = useRepositoryServices();
+
+  // TODO: Gross.
+  const courseSearch = useCallback(
+    async (query: string) => {
+      const courses = await services?.courses.getAll();
+      const mapper = (course: CourseModel) => ({
+        text: course.name,
+        value: course.id,
+      });
+
+      if (!courses) {
+        return [];
+      }
+
+      if (query.length === 0) {
+        return courses.map(mapper);
+      }
+
+      return courses
+        ?.filter(course =>
+          course.name.toLocaleLowerCase().startsWith(query.toLocaleLowerCase())
+        )
+        .map(mapper);
+    },
+    [services?.courses]
+  );
 
   // TODO: Same as above, baby just pooped so I don't have time.
   const courseLayoutSearch = useCallback(
     async (query: string) => {
+      if (!modelRef.current.courseId) {
+        return [];
+      }
+
       const courseLayouts = await services?.courses.getLayoutsForCourse(
-        courseId
+        modelRef.current.courseId
       );
       const mapper = (course: CourseLayoutModel) => ({
         text: course.name,
@@ -67,16 +96,24 @@ const RoundForm = (props: RoundFormComponentProps): ReactElement => {
         )
         .map(mapper);
     },
-    [courseId, services?.courses]
+    [services?.courses]
   );
+
+  const isCourseLayoutDisabled = isNil(modelRef.current.courseId);
 
   return (
     <>
       <Form.Group widths="equal">
         <EntitySearch
+          {...courseBinding}
+          label="Course"
+          searcher={courseSearch}
+        />
+        <EntitySearch
           {...layoutBinding}
           label="Course Layout"
           searcher={courseLayoutSearch}
+          disabled={isCourseLayoutDisabled}
         />
       </Form.Group>
     </>
@@ -98,7 +135,6 @@ const EventFormComponent = (
   const descriptionBinding = useInputBinding(model, 'description');
   const startDateBinding = useDateBinding(model, 'startDate');
   const seasonBinding = useSelectBinding(model, 'seasonId');
-  const courseBinding = useSelectBinding(model, 'courseId');
   const [isInFlight, setIsInFlight] = useState(false);
   const history = useHistory();
 
@@ -153,41 +189,6 @@ const EventFormComponent = (
     [services?.seasons]
   );
 
-  // TODO: Same as above, baby just pooped so I don't have time.
-  const courseSearch = useCallback(
-    async (query: string) => {
-      const courses = await services?.courses.getAll();
-      const mapper = (course: CourseModel) => ({
-        text: course.name,
-        value: course.id,
-      });
-
-      if (!courses) {
-        return [];
-      }
-
-      if (query.length === 0) {
-        return courses.map(mapper);
-      }
-
-      return courses
-        ?.filter(course =>
-          course.name.toLocaleLowerCase().startsWith(query.toLocaleLowerCase())
-        )
-        .map(mapper);
-    },
-    [services?.courses]
-  );
-
-  // TODO: Move courseId to round as we can have rounds at different courses (such as a Madison day of discing.)
-  // Right now there's an issue because Round form is decoupled from Event form by the generic tab collection.
-  // If we pass in props, we have to rerender the whole collection if that changes.
-  // Instead of building a way to access all the models through the react component tree (context) I just should
-  // move the prop anyway.
-  const tabProps = {
-    courseId: model.current?.courseId,
-  };
-
   return (
     <>
       <h1>{isEditing ? 'Edit Event' : 'New Event'}</h1>
@@ -206,11 +207,6 @@ const EventFormComponent = (
             searcher={seasonSearch}
           />
         </Form.Group>
-        <EntitySearch
-          {...courseBinding}
-          label="Course"
-          searcher={courseSearch}
-        />
         <TextInput
           {...descriptionBinding}
           fluid
@@ -223,7 +219,6 @@ const EventFormComponent = (
           TabComponent={RoundForm}
           list={model.current?.rounds}
           modelFactory={() => new RoundModel()}
-          tabProps={tabProps}
         />
         <Form.Button positive content="Submit" />
       </Form>

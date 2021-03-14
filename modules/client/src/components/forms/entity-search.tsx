@@ -13,6 +13,7 @@ export interface EntitySearchProps {
   searcher: (query: string) => Promise<AsyncSearcherResult[]>;
   label: string;
   onChange: (event: any, value: any) => void;
+  disabled?: boolean;
 }
 
 const EntitySearch = (props: EntitySearchProps) => {
@@ -21,6 +22,7 @@ const EntitySearch = (props: EntitySearchProps) => {
     onChange: parentOnChange,
     searcher,
     label,
+    disabled,
   } = props;
   const [value, setValue] = useState(originalValue);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,6 +62,7 @@ const EntitySearch = (props: EntitySearchProps) => {
         onSearchChange={handleSearchChange}
         options={results}
         value={value}
+        disabled={disabled}
       />
     </div>
   );

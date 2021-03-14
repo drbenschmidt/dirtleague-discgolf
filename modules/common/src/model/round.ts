@@ -5,6 +5,7 @@ import DirtLeagueModel from './dl-model';
 export interface RoundAttributes {
   id?: number;
   eventId?: number;
+  courseId?: number;
   courseLayoutId?: number;
   cards?: CardAttributes[];
   name?: string;
@@ -40,6 +41,14 @@ export default class RoundModel
 
   set eventId(value: number) {
     this.attributes.eventId = value;
+  }
+
+  get courseId(): number {
+    return this.attributes.courseId;
+  }
+
+  set courseId(value: number) {
+    this.attributes.courseId = value;
   }
 
   get courseLayoutId(): number {

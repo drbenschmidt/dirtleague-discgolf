@@ -8,7 +8,6 @@ export interface TabCollectionProps<TModel> {
   modelFactory: () => TModel;
   TabComponent: (props: any) => ReactElement;
   label: string;
-  tabProps: any;
 }
 
 export interface TabModelProps {
@@ -19,7 +18,7 @@ export interface TabModelProps {
 function TabCollection<TModel extends TabModelProps>(
   props: TabCollectionProps<TModel>
 ) {
-  const { list, modelFactory, TabComponent, label, tabProps = {} } = props;
+  const { list, modelFactory, TabComponent, label } = props;
   const [activeIndex, setActiveIndex] = useState(-1);
   const [, setDummy] = useState(false);
 
@@ -82,7 +81,7 @@ function TabCollection<TModel extends TabModelProps>(
         ),
         render: () => (
           <Tab.Pane>
-            <TabComponent {...tabProps} key={entity.cid} model={entity} />
+            <TabComponent key={entity.cid} model={entity} />
           </Tab.Pane>
         ),
       };

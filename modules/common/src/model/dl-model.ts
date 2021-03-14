@@ -51,6 +51,10 @@ class DirtLeagueModel<TAttributes> {
     return value;
   }
 
+  set<T>(key: string, value: T): void {
+    (this.attributes as any)[key] = value;
+  }
+
   toJson(): Record<string, any> {
     const result = {} as Record<string, any>;
     const totalKeys = new Set([
