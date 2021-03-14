@@ -55,6 +55,25 @@ const buildRoute = (services: RepositoryServices): Router => {
     })
   );
 
+  router.get(
+    '/:id/layouts',
+    corsHandler,
+    withTryCatch(async (req, res) => {
+      const { id } = req.params;
+      const entity = await services.courses.get(parseInt(id, 10));
+
+      if (!entity) {
+        res.status(404).json({ error: 'Entity Not Found' });
+      }
+
+      const courseLayouts = await services.courseLayouts.getAllForCourse(
+        parseInt(id, 10)
+      );
+
+      res.json(courseLayouts);
+    })
+  );
+
   router.post(
     '/',
     corsHandler,

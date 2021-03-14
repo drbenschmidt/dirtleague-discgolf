@@ -1,10 +1,19 @@
-import { ReactElement, useCallback, useEffect, useState, memo } from 'react';
+import {
+  ReactElement,
+  useCallback,
+  useEffect,
+  useState,
+  useRef,
+  memo,
+  useMemo,
+} from 'react';
 import {
   isNil,
   EventModel,
   RoundModel,
   SeasonModel,
   CourseModel,
+  CourseLayoutModel,
 } from '@dirtleague/common';
 import { useParams, useHistory } from 'react-router-dom';
 import { Form, TextArea } from 'semantic-ui-react';
@@ -22,8 +31,56 @@ import TabCollection from '../../components/forms/tab-collection';
 import EntitySearch from '../../components/forms/entity-search';
 import RepositoryServices from '../../data-access/repository-services';
 
-const RoundForm = (): ReactElement => {
-  return <div>Round</div>;
+export interface RoundFormComponentProps {
+  model: RoundModel;
+  courseId: number;
+}
+
+const RoundForm = (props: RoundFormComponentProps): ReactElement => {
+  const { model, courseId } = props;
+  const modelRef = useRef(model);
+  const layoutBinding = useSelectBinding(modelRef, 'courseLayoutId');
+  const services = useRepositoryServices();
+
+  // TODO: Same as above, baby just pooped so I don't have time.
+  const courseLayoutSearch = useCallback(
+    async (query: string) => {
+      const courseLayouts = await services?.courses.getLayoutsForCourse(
+        courseId
+      );
+      const mapper = (course: CourseLayoutModel) => ({
+        text: course.name,
+        value: course.id,
+      });
+
+      if (!courseLayouts) {
+        return [];
+      }
+
+      if (query.length === 0) {
+        return courseLayouts.map(mapper);
+      }
+
+      return courseLayouts
+        ?.filter(layout =>
+          layout.name.toLocaleLowerCase().startsWith(query.toLocaleLowerCase())
+        )
+        .map(mapper);
+    },
+    [courseId, services?.courses]
+  );
+
+  return (
+    <>
+      <Form.Group widths="equal">
+        <EntitySearch
+          {...layoutBinding}
+          label="Course Layout"
+          searcher={courseLayoutSearch}
+        />
+      </Form.Group>
+    </>
+  );
 };
 
 export interface EventFormComponentProps {
@@ -122,6 +179,15 @@ const EventFormComponent = (
     [services?.courses]
   );
 
+  // TODO: Move courseId to round as we can have rounds at different courses (such as a Madison day of discing.)
+  // Right now there's an issue because Round form is decoupled from Event form by the generic tab collection.
+  // If we pass in props, we have to rerender the whole collection if that changes.
+  // Instead of building a way to access all the models through the react component tree (context) I just should
+  // move the prop anyway.
+  const tabProps = {
+    courseId: model.current?.courseId,
+  };
+
   return (
     <>
       <h1>{isEditing ? 'Edit Event' : 'New Event'}</h1>
@@ -157,6 +223,7 @@ const EventFormComponent = (
           TabComponent={RoundForm}
           list={model.current?.rounds}
           modelFactory={() => new RoundModel()}
+          tabProps={tabProps}
         />
         <Form.Button positive content="Submit" />
       </Form>

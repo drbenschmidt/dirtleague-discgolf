@@ -6,8 +6,9 @@ import { Tab, Button, Menu, Label, Icon } from 'semantic-ui-react';
 export interface TabCollectionProps<TModel> {
   list?: LinkedList<TModel>;
   modelFactory: () => TModel;
-  TabComponent: (props: { model: TModel }) => ReactElement;
+  TabComponent: (props: any) => ReactElement;
   label: string;
+  tabProps: any;
 }
 
 export interface TabModelProps {
@@ -18,7 +19,7 @@ export interface TabModelProps {
 function TabCollection<TModel extends TabModelProps>(
   props: TabCollectionProps<TModel>
 ) {
-  const { list, modelFactory, TabComponent, label } = props;
+  const { list, modelFactory, TabComponent, label, tabProps = {} } = props;
   const [activeIndex, setActiveIndex] = useState(-1);
   const [, setDummy] = useState(false);
 
@@ -81,7 +82,7 @@ function TabCollection<TModel extends TabModelProps>(
         ),
         render: () => (
           <Tab.Pane>
-            <TabComponent key={entity.cid} model={entity} />
+            <TabComponent {...tabProps} key={entity.cid} model={entity} />
           </Tab.Pane>
         ),
       };
