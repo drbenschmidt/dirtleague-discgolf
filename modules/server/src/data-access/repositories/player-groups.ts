@@ -64,6 +64,15 @@ class PlayerGroupsRepository implements Repository<DbPlayerGroup> {
 
     return entities;
   }
+
+  async getForCard(id: number): Promise<DbPlayerGroup[]> {
+    const entities = await this.db.query(sql`
+      SELECT * FROM playerGroups
+      WHERE cardId=${id}
+    `);
+
+    return entities;
+  }
 }
 
 export default PlayerGroupsRepository;

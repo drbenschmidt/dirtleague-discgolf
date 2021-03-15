@@ -36,24 +36,33 @@ const buildRoute = (services: RepositoryServices): Router => {
       }
 
       // TODO: parse it and check for entity types.
-      /*
       if (include && entity) {
-        const courseLayouts = await services.courseLayouts.getAllForCourse(
-          parseInt(id, 10)
-        );
+        const rounds = await services.rounds.getAllForEvent(parseInt(id, 10));
 
-        (entity as any).layouts = courseLayouts;
+        (entity as any).rounds = rounds;
 
-        await asyncForEach(courseLayouts, async courseLayout => {
-          const holes = await services.courseHoles.getAllForCourseLayout(
-            courseLayout.id
-          );
+        await asyncForEach(rounds, async round => {
+          const cards = await services.cards.getForRound(round.id);
 
-          // eslint-disable-next-line no-param-reassign
-          (courseLayout as any).holes = holes;
+          (round as any).cards = cards;
+
+          await asyncForEach(cards, async card => {
+            const playerGroups = await services.playerGroups.getForCard(
+              card.id
+            );
+
+            (card as any).playerGroups = playerGroups;
+
+            await asyncForEach(playerGroups, async playerGroup => {
+              const playerGroupPlayers = await services.playerGroupPlayers.getForPlayerGroup(
+                playerGroup.id
+              );
+
+              (playerGroup as any).players = playerGroupPlayers;
+            });
+          });
         });
       }
-      */
 
       res.json(entity);
     })
@@ -121,36 +130,6 @@ const buildRoute = (services: RepositoryServices): Router => {
           });
         });
       }
-
-      /**
-      if (model.rounds) {
-        // Create each alias if included.
-        await asyncForEach(model.layouts.toArray(), async layout => {
-          // Make sure the aliases relate to this player.
-          // eslint-disable-next-line no-param-reassign
-          layout.courseId = newId;
-
-          const layoutJson = layout.toJson();
-
-          const newLayoutId = await services.courseLayouts.create(
-            layoutJson as DbCourseLayout
-          );
-
-          // eslint-disable-next-line no-param-reassign
-          layout.id = newLayoutId;
-          layoutJson.id = newLayoutId;
-
-          await asyncForEach(layout.holes.toArray(), async hole => {
-            // eslint-disable-next-line no-param-reassign
-            hole.courseLayoutId = newLayoutId;
-
-            const holeJson = hole.toJson();
-
-            await services.courseHoles.create(holeJson as DbCourseHole);
-          });
-        });
-      }
-      */
 
       res.json(model.toJson());
     })

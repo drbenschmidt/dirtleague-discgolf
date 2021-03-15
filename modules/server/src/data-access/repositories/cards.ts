@@ -63,6 +63,15 @@ class CardsRepository implements Repository<DbCard> {
 
     return entities;
   }
+
+  async getForRound(id: number): Promise<DbCard[]> {
+    const entities = await this.db.query(sql`
+      SELECT * FROM cards
+      WHERE roundId=${id}
+    `);
+
+    return entities;
+  }
 }
 
 export default CardsRepository;

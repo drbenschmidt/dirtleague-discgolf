@@ -66,6 +66,15 @@ class RoundsRepository implements Repository<DbRound> {
 
     return entities;
   }
+
+  async getAllForEvent(id: number): Promise<DbRound[]> {
+    const entities = await this.db.query(sql`
+      SELECT * FROM rounds
+      WHERE eventId=${id}
+    `);
+
+    return entities;
+  }
 }
 
 export default RoundsRepository;
