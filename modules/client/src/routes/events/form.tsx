@@ -18,6 +18,7 @@ import {
   CardModel,
   PlayerModel,
   CardThrowerModel,
+  IdNamePairModel,
 } from '@dirtleague/common';
 import { useParams, useHistory } from 'react-router-dom';
 import {
@@ -56,8 +57,15 @@ export interface PlayerGroupFormRowComponentProps {
   model: CardThrowerModel;
 }
 
-const PlayerFormRow = (): ReactElement => {
+export interface PlayerFormRowComponentProps {
+  model: IdNamePairModel;
+}
+
+const PlayerFormRow = (props: PlayerFormRowComponentProps): ReactElement => {
+  const { model } = props;
+  const modelRef = useRef(model);
   const services = useRepositoryServices();
+  const playerBinding = useSelectBinding(modelRef, 'id');
 
   const playerSearch = useCallback(
     async (query: string) => {
@@ -86,9 +94,7 @@ const PlayerFormRow = (): ReactElement => {
     [services?.players]
   );
 
-  return (
-    <EntitySearch value={null} onChange={console.log} searcher={playerSearch} />
-  );
+  return <EntitySearch {...playerBinding} searcher={playerSearch} />;
 };
 
 const PlayerGroupFormRow = (
@@ -106,10 +112,10 @@ const PlayerGroupFormRow = (
       <Collection
         tableColor="green"
         buttonText="Add Player"
-        model={modelRef}
-        propName="playerIds"
+        list={model.playerIds}
         label="Players"
         RowComponent={PlayerFormRow}
+        modelFactory={() => new IdNamePairModel()}
       />
     </>
   );
@@ -117,16 +123,15 @@ const PlayerGroupFormRow = (
 
 const CardForm = (props: CardFormComponentProps): ReactElement => {
   const { model } = props;
-  const modelRef = useRef(model);
 
   return (
     <Collection
       tableColor="blue"
       buttonText="Add Player Group"
-      model={modelRef}
-      propName="cardThrowers"
       label="Card"
+      list={model.cardThrowers}
       RowComponent={PlayerGroupFormRow}
+      modelFactory={() => new CardThrowerModel()}
     />
   );
 };
@@ -303,11 +308,7 @@ const EventFormComponent = (
 
             history.push(`/events/${model.current.id}`);
           } else {
-            // await services?.events.create(model.current);
-
-            (window as any).testing = model.current;
-            console.log('updated testing', model.current);
-            return;
+            await services?.events.create(model.current);
 
             // TODO: Move to course view?
             history.push('/events');

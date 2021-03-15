@@ -1,17 +1,16 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { ReactElement, useCallback, useState } from 'react';
 import { Table, Menu, Button, Icon, SemanticCOLORS } from 'semantic-ui-react';
-import { isNil } from '@dirtleague/common';
 import { LinkedList } from 'linked-list-typescript';
 import DirtLeagueModel from '@dirtleague/common/src/model/dl-model';
 
 interface CollectionProps<TModel> {
   RowComponent: (props: any) => ReactElement;
-  model: React.RefObject<TModel>;
-  propName: string;
+  list?: LinkedList<TModel>;
   label: string;
   buttonText: string;
   tableColor?: SemanticCOLORS;
+  modelFactory: () => TModel;
 }
 
 function CollectionComponent<TModel extends DirtLeagueModel<void>>(
@@ -19,37 +18,31 @@ function CollectionComponent<TModel extends DirtLeagueModel<void>>(
 ): ReactElement {
   const {
     RowComponent,
-    model,
-    propName,
+    list,
     label,
     buttonText,
     tableColor,
+    modelFactory,
   } = props;
-  let entities = (model.current as any)[propName] as LinkedList<TModel>;
   const [, setDummy] = useState(false);
 
-  if (isNil(entities)) {
-    (model.current as any)[propName] = new LinkedList<TModel>();
-    entities = new LinkedList<TModel>();
-  }
-
   const onAddClick = useCallback(() => {
-    entities.append({} as TModel);
+    list?.append(modelFactory());
     setDummy(v => !v);
-  }, [entities]);
+  }, [list, modelFactory]);
 
   const onRemoveClick = useCallback(
     (obj: TModel) => {
       return () => {
-        if (entities?.length === 1) {
-          entities?.removeHead();
+        if (list?.length === 1) {
+          list?.removeHead();
         } else {
-          entities?.remove(obj);
+          list?.remove(obj);
         }
         setDummy(v => !v);
       };
     },
-    [entities]
+    [list]
   );
 
   return (
@@ -59,7 +52,7 @@ function CollectionComponent<TModel extends DirtLeagueModel<void>>(
       </div>
       <Table color={tableColor}>
         <Table.Body>
-          {entities.toArray().map(entity => (
+          {list?.toArray().map(entity => (
             // eslint-disable-next-line react/no-array-index-key
             <Table.Row key={`collection_${entity.cid}`}>
               <Table.Cell width="14">

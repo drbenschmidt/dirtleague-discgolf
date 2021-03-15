@@ -22,6 +22,7 @@ export { default as RoundModel } from './model/round';
 export { default as CardModel } from './model/card';
 export { default as CardThrowerModel } from './model/card-thrower';
 export { default as CardHoleResultModel } from './model/card-hole-result';
+export { default as IdNamePairModel } from './model/id-name-pair';
 export type { AliasAttributes } from './model/alias';
 export type { CourseAttributes } from './model/course';
 export type { CourseHoleAttributes } from './model/course-hole';
@@ -33,6 +34,7 @@ export type { RoundAttributes } from './model/round';
 export type { CardAttributes } from './model/card';
 export type { CardThrowerAttributes } from './model/card-thrower';
 export type { CardHoleResultAttributes } from './model/card-hole-result';
+export type { IdNamePairAttributes } from './model/id-name-pair';
 
 export type { UserModel } from './model/user';
 
