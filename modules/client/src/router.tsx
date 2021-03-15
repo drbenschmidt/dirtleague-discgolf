@@ -30,6 +30,7 @@ const Router = (): ReactElement => {
           <Route exact path="/courses/:id" component={CourseDetails} />
           <Route exact path="/events" component={EventList} />
           <Route exact path="/events/new" component={EventForm} />
+          <Route exact path="/events/edit/:id" component={EventForm} />
           <Route exact path="/events/:id" component={EventDetails} />
           <Route exact path="/seasons" component={SeasonList} />
           <Route exact path="/seasons/new" component={SeasonForm} />

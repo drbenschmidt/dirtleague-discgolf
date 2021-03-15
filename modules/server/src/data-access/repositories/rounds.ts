@@ -5,6 +5,7 @@ import { Repository } from '../repository';
 export interface DbRound {
   id?: number;
   eventId?: number;
+  courseId?: number;
   courseLayoutId?: number;
   name?: string;
 }
@@ -18,8 +19,8 @@ class RoundsRepository implements Repository<DbRound> {
 
   async create(model: DbRound): Promise<number> {
     const [result] = await this.db.query(sql`
-      INSERT INTO rounds (name, eventId, courseLayoutId)
-      VALUES (${model.name}, ${model.eventId}, ${model.courseLayoutId});
+      INSERT INTO rounds (name, eventId, courseId, courseLayoutId)
+      VALUES (${model.name}, ${model.eventId}, ${model.courseId}, ${model.courseLayoutId});
 
       SELECT LAST_INSERT_ID();
     `);
@@ -33,7 +34,7 @@ class RoundsRepository implements Repository<DbRound> {
   async update(model: DbRound): Promise<void> {
     await this.db.query(sql`
       UPDATE rounds
-      SET name=${model.name}, eventId=${model.eventId}, courseLayoutId=${model.courseLayoutId}
+      SET name=${model.name}, eventId=${model.eventId}, courseId=${model.courseId} courseLayoutId=${model.courseLayoutId}
       WHERE id=${model.id}
     `);
   }

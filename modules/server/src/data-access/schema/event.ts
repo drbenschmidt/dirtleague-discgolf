@@ -5,9 +5,9 @@ export const createEventsTable = async (db: ConnectionPool): Promise<void> => {
   await db.query(sql`
     CREATE TABLE events (
       id INT NOT NULL AUTO_INCREMENT,
-      courseId INT NOT NULL,
       seasonId INT NOT NULL,
       name VARCHAR(45) NOT NULL,
+      description LONGTEXT NULL,
       startDate DATETIME NULL,
       PRIMARY KEY (id));
   `);

@@ -1,9 +1,14 @@
+/* eslint-disable no-param-reassign */
 import { asyncForEach, Roles, EventModel } from '@dirtleague/common';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
 import RepositoryServices from '../data-access/repository-services';
 import corsHandler from '../http/cors-handler';
+import { DbRound } from '../data-access/repositories/rounds';
+import { DbCard } from '../data-access/repositories/cards';
+import { DbPlayerGroup } from '../data-access/repositories/player-groups';
+import { DbPlayerGroupPlayer } from '../data-access/repositories/player-group-players';
 
 const buildRoute = (services: RepositoryServices): Router => {
   const router = express.Router();
@@ -63,6 +68,59 @@ const buildRoute = (services: RepositoryServices): Router => {
       const newId = await services.events.create(model);
 
       model.id = newId;
+
+      if (model.rounds) {
+        // Create each round if included.
+        await asyncForEach(model.rounds.toArray(), async round => {
+          // Each round has to be tied into this event.
+          round.eventId = newId;
+
+          const roundJson = round.toJson();
+          const newRoundId = await services.rounds.create(roundJson as DbRound);
+
+          round.id = newRoundId;
+          roundJson.id = newRoundId;
+
+          await asyncForEach(round.cards.toArray(), async card => {
+            card.roundId = newRoundId;
+
+            const cardJson = card.toJson();
+            const newCardId = await services.cards.create(cardJson as DbCard);
+
+            card.id = newCardId;
+            cardJson.id = newCardId;
+
+            // TODO: rename to playerGroups
+            await asyncForEach(
+              card.playerGroups.toArray(),
+              async playerGroup => {
+                playerGroup.cardId = newCardId;
+
+                const playerGroupJson = playerGroup.toJson();
+                const newPlayerGroupId = await services.playerGroups.create(
+                  playerGroupJson as DbPlayerGroup
+                );
+
+                playerGroup.id = newPlayerGroupId;
+                playerGroupJson.id = newPlayerGroupId;
+
+                await asyncForEach(
+                  playerGroup.players.toArray(),
+                  async player => {
+                    player.playerGroupId = newPlayerGroupId;
+
+                    const playerJson = player.toJson();
+
+                    await services.playerGroupPlayers.create(
+                      playerJson as DbPlayerGroupPlayer
+                    );
+                  }
+                );
+              }
+            );
+          });
+        });
+      }
 
       /**
       if (model.rounds) {

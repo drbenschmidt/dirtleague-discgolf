@@ -9,7 +9,8 @@ import SeasonsRepository from './repositories/seasons';
 import EventsRepository from './repositories/events';
 import RoundsRepository from './repositories/rounds';
 import CardsRepository from './repositories/cards';
-import CardThrowersRepository from './repositories/card-throwers';
+import PlayerGroupsRepository from './repositories/player-groups';
+import PlayerGroupPlayersRepository from './repositories/player-group-players';
 import CardHoleResultsRepository from './repositories/card-hole-results';
 
 class RepositoryServices {
@@ -33,7 +34,9 @@ class RepositoryServices {
 
   cards: CardsRepository = null;
 
-  cardThrowers: CardThrowersRepository = null;
+  playerGroups: PlayerGroupsRepository = null;
+
+  playerGroupPlayers: PlayerGroupPlayersRepository = null;
 
   cardHoleResults: CardHoleResultsRepository = null;
 
@@ -48,7 +51,8 @@ class RepositoryServices {
     this.events = new EventsRepository(db);
     this.rounds = new RoundsRepository(db);
     this.cards = new CardsRepository(db);
-    this.cardThrowers = new CardThrowersRepository(db);
+    this.playerGroups = new PlayerGroupsRepository(db);
+    this.playerGroupPlayers = new PlayerGroupPlayersRepository(db);
     this.cardHoleResults = new CardHoleResultsRepository(db);
   }
 }

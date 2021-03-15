@@ -6,6 +6,7 @@ export const createRoundsTable = async (db: ConnectionPool): Promise<void> => {
     CREATE TABLE rounds (
       id INT NOT NULL AUTO_INCREMENT,
       eventId INT NOT NULL,
+      courseId INT NOT NULL,
       courseLayoutId INT NOT NULL,
       name VARCHAR(45) NULL,
       PRIMARY KEY (id));

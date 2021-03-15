@@ -1,20 +1,20 @@
 import { LinkedList } from 'linked-list-typescript';
 import { Memoize } from 'typescript-memoize';
 import Cloneable from '../interfaces/cloneable';
-import CardThrowerModel, { CardThrowerAttributes } from './card-thrower';
+import PlayerGroupModel, { PlayerGroupAttributes } from './player-group';
 import DirtLeagueModel from './dl-model';
 
 export interface CardAttributes {
   id?: number;
   roundId?: number;
-  cardThrowers?: CardThrowerAttributes[];
+  playerGroups?: PlayerGroupAttributes[];
 }
 
 export default class CardModel
   extends DirtLeagueModel<CardAttributes>
   implements Cloneable<CardModel> {
   static defaults = {
-    cardThrowers: [] as CardThrowerAttributes[],
+    playerGroups: [] as PlayerGroupAttributes[],
   };
 
   constructor(obj: Record<string, any> = {}) {
@@ -41,10 +41,10 @@ export default class CardModel
   }
 
   @Memoize()
-  get cardThrowers(): LinkedList<CardThrowerModel> {
-    return new LinkedList<CardThrowerModel>(
-      ...this.attributes?.cardThrowers?.map(
-        (v: CardThrowerAttributes) => new CardThrowerModel(v)
+  get playerGroups(): LinkedList<PlayerGroupModel> {
+    return new LinkedList<PlayerGroupModel>(
+      ...this.attributes?.playerGroups?.map(
+        (v: PlayerGroupAttributes) => new PlayerGroupModel(v)
       )
     );
   }

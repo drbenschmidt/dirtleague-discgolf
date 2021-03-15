@@ -8,7 +8,6 @@ export interface EventAttributes {
   id?: number;
   name?: string;
   description?: string;
-  courseId?: number;
   seasonId?: number;
   startDate?: Date;
   rounds?: RoundAttributes[];
@@ -36,14 +35,6 @@ export default class EventModel
 
   set id(value: number) {
     this.attributes.id = value;
-  }
-
-  get courseId(): number {
-    return this.attributes.courseId;
-  }
-
-  set courseId(value: number) {
-    this.attributes.courseId = value;
   }
 
   get seasonId(): number {

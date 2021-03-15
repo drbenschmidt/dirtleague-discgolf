@@ -2,22 +2,23 @@
 import { ConnectionPool, sql } from '@databases/mysql';
 import { Repository } from '../repository';
 
-export interface DbCardThrower {
+export interface DbPlayerGroup {
   id?: number;
+  cardId?: number;
   teamName?: string;
 }
 
-class CardThrowersRepository implements Repository<DbCardThrower> {
+class PlayerGroupsRepository implements Repository<DbPlayerGroup> {
   db: ConnectionPool;
 
   constructor(db: ConnectionPool) {
     this.db = db;
   }
 
-  async create(model: DbCardThrower): Promise<number> {
+  async create(model: DbPlayerGroup): Promise<number> {
     const [result] = await this.db.query(sql`
-      INSERT INTO cardThrowers (teamName)
-      VALUES (${model.teamName});
+      INSERT INTO playerGroups (teamName, cardId)
+      VALUES (${model.teamName}, ${model.cardId});
 
       SELECT LAST_INSERT_ID();
     `);
@@ -28,24 +29,24 @@ class CardThrowersRepository implements Repository<DbCardThrower> {
     return id;
   }
 
-  async update(model: DbCardThrower): Promise<void> {
+  async update(model: DbPlayerGroup): Promise<void> {
     await this.db.query(sql`
-      UPDATE cardThrowers
-      SET teamName=${model.teamName}
+      UPDATE playerGroups
+      SET teamName=${model.teamName}, cardId=${model.cardId}
       WHERE id=${model.id}
     `);
   }
 
   async delete(id: number): Promise<void> {
     await this.db.query(sql`
-      DELETE FROM cardThrowers
+      DELETE FROM playerGroups
       WHERE id=${id}
     `);
   }
 
-  async get(id: number): Promise<DbCardThrower> {
+  async get(id: number): Promise<DbPlayerGroup> {
     const [entity] = await this.db.query(sql`
-      SELECT * FROM cardThrowers
+      SELECT * FROM playerGroups
       WHERE id=${id}
     `);
 
@@ -56,13 +57,13 @@ class CardThrowersRepository implements Repository<DbCardThrower> {
     return null;
   }
 
-  async getAll(): Promise<DbCardThrower[]> {
+  async getAll(): Promise<DbPlayerGroup[]> {
     const entities = await this.db.query(sql`
-      SELECT * FROM cardThrowers
+      SELECT * FROM playerGroups
     `);
 
     return entities;
   }
 }
 
-export default CardThrowersRepository;
+export default PlayerGroupsRepository;

@@ -17,8 +17,8 @@ import {
   DirtLeagueModel,
   CardModel,
   PlayerModel,
-  CardThrowerModel,
-  IdNamePairModel,
+  PlayerGroupModel,
+  PlayerGroupPlayerModel,
 } from '@dirtleague/common';
 import { useParams, useHistory } from 'react-router-dom';
 import {
@@ -54,18 +54,18 @@ export interface CardFormComponentProps {
 }
 
 export interface PlayerGroupFormRowComponentProps {
-  model: CardThrowerModel;
+  model: PlayerGroupModel;
 }
 
 export interface PlayerFormRowComponentProps {
-  model: IdNamePairModel;
+  model: PlayerGroupPlayerModel;
 }
 
 const PlayerFormRow = (props: PlayerFormRowComponentProps): ReactElement => {
   const { model } = props;
   const modelRef = useRef(model);
   const services = useRepositoryServices();
-  const playerBinding = useSelectBinding(modelRef, 'id');
+  const playerBinding = useSelectBinding(modelRef, 'playerId');
 
   const playerSearch = useCallback(
     async (query: string) => {
@@ -112,10 +112,10 @@ const PlayerGroupFormRow = (
       <Collection
         tableColor="green"
         buttonText="Add Player"
-        list={model.playerIds}
+        list={model.players}
         label="Players"
         RowComponent={PlayerFormRow}
-        modelFactory={() => new IdNamePairModel()}
+        modelFactory={() => new PlayerGroupPlayerModel()}
       />
     </>
   );
@@ -129,9 +129,9 @@ const CardForm = (props: CardFormComponentProps): ReactElement => {
       tableColor="blue"
       buttonText="Add Player Group"
       label="Card"
-      list={model.cardThrowers}
+      list={model.playerGroups}
       RowComponent={PlayerGroupFormRow}
-      modelFactory={() => new CardThrowerModel()}
+      modelFactory={() => new PlayerGroupModel()}
     />
   );
 };
@@ -311,7 +311,7 @@ const EventFormComponent = (
             await services?.events.create(model.current);
 
             // TODO: Move to course view?
-            history.push('/events');
+            // history.push('/events');
           }
         } finally {
           setIsInFlight(false);
@@ -420,6 +420,10 @@ const EventForm = (): ReactElement | null => {
       setEntityModel(response);
     }
   }, [id, isEditing, services?.events]);
+
+  if (!isEditing && !entityModel) {
+    return <div>loading</div>;
+  }
 
   if (!entityModel) {
     return null;
