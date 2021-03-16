@@ -65,6 +65,10 @@ class PlayerModel
     this.attributes.currentRating = value;
   }
 
+  get fullName(): string {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
   @Memoize()
   get aliases(): LinkedList<AliasModel> {
     return new LinkedList<AliasModel>(

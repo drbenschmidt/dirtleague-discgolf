@@ -1,8 +1,13 @@
 import { ReactElement, useCallback, useState } from 'react';
-import { Form } from 'semantic-ui-react';
+import { Form, Input } from 'semantic-ui-react';
 
 const TextInput = (props: any): ReactElement => {
-  const { value: originalValue, onChange: parentOnChange, ...rest } = props;
+  const {
+    value: originalValue,
+    onChange: parentOnChange,
+    control = Input,
+    ...rest
+  } = props;
   const [value, setValue] = useState(originalValue);
 
   const onChange = useCallback(
@@ -18,9 +23,10 @@ const TextInput = (props: any): ReactElement => {
     ...rest,
     value,
     onChange,
+    control,
   };
 
-  return <Form.Input {...inputProps} />;
+  return <Form.Field {...inputProps} />;
 };
 
 export default TextInput;

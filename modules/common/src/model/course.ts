@@ -6,11 +6,8 @@ import DirtLeagueModel from './dl-model';
 
 export interface CourseAttributes {
   id?: number;
-
   name?: string;
-
   layouts?: CourseLayoutAttributes[];
-
   dgcrSse?: number;
 }
 

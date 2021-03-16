@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "typescript-memoize": "1.0.0",
-    "linked-list-typescript": "1.0.15"
+    "linked-list-typescript": "1.0.15",
+    "rxjs": "6.6.6"
   }
 }

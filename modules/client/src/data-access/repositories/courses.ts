@@ -1,4 +1,9 @@
-import { CourseAttributes, CourseModel } from '@dirtleague/common';
+import {
+  CourseAttributes,
+  CourseLayoutAttributes,
+  CourseLayoutModel,
+  CourseModel,
+} from '@dirtleague/common';
 import { ApiOptions, ApiRepository, Repository } from '../repository';
 
 class CourseRepository
@@ -25,6 +30,14 @@ class CourseRepository
     );
 
     return new CourseModel(result);
+  }
+
+  async getLayoutsForCourse(id: number): Promise<CourseLayoutModel[]> {
+    const result = await this.api.get<CourseLayoutAttributes[]>(
+      `courses/${id}/layouts`
+    );
+
+    return result.map(obj => new CourseLayoutModel(obj));
   }
 
   async getAll(): Promise<CourseModel[]> {

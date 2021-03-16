@@ -1,4 +1,4 @@
-import { isNil, PlayerModel } from '@dirtleague/common';
+import { AliasModel, isNil, PlayerModel } from '@dirtleague/common';
 import { ReactElement, useCallback, useEffect, useState, useRef } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { Form } from 'semantic-ui-react';
@@ -67,11 +67,11 @@ const PlayerFormComponent = (props: any): ReactElement | null => {
           />
         </Form.Group>
         <Collection
-          model={model}
-          propName="aliases"
+          list={model.current?.aliases}
           RowComponent={AliasFormRow}
           label="Player Aliases"
           buttonText="Add Alias"
+          modelFactory={() => new AliasModel()}
         />
         <Form.Button positive content="Submit" />
       </Form>
