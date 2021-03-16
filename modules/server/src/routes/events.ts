@@ -97,9 +97,14 @@ const buildRoute = (services: RepositoryServices): Router => {
         (entity as any).rounds = rounds;
 
         await asyncForEach(rounds, async round => {
+          // TODO: Check for including course and layout info.
+          const course = await services.courses.get(round.courseId);
+          const layout = await services.courseLayouts.get(round.courseLayoutId);
           const cards = await services.cards.getForRound(round.id);
 
           (round as any).cards = cards;
+          (round as any).course = course;
+          (round as any).courseLayout = layout;
 
           await asyncForEach(cards, async card => {
             const playerGroups = await services.playerGroups.getForCard(
@@ -112,6 +117,8 @@ const buildRoute = (services: RepositoryServices): Router => {
               const playerGroupPlayers = await services.playerGroupPlayers.getForPlayerGroup(
                 playerGroup.id
               );
+
+              // TODO: Check for includes and get player info.
 
               (playerGroup as any).players = playerGroupPlayers;
             });

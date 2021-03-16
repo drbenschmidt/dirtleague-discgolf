@@ -311,7 +311,7 @@ const EventFormComponent = (
             await services?.events.create(model.current);
 
             // TODO: Move to course view?
-            // history.push('/events');
+            history.push('/events');
           }
         } finally {
           setIsInFlight(false);
@@ -383,6 +383,7 @@ const EventFormComponent = (
           control={TextArea}
         />
         <TabCollection
+          mode="form"
           label="Rounds"
           TabComponent={RoundForm}
           list={model.current?.rounds}

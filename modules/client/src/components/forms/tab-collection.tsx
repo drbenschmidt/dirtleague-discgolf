@@ -5,9 +5,10 @@ import { Tab, Button, Menu, Label, Icon } from 'semantic-ui-react';
 
 export interface TabCollectionProps<TModel> {
   list?: LinkedList<TModel>;
-  modelFactory: () => TModel;
+  modelFactory?: () => TModel;
   TabComponent: (props: any) => ReactElement;
-  label: string;
+  label?: string;
+  mode: 'form' | 'details';
 }
 
 export interface TabModelProps {
@@ -18,9 +19,16 @@ export interface TabModelProps {
 function TabCollection<TModel extends TabModelProps>(
   props: TabCollectionProps<TModel>
 ) {
-  const { list, modelFactory, TabComponent, label } = props;
-  const [activeIndex, setActiveIndex] = useState(-1);
+  const { list, modelFactory, TabComponent, label, mode = 'form' } = props;
+  const [activeIndex, setActiveIndex] = useState(() => {
+    if ((list?.length || 0) > 0) {
+      return 0;
+    }
+
+    return -1;
+  });
   const [, setDummy] = useState(false);
+  const isFormMode = mode === 'form';
 
   const addButton = (
     <Button
@@ -29,6 +37,10 @@ function TabCollection<TModel extends TabModelProps>(
       positive
       style={{ marginLeft: '15px', lineHeight: 'inherit', marginBottom: '5px' }}
       onClick={() => {
+        if (!modelFactory) {
+          return;
+        }
+
         list?.append(modelFactory());
 
         const newSize = list?.length || 1;
@@ -59,7 +71,7 @@ function TabCollection<TModel extends TabModelProps>(
     [list]
   );
 
-  const layoutPanes =
+  const tabPanes =
     list?.toArray().map(entity => {
       return {
         menuItem: (
@@ -69,14 +81,16 @@ function TabCollection<TModel extends TabModelProps>(
             style={{ marginRight: '15px' }}
           >
             {entity.name}
-            <Label
-              color="red"
-              floating
-              entity={entity}
-              onClick={onMenuRemoveClick}
-            >
-              <Icon name="x" style={{ marginRight: 0 }} />
-            </Label>
+            {isFormMode && (
+              <Label
+                color="red"
+                floating
+                entity={entity}
+                onClick={onMenuRemoveClick}
+              >
+                <Icon name="x" style={{ marginRight: 0 }} />
+              </Label>
+            )}
           </Menu.Item>
         ),
         render: () => (
@@ -87,17 +101,18 @@ function TabCollection<TModel extends TabModelProps>(
       };
     }) || [];
 
-  const panes = [
-    ...layoutPanes,
-    { menuItem: addButton, render: () => <Tab.Pane /> },
-  ];
+  if (isFormMode) {
+    tabPanes.push({ menuItem: addButton, render: () => <Tab.Pane /> });
+  }
 
   return (
     <>
-      <div className="field">
-        <label>{label}</label>
-      </div>
-      <Tab renderActiveOnly panes={panes} activeIndex={activeIndex} />
+      {label && (
+        <div className="field">
+          <label>{label}</label>
+        </div>
+      )}
+      <Tab renderActiveOnly panes={tabPanes} activeIndex={activeIndex} />
     </>
   );
 }

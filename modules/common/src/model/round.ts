@@ -1,5 +1,6 @@
 import { LinkedList } from 'linked-list-typescript';
 import { Memoize } from 'typescript-memoize';
+import { CourseLayoutModel, CourseModel } from '..';
 import Cloneable from '../interfaces/cloneable';
 import CardModel, { CardAttributes } from './card';
 import DirtLeagueModel from './dl-model';
@@ -53,12 +54,20 @@ export default class RoundModel
     this.set('courseId', value);
   }
 
+  get course(): CourseModel | undefined {
+    return (this.attributes as any).course;
+  }
+
   get courseLayoutId(): number {
     return this.attributes.courseLayoutId;
   }
 
   set courseLayoutId(value: number) {
     this.attributes.courseLayoutId = value;
+  }
+
+  get courseLayout(): CourseLayoutModel | undefined {
+    return (this.attributes as any).courseLayout;
   }
 
   get name(): string {
