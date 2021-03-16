@@ -27,6 +27,14 @@ class EventRepository extends ApiRepository implements Repository<EventModel> {
 
     return result.map(obj => new EventModel(obj));
   }
+
+  async putCard(
+    eventId: number,
+    cardId: number,
+    formData: FormData
+  ): Promise<void> {
+    await this.api.putFile(`events/${eventId}/card/${cardId}/upload`, formData);
+  }
 }
 
 export default EventRepository;

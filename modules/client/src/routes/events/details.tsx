@@ -5,7 +5,14 @@ import {
   PlayerGroupModel,
   RoundModel,
 } from '@dirtleague/common';
-import { ReactElement, memo, useEffect, useState, useRef } from 'react';
+import {
+  ReactElement,
+  memo,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from 'react';
 import {
   Button,
   Grid,
@@ -14,8 +21,6 @@ import {
   Message,
   Table,
   Modal,
-  Form,
-  Ref,
 } from 'semantic-ui-react';
 import { useParams } from 'react-router-dom';
 import { useRepositoryServices } from '../../data-access/context';
@@ -23,11 +28,16 @@ import { EntityDetailsParams } from '../types';
 import TabCollection from '../../components/forms/tab-collection';
 import FileUpload from '../../components/forms/file-upload';
 
-const UploadButton = (props: any): ReactElement => {
-  const { destination, modelName, id } = props;
+interface UploadButtonProps {
+  formData: FormData;
+  formPropName: string;
+  onUpload: () => Promise<void>;
+}
+
+const UploadButton = (props: UploadButtonProps): ReactElement => {
+  const { formData, formPropName, onUpload } = props;
   const [isOpen, setIsOpen] = useState(false);
   const [isInFlight, setIsInFlight] = useState(false);
-  const formRef = useRef(null);
 
   const button = (
     <Button primary as="a">
@@ -43,31 +53,28 @@ const UploadButton = (props: any): ReactElement => {
       onClose={() => setIsOpen(false)}
       trigger={button}
     >
-      <Modal.Header>Delete {modelName}</Modal.Header>
+      <Modal.Header>Upload File</Modal.Header>
       <Modal.Content>
-        <Ref innerRef={formRef}>
-          <Form method="POST" action={destination}>
-            <FileUpload />
-          </Form>
-        </Ref>
+        <FileUpload formData={formData} formPropName={formPropName} />
       </Modal.Content>
       <Modal.Actions>
         <Button disabled={isInFlight} onClick={() => setIsOpen(false)} negative>
-          No
+          Cancel
         </Button>
         <Button
           loading={isInFlight}
-          onClick={() => {
-            setIsOpen(false);
-            if (!formRef.current) {
-              return;
+          onClick={async () => {
+            try {
+              setIsInFlight(true);
+              await onUpload();
+              setIsOpen(false);
+            } finally {
+              setIsInFlight(false);
             }
-            console.log(formRef.current);
-            (formRef.current as any).submit();
           }}
           positive
         >
-          Yes
+          Upload
         </Button>
       </Modal.Actions>
     </Modal>
@@ -82,8 +89,9 @@ interface CardDetailsProps {
 
 const CardDetails = (props: CardDetailsProps): ReactElement => {
   const { model, layout, eventId } = props;
-
   const holes = layout?.holes;
+  const formDataRef = useRef(new FormData());
+  const services = useRepositoryServices();
 
   const buildPlayerGroup = (playerGroup: PlayerGroupModel) => {
     const teamName =
@@ -102,6 +110,10 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
       </div>
     );
   };
+
+  const onUpload = useCallback(async () => {
+    await services?.events.putCard(eventId, model.id, formDataRef.current);
+  }, [eventId, model.id, services?.events]);
 
   return (
     <>
@@ -141,7 +153,11 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
       </Table>
       <Grid>
         <Grid.Column width="16" floated="right" textAlign="right">
-          <UploadButton destination={`/events/${eventId}/card/${model.id}`} />
+          <UploadButton
+            onUpload={onUpload}
+            formData={formDataRef.current}
+            formPropName="csv"
+          />
         </Grid.Column>
       </Grid>
     </>

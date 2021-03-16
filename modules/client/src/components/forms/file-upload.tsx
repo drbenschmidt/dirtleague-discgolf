@@ -1,20 +1,34 @@
-import { memo, useRef, useCallback } from 'react';
+import { memo, useRef, useCallback, useState } from 'react';
 import { Button } from 'semantic-ui-react';
 
-const FileUploadComponent = (props: any) => {
+interface FileUploadComponentProps {
+  formData: FormData;
+  formPropName: string;
+}
+
+const FileUploadComponent = (props: FileUploadComponentProps) => {
+  const { formData, formPropName } = props;
+  const [fileName, setFileName] = useState();
   const inputRef = useRef<HTMLInputElement>(null);
   const onClick = useCallback(() => {
     inputRef.current?.click();
   }, []);
-  const onChange = useCallback((e: any) => {
-    console.log(e);
-    console.log(e.target.files[0]);
-  }, []);
+  const onChange = useCallback(
+    (e: any) => {
+      const file = e.target.files[0];
+      console.log(file);
+
+      formData.append(formPropName, file);
+
+      setFileName(file.name);
+    },
+    [formData, formPropName]
+  );
 
   return (
     <>
       <Button
-        content="Choose File"
+        content={fileName ?? 'Choose File'}
         labelPosition="left"
         icon="file"
         onClick={onClick}

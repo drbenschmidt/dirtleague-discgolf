@@ -16,6 +16,7 @@ import { DbCard } from '../data-access/repositories/cards';
 import { DbPlayerGroup } from '../data-access/repositories/player-groups';
 import { DbPlayerGroupPlayer } from '../data-access/repositories/player-group-players';
 import getCrud from '../utils/getCrud';
+import parseUDisc from '../utils/parseUdisc';
 
 const createRounds = async (
   rounds: RoundModel[],
@@ -162,13 +163,17 @@ const buildRoute = (services: RepositoryServices): Router => {
     })
   );
 
-  router.post(
+  router.put(
     '/:id/card/:cardId/upload',
     corsHandler,
     requireRoles([Roles.Admin]),
     csvUpload.single('csv'),
     withTryCatch(async (req, res) => {
-      console.log('FILE INFO', req.file);
+      const csvData = req.file.buffer.toString('utf8');
+
+      const scores = parseUDisc(csvData);
+
+      res.json({ success: true, scores });
     })
   );
 
