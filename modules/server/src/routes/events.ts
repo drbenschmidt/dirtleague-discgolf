@@ -100,11 +100,15 @@ const buildRoute = (services: RepositoryServices): Router => {
           // TODO: Check for including course and layout info.
           const course = await services.courses.get(round.courseId);
           const layout = await services.courseLayouts.get(round.courseLayoutId);
+          const layoutHoles = await services.courseHoles.getAllForCourseLayout(
+            round.courseLayoutId
+          );
           const cards = await services.cards.getForRound(round.id);
 
           (round as any).cards = cards;
           (round as any).course = course;
           (round as any).courseLayout = layout;
+          (round as any).courseLayout.holes = layoutHoles;
 
           await asyncForEach(cards, async card => {
             const playerGroups = await services.playerGroups.getForCard(
@@ -119,6 +123,11 @@ const buildRoute = (services: RepositoryServices): Router => {
               );
 
               // TODO: Check for includes and get player info.
+              await asyncForEach(playerGroupPlayers, async player => {
+                const dbPlayer = await services.profiles.get(player.playerId);
+
+                (player as any).player = dbPlayer;
+              });
 
               (playerGroup as any).players = playerGroupPlayers;
             });
@@ -237,6 +246,8 @@ const buildRoute = (services: RepositoryServices): Router => {
                 await asyncForEach(
                   playerGroup.players.toArray(),
                   async player => {
+                    player.playerGroupId = playerGroup.id;
+
                     await services.playerGroupPlayers.create(player);
                   }
                 );

@@ -82,6 +82,7 @@ export default class CourseLayoutModel
     return new CourseLayoutModel(obj);
   }
 
+  // TODO: Remove this.
   static createDefault(): CourseLayoutModel {
     return new CourseLayoutModel({
       name: 'New Layout',

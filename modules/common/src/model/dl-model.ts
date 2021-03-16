@@ -49,6 +49,17 @@ class DirtLeagueModel<TAttributes> {
     this.cid = ++cidCounter;
   }
 
+  getAttribute<T>(key: string): T {
+    const value = (this.attributes as any)[key] as T;
+    const defaultValue = (this.defaults as any)[key] as T;
+
+    if (value === undefined && defaultValue !== undefined) {
+      return defaultValue;
+    }
+
+    return value;
+  }
+
   get<T>(key: string): T {
     const value = (this as any)[key] as T;
     const defaultValue = (this.defaults as any)[key] as T;

@@ -1,5 +1,7 @@
+import { Memoize } from 'typescript-memoize';
 import Cloneable from '../interfaces/cloneable';
 import DirtLeagueModel from './dl-model';
+import PlayerModel, { PlayerAttributes } from './player';
 
 export interface PlayerGroupPlayerAttributes {
   playerGroupId?: number;
@@ -32,6 +34,17 @@ export default class PlayerGroupPlayerModel
 
   set playerId(value: number) {
     this.attributes.playerId = value;
+  }
+
+  @Memoize()
+  get player(): PlayerModel | undefined {
+    const player = this.getAttribute<PlayerAttributes>('player');
+
+    if (player) {
+      return new PlayerModel(player);
+    }
+
+    return undefined;
   }
 
   clone(): PlayerGroupPlayerModel {

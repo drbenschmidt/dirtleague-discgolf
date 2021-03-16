@@ -1,8 +1,9 @@
 import { LinkedList } from 'linked-list-typescript';
 import { Memoize } from 'typescript-memoize';
-import { CourseLayoutModel, CourseModel } from '..';
+import { CourseAttributes, CourseLayoutModel, CourseModel } from '..';
 import Cloneable from '../interfaces/cloneable';
 import CardModel, { CardAttributes } from './card';
+import { CourseLayoutAttributes } from './course-layout';
 import DirtLeagueModel from './dl-model';
 
 export interface RoundAttributes {
@@ -54,8 +55,15 @@ export default class RoundModel
     this.set('courseId', value);
   }
 
+  @Memoize()
   get course(): CourseModel | undefined {
-    return (this.attributes as any).course;
+    const course = this.getAttribute<CourseAttributes>('course');
+
+    if (course) {
+      return new CourseModel(course);
+    }
+
+    return undefined;
   }
 
   get courseLayoutId(): number {
@@ -66,8 +74,17 @@ export default class RoundModel
     this.attributes.courseLayoutId = value;
   }
 
+  @Memoize()
   get courseLayout(): CourseLayoutModel | undefined {
-    return (this.attributes as any).courseLayout;
+    const courseLayout = this.getAttribute<CourseLayoutAttributes>(
+      'courseLayout'
+    );
+
+    if (courseLayout) {
+      return new CourseLayoutModel(courseLayout);
+    }
+
+    return undefined;
   }
 
   get name(): string {
