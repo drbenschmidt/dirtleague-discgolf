@@ -68,6 +68,13 @@ class PlayerGroupPlayersRepository implements Repository<DbPlayerGroupPlayer> {
 
     return entities;
   }
+
+  async deleteForPlayerGroup(id: number): Promise<void> {
+    await this.db.query(sql`
+      DELETE FROM playerGroupPlayers
+      WHERE playerGroupId=${id}
+    `);
+  }
 }
 
 export default PlayerGroupPlayersRepository;

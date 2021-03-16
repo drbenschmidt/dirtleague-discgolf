@@ -1,5 +1,10 @@
 /* eslint-disable no-param-reassign */
-import { asyncForEach, Roles, EventModel } from '@dirtleague/common';
+import {
+  asyncForEach,
+  Roles,
+  EventModel,
+  RoundModel,
+} from '@dirtleague/common';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
@@ -9,6 +14,56 @@ import { DbRound } from '../data-access/repositories/rounds';
 import { DbCard } from '../data-access/repositories/cards';
 import { DbPlayerGroup } from '../data-access/repositories/player-groups';
 import { DbPlayerGroupPlayer } from '../data-access/repositories/player-group-players';
+import getCrud from '../utils/getCrud';
+
+const createRounds = async (
+  rounds: RoundModel[],
+  newEventId: number,
+  services: RepositoryServices
+) => {
+  await asyncForEach(rounds, async round => {
+    // Each round has to be tied into this event.
+    round.eventId = newEventId;
+
+    const roundJson = round.toJson();
+    const newRoundId = await services.rounds.create(roundJson as DbRound);
+
+    round.id = newRoundId;
+    roundJson.id = newRoundId;
+
+    await asyncForEach(round.cards.toArray(), async card => {
+      card.roundId = newRoundId;
+
+      const cardJson = card.toJson();
+      const newCardId = await services.cards.create(cardJson as DbCard);
+
+      card.id = newCardId;
+      cardJson.id = newCardId;
+
+      await asyncForEach(card.playerGroups.toArray(), async playerGroup => {
+        playerGroup.cardId = newCardId;
+
+        const playerGroupJson = playerGroup.toJson();
+        const newPlayerGroupId = await services.playerGroups.create(
+          playerGroupJson as DbPlayerGroup
+        );
+
+        playerGroup.id = newPlayerGroupId;
+        playerGroupJson.id = newPlayerGroupId;
+
+        await asyncForEach(playerGroup.players.toArray(), async player => {
+          player.playerGroupId = newPlayerGroupId;
+
+          const playerJson = player.toJson();
+
+          await services.playerGroupPlayers.create(
+            playerJson as DbPlayerGroupPlayer
+          );
+        });
+      });
+    });
+  });
+};
 
 const buildRoute = (services: RepositoryServices): Router => {
   const router = express.Router();
@@ -17,9 +72,9 @@ const buildRoute = (services: RepositoryServices): Router => {
     '/',
     corsHandler,
     withTryCatch(async (req, res) => {
-      const users = await services.events.getAll();
+      const entities = await services.events.getAll();
 
-      res.json(users);
+      res.json(entities);
     })
   );
 
@@ -80,55 +135,7 @@ const buildRoute = (services: RepositoryServices): Router => {
 
       if (model.rounds) {
         // Create each round if included.
-        await asyncForEach(model.rounds.toArray(), async round => {
-          // Each round has to be tied into this event.
-          round.eventId = newId;
-
-          const roundJson = round.toJson();
-          const newRoundId = await services.rounds.create(roundJson as DbRound);
-
-          round.id = newRoundId;
-          roundJson.id = newRoundId;
-
-          await asyncForEach(round.cards.toArray(), async card => {
-            card.roundId = newRoundId;
-
-            const cardJson = card.toJson();
-            const newCardId = await services.cards.create(cardJson as DbCard);
-
-            card.id = newCardId;
-            cardJson.id = newCardId;
-
-            // TODO: rename to playerGroups
-            await asyncForEach(
-              card.playerGroups.toArray(),
-              async playerGroup => {
-                playerGroup.cardId = newCardId;
-
-                const playerGroupJson = playerGroup.toJson();
-                const newPlayerGroupId = await services.playerGroups.create(
-                  playerGroupJson as DbPlayerGroup
-                );
-
-                playerGroup.id = newPlayerGroupId;
-                playerGroupJson.id = newPlayerGroupId;
-
-                await asyncForEach(
-                  playerGroup.players.toArray(),
-                  async player => {
-                    player.playerGroupId = newPlayerGroupId;
-
-                    const playerJson = player.toJson();
-
-                    await services.playerGroupPlayers.create(
-                      playerJson as DbPlayerGroupPlayer
-                    );
-                  }
-                );
-              }
-            );
-          });
-        });
+        await createRounds(model.rounds.toArray(), newId, services);
       }
 
       res.json(model.toJson());
@@ -155,76 +162,92 @@ const buildRoute = (services: RepositoryServices): Router => {
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       // TODO: Technically, this should be a transaction.
-      const body = req.body as EventModel;
+      const model = new EventModel(req.body);
 
-      await services.events.update(body);
+      await services.events.update(model);
 
-      /*
-      if (body.layouts) {
-        const requestLayouts = Array.from(body.layouts);
-        const dbLayouts = await services.courseLayouts.getAllForCourse(body.id);
+      if (model.rounds) {
+        const requestRounds = model.rounds.toArray();
+        const dbRounds = await services.rounds.getAllForEvent(model.id);
 
-        const [layoutsToCreate, layoutsToUpdate, layoutsToDelete] = getCrud(
-          requestLayouts,
-          dbLayouts
+        const [roundsToCreate, roundsToUpdate, roundsToDelete] = getCrud(
+          requestRounds,
+          dbRounds
         );
 
-        await asyncForEach(layoutsToCreate, async entity => {
-          // eslint-disable-next-line no-param-reassign
-          entity.courseId = body.id;
-          const layoutJson = entity.toJson();
+        await createRounds(roundsToCreate, model.id, services);
 
-          const newLayoutId = await services.courseLayouts.create(
-            layoutJson as DbCourseLayout
+        await asyncForEach(roundsToUpdate, async round => {
+          await services.rounds.update(round);
+
+          const cards = await services.cards.getForRound(round.id);
+
+          const [cardsToCreate, cardsToUpdate, cardsToDelete] = getCrud(
+            round.cards.toArray(),
+            cards
           );
 
-          // eslint-disable-next-line no-param-reassign
-          entity.id = newLayoutId;
-          layoutJson.id = newLayoutId;
+          await asyncForEach(cardsToCreate, async card => {
+            card.roundId = round.id;
 
-          await asyncForEach(entity.holes.toArray(), async hole => {
-            // eslint-disable-next-line no-param-reassign
-            hole.courseLayoutId = newLayoutId;
+            const newCardId = await services.cards.create(card);
 
-            const holeJson = hole.toJson();
+            await asyncForEach(
+              card.playerGroups.toArray(),
+              async playerGroup => {
+                playerGroup.cardId = newCardId;
 
-            await services.courseHoles.create(holeJson as DbCourseHole);
+                const newPlayerGroupId = await services.playerGroups.create(
+                  playerGroup
+                );
+
+                await asyncForEach(
+                  playerGroup.players.toArray(),
+                  async player => {
+                    player.playerGroupId = newPlayerGroupId;
+
+                    await services.playerGroupPlayers.create(player);
+                  }
+                );
+              }
+            );
+          });
+
+          await asyncForEach(cardsToUpdate, async card => {
+            await services.cards.update(card);
+
+            await asyncForEach(
+              card.playerGroups.toArray(),
+              async playerGroup => {
+                await services.playerGroups.update(playerGroup);
+
+                // NOTE: Since it's a join table, we just delete the previous values
+                // and add them again.
+                await services.playerGroupPlayers.deleteForPlayerGroup(
+                  playerGroup.id
+                );
+
+                await asyncForEach(
+                  playerGroup.players.toArray(),
+                  async player => {
+                    await services.playerGroupPlayers.create(player);
+                  }
+                );
+              }
+            );
+          });
+
+          await asyncForEach(cardsToDelete, async card => {
+            // TODO: setup cascading deletes after schema is finalized.
+            await services.cards.delete(card.id);
           });
         });
 
-        await asyncForEach(layoutsToUpdate, async entity => {
-          await services.courseLayouts.update(entity);
-
-          const dbHoles = await services.courseHoles.getAllForCourseLayout(
-            entity.id
-          );
-
-          const [holesToCreate, holesToUpdate, holesToDelete] = getCrud(
-            Array.from(entity.holes),
-            dbHoles
-          );
-
-          await asyncForEach(holesToCreate, async hole => {
-            // eslint-disable-next-line no-param-reassign
-            hole.courseLayoutId = entity.id;
-
-            await services.courseHoles.create(hole);
-          });
-
-          await asyncForEach(holesToUpdate, async hole => {
-            await services.courseHoles.update(hole);
-          });
-
-          await asyncForEach(holesToDelete, async hole => {
-            await services.courseHoles.delete(hole.id);
-          });
-        });
-
-        await asyncForEach(layoutsToDelete, async entity => {
-          await services.courseLayouts.delete(entity.id);
+        await asyncForEach(roundsToDelete, async round => {
+          // TODO: setup cascading deletes after schema is finalized.
+          await services.rounds.delete(round.id);
         });
       }
-      */
 
       res.json(null);
     })

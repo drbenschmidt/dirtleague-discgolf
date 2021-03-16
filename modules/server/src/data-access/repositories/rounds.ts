@@ -34,7 +34,7 @@ class RoundsRepository implements Repository<DbRound> {
   async update(model: DbRound): Promise<void> {
     await this.db.query(sql`
       UPDATE rounds
-      SET name=${model.name}, eventId=${model.eventId}, courseId=${model.courseId} courseLayoutId=${model.courseLayoutId}
+      SET name=${model.name}, eventId=${model.eventId}, courseId=${model.courseId}, courseLayoutId=${model.courseLayoutId}
       WHERE id=${model.id}
     `);
   }

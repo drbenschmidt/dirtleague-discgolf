@@ -8,7 +8,7 @@ const withTryCatch = (
       await callback(req, res, next);
     } catch (e) {
       // TODO: Only return errors in dev mode.
-      console.log(e.message);
+      console.error(e.message, e);
       res.status(500).json({ success: false, error: e });
     }
   };
