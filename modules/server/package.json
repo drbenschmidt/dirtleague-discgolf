@@ -17,7 +17,8 @@
     "cors": "^2.8.5",
     "pbkdf2-password": "1.2.1",
     "jsonwebtoken": "8.5.1",
-    "morgan": "1.10.0"
+    "morgan": "1.10.0",
+    "multer": "1.4.2"
   },
   "devDependencies": {
     "@databases/mysql-test": "^3.1.0",
@@ -25,6 +26,7 @@
     "@types/jsonwebtoken": "8.5.0",
     "@types/cors": "2.8.10",
     "@types/morgan": "1.9.2",
+    "@types/multer": "1.4.5",
     "ts-node-dev": "1.1.6",
     "ts-node": "9.1.1"
   }

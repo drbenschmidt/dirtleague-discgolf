@@ -5,6 +5,7 @@ import {
   EventModel,
   RoundModel,
 } from '@dirtleague/common';
+import multer from 'multer';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
@@ -67,6 +68,9 @@ const createRounds = async (
 
 const buildRoute = (services: RepositoryServices): Router => {
   const router = express.Router();
+
+  const storage = multer.memoryStorage();
+  const csvUpload = multer({ storage });
 
   router.get(
     '/',
@@ -155,6 +159,16 @@ const buildRoute = (services: RepositoryServices): Router => {
       }
 
       res.json(model.toJson());
+    })
+  );
+
+  router.post(
+    '/:id/card/:cardId/upload',
+    corsHandler,
+    requireRoles([Roles.Admin]),
+    csvUpload.single('csv'),
+    withTryCatch(async (req, res) => {
+      console.log('FILE INFO', req.file);
     })
   );
 

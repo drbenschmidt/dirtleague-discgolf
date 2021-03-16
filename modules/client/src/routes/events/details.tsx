@@ -5,20 +5,83 @@ import {
   PlayerGroupModel,
   RoundModel,
 } from '@dirtleague/common';
-import { ReactElement, memo, useEffect, useState } from 'react';
-import { Button, Grid, Icon, Label, Message, Table } from 'semantic-ui-react';
+import { ReactElement, memo, useEffect, useState, useRef } from 'react';
+import {
+  Button,
+  Grid,
+  Icon,
+  Label,
+  Message,
+  Table,
+  Modal,
+  Form,
+  Ref,
+} from 'semantic-ui-react';
 import { useParams } from 'react-router-dom';
 import { useRepositoryServices } from '../../data-access/context';
 import { EntityDetailsParams } from '../types';
 import TabCollection from '../../components/forms/tab-collection';
+import FileUpload from '../../components/forms/file-upload';
+
+const UploadButton = (props: any): ReactElement => {
+  const { destination, modelName, id } = props;
+  const [isOpen, setIsOpen] = useState(false);
+  const [isInFlight, setIsInFlight] = useState(false);
+  const formRef = useRef(null);
+
+  const button = (
+    <Button primary as="a">
+      <Icon name="cloud upload" />
+      Upload uDisc CSV
+    </Button>
+  );
+
+  return (
+    <Modal
+      open={isOpen}
+      onOpen={() => setIsOpen(true)}
+      onClose={() => setIsOpen(false)}
+      trigger={button}
+    >
+      <Modal.Header>Delete {modelName}</Modal.Header>
+      <Modal.Content>
+        <Ref innerRef={formRef}>
+          <Form method="POST" action={destination}>
+            <FileUpload />
+          </Form>
+        </Ref>
+      </Modal.Content>
+      <Modal.Actions>
+        <Button disabled={isInFlight} onClick={() => setIsOpen(false)} negative>
+          No
+        </Button>
+        <Button
+          loading={isInFlight}
+          onClick={() => {
+            setIsOpen(false);
+            if (!formRef.current) {
+              return;
+            }
+            console.log(formRef.current);
+            (formRef.current as any).submit();
+          }}
+          positive
+        >
+          Yes
+        </Button>
+      </Modal.Actions>
+    </Modal>
+  );
+};
 
 interface CardDetailsProps {
   model: CardModel;
   layout?: CourseLayoutModel;
+  eventId: number;
 }
 
 const CardDetails = (props: CardDetailsProps): ReactElement => {
-  const { model, layout } = props;
+  const { model, layout, eventId } = props;
 
   const holes = layout?.holes;
 
@@ -78,10 +141,7 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
       </Table>
       <Grid>
         <Grid.Column width="16" floated="right" textAlign="right">
-          <Button primary as="a">
-            <Icon name="cloud upload" />
-            Upload uDisc CSV
-          </Button>
+          <UploadButton destination={`/events/${eventId}/card/${model.id}`} />
         </Grid.Column>
       </Grid>
     </>
@@ -100,8 +160,12 @@ const RoundDetails = (props: RoundDetailsProps): ReactElement => {
       <div>Course: {model.course?.name}</div>
       <div>Layout: {model.courseLayout?.name}</div>
       <div>
-        {model.cards.toArray().map(card => (
-          <CardDetails model={card} layout={model.courseLayout} />
+        {model.cards.toArray().map((card: CardModel) => (
+          <CardDetails
+            model={card}
+            layout={model.courseLayout}
+            eventId={model.eventId}
+          />
         ))}
       </div>
     </>
