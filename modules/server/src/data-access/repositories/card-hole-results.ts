@@ -2,23 +2,23 @@
 import { ConnectionPool, sql } from '@databases/mysql';
 import { Repository } from '../repository';
 
-export interface DbCardHoleResult {
-  id?: number;
+export interface DbPlayerGroupResult {
+  playerGroupId?: number;
   courseHoleId?: number;
   score?: number;
 }
 
-class CardHoleResultsRepository implements Repository<DbCardHoleResult> {
+class PlayerGroupResultsRepository implements Repository<DbPlayerGroupResult> {
   db: ConnectionPool;
 
   constructor(db: ConnectionPool) {
     this.db = db;
   }
 
-  async create(model: DbCardHoleResult): Promise<number> {
+  async create(model: DbPlayerGroupResult): Promise<number> {
     const [result] = await this.db.query(sql`
-      INSERT INTO cardHoleResults (courseHoleId, score)
-      VALUES (${model.courseHoleId}, ${model.score});
+      INSERT INTO playerGroupResults (playerGroupId, courseHoleId, score)
+      VALUES (${model.playerGroupId}, ${model.courseHoleId}, ${model.score});
 
       SELECT LAST_INSERT_ID();
     `);
@@ -29,41 +29,32 @@ class CardHoleResultsRepository implements Repository<DbCardHoleResult> {
     return id;
   }
 
-  async update(model: DbCardHoleResult): Promise<void> {
-    await this.db.query(sql`
-      UPDATE cardHoleResults
-      SET courseHoleId=${model.courseHoleId}, score=${model.score}
-      WHERE id=${model.id}
-    `);
+  async update(model: DbPlayerGroupResult): Promise<void> {
+    throw new Error('Many to Many cant do this.');
   }
 
   async delete(id: number): Promise<void> {
-    await this.db.query(sql`
-      DELETE FROM cardHoleResults
-      WHERE id=${id}
-    `);
+    throw new Error('Many to Many cant do this.');
   }
 
-  async get(id: number): Promise<DbCardHoleResult> {
-    const [entity] = await this.db.query(sql`
-      SELECT * FROM cardHoleResults
-      WHERE id=${id}
-    `);
-
-    if (entity) {
-      return entity;
-    }
-
-    return null;
+  async get(id: number): Promise<DbPlayerGroupResult> {
+    throw new Error('Many to Many cant do this.');
   }
 
-  async getAll(): Promise<DbCardHoleResult[]> {
+  async getAll(): Promise<DbPlayerGroupResult[]> {
     const entities = await this.db.query(sql`
-      SELECT * FROM cardHoleResults
+      SELECT * FROM playerGroupResults
     `);
 
     return entities;
   }
+
+  async deleteAllForGroup(playerGroupId: number): Promise<void> {
+    await this.db.query(sql`
+      DELETE FROM playerGroupResults
+      WHERE playerGroupId=${playerGroupId}
+    `);
+  }
 }
 
-export default CardHoleResultsRepository;
+export default PlayerGroupResultsRepository;
