@@ -49,10 +49,17 @@ class PlayerGroupResultsRepository implements Repository<DbPlayerGroupResult> {
     return entities;
   }
 
+  /*
+  SELECT pgr.*, ch.number FROM `test-db`.playerGroupResults as pgr
+JOIN `test-db`.courseHoles as ch ON pgr.courseHoleId = ch.id
+ORDER BY ch.number ASC
+*/
   async getAllForGroup(playerGroupId: number): Promise<DbPlayerGroupResult[]> {
     const entities = await this.db.query(sql`
-      SELECT * FROM playerGroupResults
-      WHERE playerGroupId=${playerGroupId}
+      SELECT pgr.*, ch.number as courseHoleNumber FROM playerGroupResults as pgr
+      JOIN courseHoles as ch ON pgr.courseHoleId = ch.id
+      WHERE pgr.playerGroupId=${playerGroupId}
+      ORDER BY ch.number ASC
     `);
 
     return entities;

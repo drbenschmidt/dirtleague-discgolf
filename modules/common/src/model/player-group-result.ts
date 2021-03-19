@@ -43,6 +43,10 @@ export default class PlayerGroupResultModel
     this.attributes.score = value;
   }
 
+  get courseHoleNumber(): number | undefined {
+    return this.getAttribute<number>('courseHoleNumber');
+  }
+
   clone(): PlayerGroupResultModel {
     const obj = this.toJson();
 

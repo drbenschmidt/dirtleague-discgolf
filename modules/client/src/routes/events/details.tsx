@@ -131,10 +131,10 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
         <Table.Body>
           {model.playerGroups.toArray().map(playerGroup => {
             // HACK: This is assuming that hole 1-n is in the same order as the courses IDs.
-            const scores = playerGroup.results
-              ?.toArray()
-              .sort((a, b) => b.courseHoleId - a.courseHoleId);
+            const scores = playerGroup.results?.toArray();
             let total = 0;
+            const getScore = (holeNumber: number) =>
+              scores?.find(f => f.courseHoleNumber === holeNumber)?.score || 0;
 
             return (
               <Table.Row>
@@ -142,7 +142,7 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
                 {holes?.toArray().map(hole => {
                   let score = 0;
                   if (playerGroup.results) {
-                    score = scores?.[hole.number - 1]?.score || 0;
+                    score = getScore(hole.number);
                     total += score;
                   }
                   return <Table.Cell>{score}</Table.Cell>;

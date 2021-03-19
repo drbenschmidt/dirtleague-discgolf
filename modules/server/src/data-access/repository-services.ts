@@ -11,7 +11,7 @@ import RoundsRepository from './repositories/rounds';
 import CardsRepository from './repositories/cards';
 import PlayerGroupsRepository from './repositories/player-groups';
 import PlayerGroupPlayersRepository from './repositories/player-group-players';
-import PlayerGroupResultsRepository from './repositories/card-hole-results';
+import PlayerGroupResultsRepository from './repositories/player-group-results';
 
 class RepositoryServices {
   users: UsersRepository = null;
