@@ -130,13 +130,24 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
 
         <Table.Body>
           {model.playerGroups.toArray().map(playerGroup => {
+            // HACK: This is assuming that hole 1-n is in the same order as the courses IDs.
+            const scores = playerGroup.results
+              ?.toArray()
+              .sort((a, b) => b.courseHoleId - a.courseHoleId);
+            let total = 0;
+
             return (
               <Table.Row>
                 <Table.Cell>{buildPlayerGroup(playerGroup)}</Table.Cell>
-                {holes?.toArray().map(hole => (
-                  <Table.Cell>0</Table.Cell>
-                ))}
-                <Table.Cell>0</Table.Cell>
+                {holes?.toArray().map(hole => {
+                  let score = 0;
+                  if (playerGroup.results) {
+                    score = scores?.[hole.number - 1]?.score || 0;
+                    total += score;
+                  }
+                  return <Table.Cell>{score}</Table.Cell>;
+                })}
+                <Table.Cell>{total}</Table.Cell>
               </Table.Row>
             );
           })}

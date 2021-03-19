@@ -1,31 +1,22 @@
 import Cloneable from '../interfaces/cloneable';
 import DirtLeagueModel from './dl-model';
 
-export interface CardHoleResultAttributes {
-  id?: number;
+export interface PlayerGroupResultAttributes {
   cardThrowerId?: number;
   courseHoleId?: number;
   score?: number;
 }
 
-export default class CardHoleResultModel
-  extends DirtLeagueModel<CardHoleResultAttributes>
-  implements Cloneable<CardHoleResultModel> {
+export default class PlayerGroupResultModel
+  extends DirtLeagueModel<PlayerGroupResultAttributes>
+  implements Cloneable<PlayerGroupResultModel> {
   static defaults = {};
 
   constructor(obj: Record<string, any> = {}) {
     super({
-      ...CardHoleResultModel.defaults,
+      ...PlayerGroupResultModel.defaults,
       ...obj,
     });
-  }
-
-  get id(): number {
-    return this.attributes.id;
-  }
-
-  set id(value: number) {
-    this.attributes.id = value;
   }
 
   get cardThrowerId(): number {
@@ -52,9 +43,9 @@ export default class CardHoleResultModel
     this.attributes.score = value;
   }
 
-  clone(): CardHoleResultModel {
+  clone(): PlayerGroupResultModel {
     const obj = this.toJson();
 
-    return new CardHoleResultModel(obj);
+    return new PlayerGroupResultModel(obj);
   }
 }

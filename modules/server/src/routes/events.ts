@@ -135,6 +135,13 @@ const buildRoute = (services: RepositoryServices): Router => {
               });
 
               (playerGroup as any).players = playerGroupPlayers;
+
+              // TODO: Check for results and include.
+              const results = await services.playerGroupResults.getAllForGroup(
+                playerGroup.id
+              );
+
+              (playerGroup as any).results = results;
             });
           });
         });

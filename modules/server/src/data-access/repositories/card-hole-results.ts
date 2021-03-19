@@ -49,6 +49,15 @@ class PlayerGroupResultsRepository implements Repository<DbPlayerGroupResult> {
     return entities;
   }
 
+  async getAllForGroup(playerGroupId: number): Promise<DbPlayerGroupResult[]> {
+    const entities = await this.db.query(sql`
+      SELECT * FROM playerGroupResults
+      WHERE playerGroupId=${playerGroupId}
+    `);
+
+    return entities;
+  }
+
   async deleteAllForGroup(playerGroupId: number): Promise<void> {
     await this.db.query(sql`
       DELETE FROM playerGroupResults
