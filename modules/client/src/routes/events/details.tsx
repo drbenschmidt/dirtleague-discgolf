@@ -2,6 +2,7 @@ import {
   CardModel,
   CourseLayoutModel,
   EventModel,
+  isNil,
   PlayerGroupModel,
   RoundModel,
 } from '@dirtleague/common';
@@ -21,6 +22,7 @@ import {
   Message,
   Table,
   Modal,
+  SemanticCOLORS,
 } from 'semantic-ui-react';
 import { useParams } from 'react-router-dom';
 import { useRepositoryServices } from '../../data-access/context';
@@ -87,6 +89,17 @@ interface CardDetailsProps {
   eventId: number;
 }
 
+const scoreLabelMap = new Map<number, string | null>([
+  [-2, 'green'],
+  [-1, 'olive'],
+  [0, null],
+  [1, 'orange'],
+  [2, 'red'],
+]);
+
+const clamper = (min: number, max: number) => (x: number) =>
+  Math.max(min, Math.min(x, max));
+
 const CardDetails = (props: CardDetailsProps): ReactElement => {
   const { model, layout, eventId } = props;
   const holes = layout?.holes;
@@ -115,6 +128,24 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
     await services?.events.putCard(eventId, model.id, formDataRef.current);
   }, [eventId, model.id, services?.events]);
 
+  const scoreClamper = clamper(-2, 2);
+
+  const getScoreLabel = (score: number, par: number) => {
+    const diff = score - par;
+    const value = scoreLabelMap.get(scoreClamper(diff));
+
+    if (value) {
+      const labelProps = {
+        circular: true,
+        color: value as SemanticCOLORS,
+      };
+
+      return <Label {...labelProps}>{score}</Label>;
+    }
+
+    return score;
+  };
+
   return (
     <>
       <Table definition style={{ marginLeft: '5px', marginRight: '5px' }}>
@@ -122,7 +153,9 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
           <Table.Row>
             <Table.HeaderCell key="blank" />
             {holes?.toArray().map(hole => (
-              <Table.HeaderCell key={hole.cid}>{hole.number}</Table.HeaderCell>
+              <Table.HeaderCell textAlign="center" key={hole.cid}>
+                {hole.number}
+              </Table.HeaderCell>
             ))}
             <Table.HeaderCell key="total">Total</Table.HeaderCell>
           </Table.Row>
@@ -130,8 +163,8 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
 
         <Table.Body>
           {model.playerGroups.toArray().map(playerGroup => {
-            // HACK: This is assuming that hole 1-n is in the same order as the courses IDs.
             const scores = playerGroup.results?.toArray();
+            const hasScores = (scores?.length ?? 0) > 0;
             let total = 0;
             const getScore = (holeNumber: number) =>
               scores?.find(f => f.courseHoleNumber === holeNumber)?.score || 0;
@@ -145,7 +178,11 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
                     score = getScore(hole.number);
                     total += score;
                   }
-                  return <Table.Cell>{score}</Table.Cell>;
+                  return (
+                    <Table.Cell textAlign="center">
+                      {hasScores ? getScoreLabel(score, hole.par) : 0}
+                    </Table.Cell>
+                  );
                 })}
                 <Table.Cell>{total}</Table.Cell>
               </Table.Row>
@@ -154,7 +191,7 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
           <Table.Row>
             <Table.Cell>Par</Table.Cell>
             {holes?.toArray().map(hole => (
-              <Table.Cell>{hole.par}</Table.Cell>
+              <Table.Cell textAlign="center">{hole.par}</Table.Cell>
             ))}
             <Table.Cell>
               {holes?.toArray().reduce((acc, curr) => acc + curr.par, 0)}
