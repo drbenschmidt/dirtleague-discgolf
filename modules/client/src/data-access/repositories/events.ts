@@ -28,6 +28,11 @@ class EventRepository extends ApiRepository implements Repository<EventModel> {
     return result.map(obj => new EventModel(obj));
   }
 
+  // TODO: Put this on a round repository.
+  async markRoundComplete(roundId: number): Promise<void> {
+    await this.api.get(`rounds/${roundId}/complete`);
+  }
+
   async putCard(
     eventId: number,
     cardId: number,

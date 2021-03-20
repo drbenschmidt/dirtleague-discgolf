@@ -7,6 +7,7 @@ export interface DbRound {
   eventId?: number;
   courseId?: number;
   courseLayoutId?: number;
+  isComplete?: boolean;
   name?: string;
 }
 
@@ -19,8 +20,8 @@ class RoundsRepository implements Repository<DbRound> {
 
   async create(model: DbRound): Promise<number> {
     const [result] = await this.db.query(sql`
-      INSERT INTO rounds (name, eventId, courseId, courseLayoutId)
-      VALUES (${model.name}, ${model.eventId}, ${model.courseId}, ${model.courseLayoutId});
+      INSERT INTO rounds (name, eventId, courseId, courseLayoutId, isComplete)
+      VALUES (${model.name}, ${model.eventId}, ${model.courseId}, ${model.courseLayoutId}, ${model.isComplete});
 
       SELECT LAST_INSERT_ID();
     `);
@@ -34,7 +35,7 @@ class RoundsRepository implements Repository<DbRound> {
   async update(model: DbRound): Promise<void> {
     await this.db.query(sql`
       UPDATE rounds
-      SET name=${model.name}, eventId=${model.eventId}, courseId=${model.courseId}, courseLayoutId=${model.courseLayoutId}
+      SET name=${model.name}, eventId=${model.eventId}, courseId=${model.courseId}, courseLayoutId=${model.courseLayoutId}, isComplete=${model.isComplete}
       WHERE id=${model.id}
     `);
   }

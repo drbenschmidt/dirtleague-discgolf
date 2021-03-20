@@ -2,7 +2,6 @@ import {
   CardModel,
   CourseLayoutModel,
   EventModel,
-  isNil,
   PlayerGroupModel,
   RoundModel,
 } from '@dirtleague/common';
@@ -29,20 +28,22 @@ import { useRepositoryServices } from '../../data-access/context';
 import { EntityDetailsParams } from '../types';
 import TabCollection from '../../components/forms/tab-collection';
 import FileUpload from '../../components/forms/file-upload';
+import useModelState from '../../hooks/useModelState';
 
 interface UploadButtonProps {
+  disabled: boolean;
   formData: FormData;
   formPropName: string;
   onUpload: () => Promise<void>;
 }
 
 const UploadButton = (props: UploadButtonProps): ReactElement => {
-  const { formData, formPropName, onUpload } = props;
+  const { formData, formPropName, onUpload, disabled } = props;
   const [isOpen, setIsOpen] = useState(false);
   const [isInFlight, setIsInFlight] = useState(false);
 
   const button = (
-    <Button primary as="a">
+    <Button primary as="a" disabled={disabled}>
       <Icon name="cloud upload" />
       Upload uDisc CSV
     </Button>
@@ -87,6 +88,7 @@ interface CardDetailsProps {
   model: CardModel;
   layout?: CourseLayoutModel;
   eventId: number;
+  isComplete: boolean;
 }
 
 const scoreLabelMap = new Map<number, string | null>([
@@ -101,7 +103,7 @@ const clamper = (min: number, max: number) => (x: number) =>
   Math.max(min, Math.min(x, max));
 
 const CardDetails = (props: CardDetailsProps): ReactElement => {
-  const { model, layout, eventId } = props;
+  const { model, layout, eventId, isComplete } = props;
   const holes = layout?.holes;
   const formDataRef = useRef(new FormData());
   const services = useRepositoryServices();
@@ -202,6 +204,7 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
       <Grid>
         <Grid.Column width="16" floated="right" textAlign="right">
           <UploadButton
+            disabled={isComplete}
             onUpload={onUpload}
             formData={formDataRef.current}
             formPropName="csv"
@@ -218,17 +221,42 @@ interface RoundDetailsProps {
 
 const RoundDetails = (props: RoundDetailsProps): ReactElement => {
   const { model } = props;
+  const services = useRepositoryServices();
+  const [isComplete] = useModelState<boolean>(model, 'isComplete');
+
+  const onCompleteClick = useCallback(async () => {
+    await services?.events.markRoundComplete(model.id);
+    model.isComplete = true;
+  }, [model, services?.events]);
 
   return (
     <>
-      <div>Course: {model.course?.name}</div>
-      <div>Layout: {model.courseLayout?.name}</div>
+      <Grid style={{ marginBottom: '10px' }}>
+        <Grid.Row>
+          <Grid.Column width="8" floated="left">
+            <div>Course: {model.course?.name}</div>
+            <div>Layout: {model.courseLayout?.name}</div>
+          </Grid.Column>
+          <Grid.Column width="8" floated="right" textAlign="right">
+            <Button
+              as="a"
+              disabled={isComplete}
+              positive
+              onClick={onCompleteClick}
+            >
+              <Icon name="checkmark" />
+              Complete
+            </Button>
+          </Grid.Column>
+        </Grid.Row>
+      </Grid>
       <div>
         {model.cards.toArray().map((card: CardModel) => (
           <CardDetails
             model={card}
             layout={model.courseLayout}
             eventId={model.eventId}
+            isComplete={isComplete}
           />
         ))}
       </div>
