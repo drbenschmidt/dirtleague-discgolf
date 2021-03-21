@@ -99,6 +99,7 @@ const scoreLabelMap = new Map<number, string | null>([
   [2, 'red'],
 ]);
 
+// TODO: Move to common.
 const clamper = (min: number, max: number) => (x: number) =>
   Math.max(min, Math.min(x, max));
 
