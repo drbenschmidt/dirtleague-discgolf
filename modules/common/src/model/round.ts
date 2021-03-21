@@ -1,9 +1,9 @@
 import { LinkedList } from 'linked-list-typescript';
 import { Memoize } from 'typescript-memoize';
-import { CourseAttributes, CourseLayoutModel, CourseModel } from '..';
+import CourseModel, { CourseAttributes } from './course';
 import Cloneable from '../interfaces/cloneable';
 import CardModel, { CardAttributes } from './card';
-import { CourseLayoutAttributes } from './course-layout';
+import CourseLayoutModel, { CourseLayoutAttributes } from './course-layout';
 import DirtLeagueModel from './dl-model';
 
 export interface RoundAttributes {

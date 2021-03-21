@@ -55,6 +55,7 @@ export default class PlayerGroupModel
     this.attributes.teamName = value;
   }
 
+  @Memoize()
   get results(): LinkedList<PlayerGroupResultModel> | undefined {
     const results = this.getAttribute<PlayerGroupResultAttributes[]>('results');
 

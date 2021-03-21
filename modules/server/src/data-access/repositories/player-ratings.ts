@@ -84,6 +84,18 @@ class PlayerRatingRepository implements Repository<DbPlayerRating> {
 
     return entities;
   }
+
+  async getForPlayerCardId(
+    playerId: number,
+    cardId: number
+  ): Promise<DbPlayerRating> {
+    const [result] = await this.db.query(sql`
+      SELECT * FROM playerRatings
+      WHERE playerId=${playerId} AND cardId=${cardId}
+    `);
+
+    return result;
+  }
 }
 
 export default PlayerRatingRepository;

@@ -130,8 +130,16 @@ const buildRoute = (services: RepositoryServices): Router => {
               // TODO: Check for includes and get player info.
               await asyncForEach(playerGroupPlayers, async player => {
                 const dbPlayer = await services.profiles.get(player.playerId);
+                const dbRating = await services.playerRatings.getForPlayerCardId(
+                  player.playerId,
+                  card.id
+                );
 
                 (player as any).player = dbPlayer;
+
+                if (dbPlayer && dbRating) {
+                  (player as any).rating = dbRating.rating;
+                }
               });
 
               (playerGroup as any).players = playerGroupPlayers;
