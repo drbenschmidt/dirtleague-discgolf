@@ -8,6 +8,7 @@ export const createRoundsTable = async (db: ConnectionPool): Promise<void> => {
       eventId INT NOT NULL,
       courseId INT NOT NULL,
       courseLayoutId INT NOT NULL,
+      isComplete TINYINT NULL DEFAULT 0,
       name VARCHAR(45) NULL,
       PRIMARY KEY (id));
   `);

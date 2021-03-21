@@ -47,6 +47,17 @@ export default class PlayerGroupPlayerModel
     return undefined;
   }
 
+  @Memoize()
+  get rating(): number | undefined {
+    const rating = this.getAttribute<number>('rating');
+
+    if (rating) {
+      return rating;
+    }
+
+    return undefined;
+  }
+
   clone(): PlayerGroupPlayerModel {
     const obj = this.toJson();
 

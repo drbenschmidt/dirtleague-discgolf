@@ -59,6 +59,14 @@ const EventList = (): ReactElement => {
                   <Icon name="address book" />
                   View
                 </Button>
+                <Button
+                  as={Link}
+                  to={`${url}/${entity.id}/results`}
+                  size="mini"
+                >
+                  <Icon name="chart bar" />
+                  Results
+                </Button>
                 <IfAdmin>
                   <Button as={Link} to={`${url}/edit/${entity.id}`} size="mini">
                     <Icon name="edit" />

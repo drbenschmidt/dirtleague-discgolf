@@ -1,9 +1,9 @@
 import { LinkedList } from 'linked-list-typescript';
 import { Memoize } from 'typescript-memoize';
-import { CourseAttributes, CourseLayoutModel, CourseModel } from '..';
+import CourseModel, { CourseAttributes } from './course';
 import Cloneable from '../interfaces/cloneable';
 import CardModel, { CardAttributes } from './card';
-import { CourseLayoutAttributes } from './course-layout';
+import CourseLayoutModel, { CourseLayoutAttributes } from './course-layout';
 import DirtLeagueModel from './dl-model';
 
 export interface RoundAttributes {
@@ -11,6 +11,7 @@ export interface RoundAttributes {
   eventId?: number;
   courseId?: number;
   courseLayoutId?: number;
+  isComplete: boolean;
   cards?: CardAttributes[];
   name?: string;
 }
@@ -22,6 +23,7 @@ export default class RoundModel
     name: 'New Round',
     startDate: new Date(),
     cards: [] as CardAttributes[],
+    isComplete: false,
   };
 
   constructor(obj: Record<string, any> = {}) {
@@ -53,6 +55,14 @@ export default class RoundModel
 
   set courseId(value: number) {
     this.set('courseId', value);
+  }
+
+  get isComplete(): boolean {
+    return this.attributes.isComplete;
+  }
+
+  set isComplete(value: boolean) {
+    this.set('isComplete', value);
   }
 
   @Memoize()

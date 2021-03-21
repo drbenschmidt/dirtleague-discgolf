@@ -65,6 +65,7 @@ class AliasesRepository implements Repository<DbAlias> {
     return entities;
   }
 
+  // TODO: Update to `getForPlayerId`.
   async getForUserId(playerId: number): Promise<DbAlias[]> {
     const entities = await this.db.query(sql`
       SELECT * FROM aliases

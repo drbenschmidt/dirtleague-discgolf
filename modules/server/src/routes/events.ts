@@ -5,6 +5,7 @@ import {
   EventModel,
   RoundModel,
 } from '@dirtleague/common';
+import multer from 'multer';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
@@ -15,6 +16,7 @@ import { DbCard } from '../data-access/repositories/cards';
 import { DbPlayerGroup } from '../data-access/repositories/player-groups';
 import { DbPlayerGroupPlayer } from '../data-access/repositories/player-group-players';
 import getCrud from '../utils/getCrud';
+import parseUDisc from '../utils/parseUdisc';
 
 const createRounds = async (
   rounds: RoundModel[],
@@ -67,6 +69,9 @@ const createRounds = async (
 
 const buildRoute = (services: RepositoryServices): Router => {
   const router = express.Router();
+
+  const storage = multer.memoryStorage();
+  const csvUpload = multer({ storage });
 
   router.get(
     '/',
@@ -125,11 +130,26 @@ const buildRoute = (services: RepositoryServices): Router => {
               // TODO: Check for includes and get player info.
               await asyncForEach(playerGroupPlayers, async player => {
                 const dbPlayer = await services.profiles.get(player.playerId);
+                const dbRating = await services.playerRatings.getForPlayerCardId(
+                  player.playerId,
+                  card.id
+                );
 
                 (player as any).player = dbPlayer;
+
+                if (dbPlayer && dbRating) {
+                  (player as any).rating = dbRating.rating;
+                }
               });
 
               (playerGroup as any).players = playerGroupPlayers;
+
+              // TODO: Check for results and include.
+              const results = await services.playerGroupResults.getAllForGroup(
+                playerGroup.id
+              );
+
+              (playerGroup as any).results = results;
             });
           });
         });
@@ -155,6 +175,75 @@ const buildRoute = (services: RepositoryServices): Router => {
       }
 
       res.json(model.toJson());
+    })
+  );
+
+  router.put(
+    '/:id/card/:cardId/upload',
+    corsHandler,
+    requireRoles([Roles.Admin]),
+    csvUpload.single('csv'),
+    withTryCatch(async (req, res) => {
+      const { id, cardId } = req.params;
+      const csvData = req.file.buffer.toString('utf8');
+      const scores = parseUDisc(csvData);
+      const playerGroups = await services.playerGroups.getForCard(
+        parseInt(cardId, 10)
+      );
+      const card = await services.cards.get(parseInt(cardId, 10));
+      const round = await services.rounds.get(card.roundId);
+      const holes = await services.courseHoles.getAllForCourseLayout(
+        round.courseLayoutId
+      );
+
+      const getHole = (n: number) => holes.find(h => h.number === n);
+
+      // Look through each player group...
+      await asyncForEach(playerGroups, async playerGroup => {
+        const possibleNames = new Array<string>();
+
+        // For possible names that could be on the uploaded card.
+        if (playerGroup.teamName) {
+          possibleNames.push(playerGroup.teamName.toLowerCase());
+        }
+
+        const dbPlayers = await services.playerGroupPlayers.getForPlayerGroup(
+          playerGroup.id
+        );
+
+        // Each player group has players, and those have aliases.
+        await asyncForEach(dbPlayers, async dbPlayer => {
+          const player = await services.profiles.get(dbPlayer.playerId);
+
+          // eslint-disable-next-line prettier/prettier
+          possibleNames.push(`${player.firstName.toLowerCase()} ${player.lastName.toLowerCase()}`);
+
+          const aliases = await services.aliases.getForUserId(player.id);
+
+          possibleNames.push(...aliases.map(a => a.value.toLowerCase()));
+        });
+
+        // And with that array, we can look through the scores to find a match.
+        const match = scores.find(f =>
+          possibleNames.includes(f.name.toLowerCase())
+        );
+
+        if (match) {
+          // Remove any results that we may already have, in the event someone fixes a card.
+          await services.playerGroupResults.deleteAllForGroup(playerGroup.id);
+
+          // Loop through the uDisc scores and add them to the db!
+          await asyncForEach(match.scores, async uDiscScore => {
+            await services.playerGroupResults.create({
+              playerGroupId: playerGroup.id,
+              courseHoleId: getHole(uDiscScore.number).id,
+              score: uDiscScore.score,
+            });
+          });
+        }
+      });
+
+      res.json({ success: true, scores });
     })
   );
 

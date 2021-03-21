@@ -14,7 +14,6 @@ import {
   SeasonModel,
   CourseModel,
   CourseLayoutModel,
-  DirtLeagueModel,
   CardModel,
   PlayerModel,
   PlayerGroupModel,
@@ -44,6 +43,7 @@ import TabCollection from '../../components/forms/tab-collection';
 import EntitySearch from '../../components/forms/entity-search';
 import Collection from '../../components/forms/collection';
 import RepositoryServices from '../../data-access/repository-services';
+import useSubscription from '../../hooks/useSubscription';
 
 export interface RoundFormComponentProps {
   model: RoundModel;
@@ -175,22 +175,6 @@ const CardList = (props: CardListComponentProps): ReactElement => {
       </Segment>
     </>
   );
-};
-
-const useSubscription = (
-  model: DirtLeagueModel<any>,
-  keyWatch: string,
-  setter: (v: any) => void
-) => {
-  useEffect(() => {
-    const test = model.onChange.subscribe(props => {
-      if (keyWatch === props.key) {
-        setter(props.value);
-      }
-    });
-
-    return () => test.unsubscribe();
-  });
 };
 
 const RoundForm = (props: RoundFormComponentProps): ReactElement => {

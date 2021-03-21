@@ -129,6 +129,29 @@ class ApiFetch {
 
     return null;
   };
+
+  putFile = async <TResponse>(
+    url = '',
+    data: FormData,
+    queryParams = {}
+  ): Promise<TResponse | null> => {
+    const response = await fetch(
+      buildUrl(this.baseUrl, url, queryParams),
+      buildRequestOptions(this.jwt, {
+        method: 'PUT',
+        body: data,
+        headers: {},
+      })
+    );
+
+    const length = response.headers.get('Content-Length');
+
+    if (length && parseInt(length, 10) > 0) {
+      return response.json();
+    }
+
+    return null;
+  };
 }
 
 export default ApiFetch;

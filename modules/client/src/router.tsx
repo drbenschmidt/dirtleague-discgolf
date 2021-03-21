@@ -11,6 +11,7 @@ import CourseDetails from './routes/courses/details';
 import EventList from './routes/events/list';
 import EventDetails from './routes/events/details';
 import EventForm from './routes/events/form';
+import EventResults from './routes/events/results';
 import SeasonList from './routes/seasons/list';
 import SeasonForm from './routes/seasons/form';
 
@@ -32,6 +33,7 @@ const Router = (): ReactElement => {
           <Route exact path="/events/new" component={EventForm} />
           <Route exact path="/events/edit/:id" component={EventForm} />
           <Route exact path="/events/:id" component={EventDetails} />
+          <Route exact path="/events/:id/results" component={EventResults} />
           <Route exact path="/seasons" component={SeasonList} />
           <Route exact path="/seasons/new" component={SeasonForm} />
           <Route exact path="/seasons/edit/:id" component={SeasonForm} />
