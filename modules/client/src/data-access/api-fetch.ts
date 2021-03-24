@@ -46,7 +46,7 @@ class ApiFetch {
   jwt: string | null;
 
   // TODO: make this configurable and work by getting the window's current scheme.
-  baseUrl = `${window.location.protocol}//localhost:8081`;
+  baseUrl = `${window.location.protocol}//localhost:8080`;
 
   constructor(token: string | null) {
     this.jwt = token;
