@@ -24,6 +24,9 @@ app.use(express.urlencoded({ extended: true })); // for parsing application/x-ww
 app.use(applyToken);
 app.use(genericErrorHandler);
 
+// For prod builds, we want to serve the static files of the frontend app.
+app.use(express.static('../client/build'));
+
 // For now, just tell express that any OPTIONS request should follow the same CORS rules.
 app.options('*', corsHandler);
 

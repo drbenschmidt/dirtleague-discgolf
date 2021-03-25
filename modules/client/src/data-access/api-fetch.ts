@@ -45,8 +45,13 @@ const buildRequestOptions = (jwt: string | null, options: any) => {
 class ApiFetch {
   jwt: string | null;
 
-  // TODO: make this configurable and work by getting the window's current scheme.
-  baseUrl = `${window.location.protocol}//localhost:8081`;
+  static getBaseUrl(): string {
+    const { REACT_APP_API_ROOT } = process.env;
+
+    return `${window.location.protocol}//${
+      REACT_APP_API_ROOT || 'localhost:8080'
+    }`;
+  }
 
   constructor(token: string | null) {
     this.jwt = token;
@@ -76,7 +81,7 @@ class ApiFetch {
   ): Promise<TResponse> => {
     // Default options are marked with *
     const response = await fetch(
-      buildUrl(this.baseUrl, url, queryParams),
+      buildUrl(ApiFetch.getBaseUrl(), url, queryParams),
       buildRequestOptions(this.jwt, {
         method: 'POST',
         body: JSON.stringify(data?.toJson() || {}),
@@ -88,7 +93,7 @@ class ApiFetch {
 
   get = async <TResponse>(url = '', queryParams = {}): Promise<TResponse> => {
     const response = await fetch(
-      buildUrl(this.baseUrl, url, queryParams),
+      buildUrl(ApiFetch.getBaseUrl(), url, queryParams),
       buildRequestOptions(this.jwt, {
         method: 'GET',
       })
@@ -99,7 +104,7 @@ class ApiFetch {
 
   delete = async <TResponse>(url = ''): Promise<TResponse> => {
     const response = await fetch(
-      buildUrl(this.baseUrl, url),
+      buildUrl(ApiFetch.getBaseUrl(), url),
       buildRequestOptions(this.jwt, {
         method: 'DELETE',
       })
@@ -114,7 +119,7 @@ class ApiFetch {
     queryParams = {}
   ): Promise<TResponse | null> => {
     const response = await fetch(
-      buildUrl(this.baseUrl, url, queryParams),
+      buildUrl(ApiFetch.getBaseUrl(), url, queryParams),
       buildRequestOptions(this.jwt, {
         method: 'PATCH',
         body: JSON.stringify(data?.toJson() || {}),
@@ -136,7 +141,7 @@ class ApiFetch {
     queryParams = {}
   ): Promise<TResponse | null> => {
     const response = await fetch(
-      buildUrl(this.baseUrl, url, queryParams),
+      buildUrl(ApiFetch.getBaseUrl(), url, queryParams),
       buildRequestOptions(this.jwt, {
         method: 'PUT',
         body: data,
