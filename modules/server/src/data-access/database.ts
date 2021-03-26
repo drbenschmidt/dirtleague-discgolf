@@ -1,8 +1,8 @@
 import createConnectionPool from '@databases/mysql';
 import { getDefaultConfigManager } from '../config/manager';
 
-const configManager = getDefaultConfigManager();
-const connectionString = configManager.props.sqlConnectionString;
+const config = getDefaultConfigManager();
+const connectionString = config.props.DIRT_API_SQL_STRING;
 
 const debugLoggers = {
   onQueryStart: (_query: any, { text, values }: any) => {

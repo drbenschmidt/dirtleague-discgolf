@@ -3,6 +3,9 @@ import { Request, Response, NextFunction } from 'express';
 import { Roles, UserModel } from '@dirtleague/common';
 import hashPassword from '../crypto/hash';
 import RepositoryServices from '../data-access/repository-services';
+import { getDefaultConfigManager } from '../config/manager';
+
+const config = getDefaultConfigManager();
 
 interface RequestWithToken extends Request {
   token: string;
@@ -46,7 +49,7 @@ export const requireToken = (
   next: NextFunction
 ): void => {
   if (req.token) {
-    jwt.verify(req.token, 'secretkey', error => {
+    jwt.verify(req.token, config.props.DIRT_API_SESSION_SECRET, error => {
       if (error) {
         res.status(403).json({ error });
       } else {
