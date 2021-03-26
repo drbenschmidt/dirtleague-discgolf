@@ -25,6 +25,13 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Dirt League</title>
+    <script>
+      const configEncoded = "\<\%= CONFIG_STRING \%\>";
+      const configRaw = decodeURIComponent(configEncoded);
+      try {
+        window.dirtConfig = JSON.parse(configRaw);
+      } catch (e) { console.error(e) }
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

@@ -4,6 +4,9 @@ import { randomInt, sleep } from '@dirtleague/common';
 import { authenticate } from '../auth/handler';
 import corsHandler from '../http/cors-handler';
 import RepositoryServices from '../data-access/repository-services';
+import { getDefaultConfigManager } from '../config/manager';
+
+const config = getDefaultConfigManager();
 
 interface RequestWithToken extends Request {
   token: string;
@@ -21,7 +24,7 @@ const buildRoute = (services: RepositoryServices): Router => {
       // TODO: Make secret key configurable or use certificate.
       jwt.sign(
         { user },
-        'secretkey',
+        config.props.DIRT_API_SESSION_SECRET,
         (error: Error | null, token: string | null) => {
           if (error) {
             res.status(500).json({
@@ -47,21 +50,25 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   // NOTE: This doesn't use requireToken because it's supposed to respond to anonymous requests.
   router.get('/', corsHandler, async (req: RequestWithToken, res: Response) => {
-    jwt.verify(req.token, 'secretkey', (error, userData) => {
-      if (error) {
-        res.status(403).json({
-          success: true,
-          isAuthenticated: false,
-          error,
-        });
-      } else {
-        res.status(200).json({
-          success: true,
-          isAuthenticated: true,
-          userData,
-        });
+    jwt.verify(
+      req.token,
+      config.props.DIRT_API_SESSION_SECRET,
+      (error, userData) => {
+        if (error) {
+          res.status(403).json({
+            success: true,
+            isAuthenticated: false,
+            error,
+          });
+        } else {
+          res.status(200).json({
+            success: true,
+            isAuthenticated: true,
+            userData,
+          });
+        }
       }
-    });
+    );
   });
 
   return router;

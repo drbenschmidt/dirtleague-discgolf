@@ -5,7 +5,7 @@ const buildUrl = (
   url: string,
   options?: Record<string, any>
 ) => {
-  const temp = new URL(url, baseUrl);
+  const temp = new URL(`api/${url}`, baseUrl);
 
   if (options) {
     temp.search = new URLSearchParams(options).toString();
@@ -46,11 +46,13 @@ class ApiFetch {
   jwt: string | null;
 
   static getBaseUrl(): string {
-    const { REACT_APP_API_ROOT } = process.env;
+    const { REACT_APP_API_ROOT } = (window as any).dirtConfig;
 
-    return `${window.location.protocol}//${
+    const result = `${window.location.protocol}//${
       REACT_APP_API_ROOT || 'localhost:8080'
     }`;
+
+    return result;
   }
 
   constructor(token: string | null) {
