@@ -1,5 +1,5 @@
 import path from 'path';
-import express, { json } from 'express';
+import express from 'express';
 import morgan from 'morgan';
 import { renderFile } from 'ejs';
 import { getDefaultConfigManager } from './config/manager';

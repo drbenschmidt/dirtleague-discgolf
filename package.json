@@ -37,7 +37,8 @@
     "test:client": "yarn workspace client test",
     "test:server": "yarn workspace server test",
     "mysql:start": "yarn mysql-test start",
-    "mysql:seed": "yarn workspace server seed"
+    "mysql:seed": "yarn workspace server seed",
+    "util:insert-admin": "yarn workspace server insert-admin"
   },
   "eslintConfig": {
     "extends": [
