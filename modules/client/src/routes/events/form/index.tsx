@@ -17,6 +17,7 @@ import TabCollection from '../../../components/forms/tab-collection';
 import EntitySearch from '../../../components/forms/entity-search';
 import RepositoryServices from '../../../data-access/repository-services';
 import RoundForm from './round-form';
+import FocusOnMount from '../../../components/generic/focus-on-mount';
 
 export interface EventFormComponentProps {
   entityModel: EventModel;
@@ -100,12 +101,17 @@ const EventFormComponent = (
       <h1>{isEditing ? 'Edit Event' : 'New Event'}</h1>
       <Form onSubmit={onFormSubmit} loading={isInFlight}>
         <Form.Group widths="equal">
-          <TextInput
-            {...nameBinding}
-            fluid
-            label="Name"
-            placeholder="Event Name"
-          />
+          <FocusOnMount>
+            {ref => (
+              <TextInput
+                {...nameBinding}
+                ref={ref}
+                fluid
+                label="Name"
+                placeholder="Event Name"
+              />
+            )}
+          </FocusOnMount>
           <DatePicker {...startDateBinding} label="Event Date" />
           <EntitySearch
             {...seasonBinding}
@@ -154,14 +160,20 @@ const EventForm = (): ReactElement | null => {
 
       getEntity();
     } else {
-      const response = new EventModel();
+      const response = new EventModel({
+        rounds: [
+          new RoundModel({
+            name: 'Round 1',
+          }),
+        ],
+      });
 
       setEntityModel(response);
     }
   }, [id, isEditing, services?.events]);
 
   if (!isEditing && !entityModel) {
-    return <div>loading</div>;
+    return <div>Loading...</div>;
   }
 
   if (!entityModel) {

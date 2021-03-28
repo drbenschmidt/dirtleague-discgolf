@@ -1,29 +1,16 @@
-import { useState, useCallback, useRef, useEffect, memo } from 'react';
+import { useState, useCallback, useRef, memo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Button, Modal, Form, Message, Icon } from 'semantic-ui-react';
+import { getHtmlInput } from '@dirtleague/common';
 import { useAuthContext } from './context';
 import { useTransaction, useInputBinding } from '../../hooks/forms';
 import { AuthModel } from '../../managers/auth';
 import TextInput from '../forms/text-input';
+import FocusOnMount from '../generic/focus-on-mount';
 
 interface AuthButtonProps {
   fixed: boolean;
 }
-
-const getHtmlInput = (ref: React.RefObject<HTMLElement | undefined>) =>
-  ref?.current?.getElementsByTagName('input').item(0);
-
-const FocusOnMount = (props: any) => {
-  const { children } = props;
-  const componentRef = useRef<HTMLElement>();
-
-  useEffect(() => {
-    const element = getHtmlInput(componentRef);
-    element?.focus();
-  }, []);
-
-  return children(componentRef);
-};
 
 const defaultModel = new AuthModel({ email: '', password: '' });
 
@@ -113,7 +100,7 @@ const AuthButton = (props: AuthButtonProps) => {
         <Modal.Content>
           <Form size="large">
             <FocusOnMount>
-              {(ref: React.Ref<HTMLElement>) => (
+              {ref => (
                 <TextInput
                   {...emailBinding}
                   ref={ref}
