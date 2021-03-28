@@ -7,13 +7,20 @@ import Collection from '../../components/forms/collection';
 import { useRepositoryServices } from '../../data-access/context';
 import { useInputBinding, useTransaction } from '../../hooks/forms';
 import { EntityDetailsParams } from '../types';
+import FocusOnMount from '../../components/generic/focus-on-mount';
 
 const AliasFormRow = (props: any): ReactElement => {
   const { model } = props;
   const modelRef = useRef(model);
   const bindings = useInputBinding(modelRef, 'value');
 
-  return <TextInput {...bindings} placeholder="Par Save Steve, etc." />;
+  return (
+    <FocusOnMount>
+      {ref => (
+        <TextInput ref={ref} {...bindings} placeholder="Par Save Steve, etc." />
+      )}
+    </FocusOnMount>
+  );
 };
 
 const PlayerFormComponent = (props: any): ReactElement | null => {
@@ -53,12 +60,17 @@ const PlayerFormComponent = (props: any): ReactElement | null => {
       <h1>{isEditing ? 'Edit Player' : 'New Player'}</h1>
       <Form onSubmit={onFormSubmit} loading={isInFlight}>
         <Form.Group widths="equal">
-          <TextInput
-            {...firstNameBinding}
-            fluid
-            label="First name"
-            placeholder="First name"
-          />
+          <FocusOnMount>
+            {ref => (
+              <TextInput
+                {...firstNameBinding}
+                ref={ref}
+                fluid
+                label="First name"
+                placeholder="First name"
+              />
+            )}
+          </FocusOnMount>
           <TextInput
             {...lastNameBinding}
             fluid

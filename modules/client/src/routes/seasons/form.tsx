@@ -11,6 +11,7 @@ import {
   useDateBinding,
 } from '../../hooks/forms';
 import { EntityDetailsParams } from '../types';
+import FocusOnMount from '../../components/generic/focus-on-mount';
 
 const SeasonFormComponent = (props: any): ReactElement | null => {
   const { seasonModel, isEditing, services } = props;
@@ -50,12 +51,17 @@ const SeasonFormComponent = (props: any): ReactElement | null => {
       <h1>{isEditing ? 'Edit Seasons' : 'New Seasons'}</h1>
       <Form onSubmit={onFormSubmit} loading={isInFlight}>
         <Form.Group widths="equal">
-          <TextInput
-            {...nameBinding}
-            fluid
-            label="Season Name"
-            placeholder="Season Name"
-          />
+          <FocusOnMount>
+            {ref => (
+              <TextInput
+                {...nameBinding}
+                ref={ref}
+                fluid
+                label="Season Name"
+                placeholder="Season Name"
+              />
+            )}
+          </FocusOnMount>
           <DateInput {...startDateBinding} label="Start Date" />
           <DateInput {...endDateBinding} label="End Date" />
         </Form.Group>

@@ -11,15 +11,23 @@ const Home = (): ReactElement => {
         Ben needs to, so please dont expect your work to show up later.
       </p>
       <p>
-        Please add all bugs and comments as{' '}
+        Please add all bugs as{' '}
         <a
           rel="noreferrer"
           target="_blank"
-          href="https://github.com/drbenschmidt/dirtleague-discgolf/issues"
+          href="https://github.com/drbenschmidt/dirtleague-discgolf/issues/new?assignees=&labels=&template=bug_report.md&title="
         >
-          GitHub Issues
-        </a>{' '}
-        with repro steps so I can fix them.
+          GitHub Bugs
+        </a>
+        , and all comments as{' '}
+        <a
+          rel="noreferrer"
+          target="_blank"
+          href="https://github.com/drbenschmidt/dirtleague-discgolf/issues/new"
+        >
+          Github Issues
+        </a>
+        .
       </p>
     </Message>
   );

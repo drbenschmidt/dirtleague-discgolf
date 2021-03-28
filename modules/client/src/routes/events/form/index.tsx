@@ -162,9 +162,9 @@ const EventForm = (): ReactElement | null => {
     } else {
       const response = new EventModel({
         rounds: [
-          new RoundModel({
+          {
             name: 'Round 1',
-          }),
+          },
         ],
       });
 

@@ -8,6 +8,7 @@ import { useRepositoryServices } from '../../../data-access/context';
 import { useInputBinding, useTransaction } from '../../../hooks/forms';
 import { EntityDetailsParams } from '../../types';
 import CourseLayoutForm from './course-layout-form';
+import FocusOnMount from '../../../components/generic/focus-on-mount';
 
 const CourseFormComponent = (props: any): ReactElement | null => {
   const { entityModel, isEditing, services } = props;
@@ -53,16 +54,21 @@ const CourseFormComponent = (props: any): ReactElement | null => {
       <h1>{isEditing ? 'Edit Course' : 'New Course'}</h1>
       <Form onSubmit={onFormSubmit} loading={isInFlight}>
         <Form.Group widths="equal">
-          <TextInput
-            {...nameBinding}
-            fluid
-            label="Name"
-            placeholder="Course Name"
-          />
+          <FocusOnMount>
+            {ref => (
+              <TextInput
+                {...nameBinding}
+                ref={ref}
+                fluid
+                label="Name"
+                placeholder="Course Name"
+              />
+            )}
+          </FocusOnMount>
         </Form.Group>
         <TabCollection
           mode="form"
-          label="Rounds"
+          label="Layouts"
           TabComponent={CourseLayoutForm}
           list={model.current?.layouts}
           modelFactory={modelFactory}
@@ -94,7 +100,13 @@ const CourseForm = (): ReactElement | null => {
 
       getCourse();
     } else {
-      const response = new CourseModel();
+      const response = new CourseModel({
+        layouts: [
+          {
+            name: 'Layout 1',
+          },
+        ],
+      });
 
       setEntityModel(response);
     }
