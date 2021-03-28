@@ -1,17 +1,36 @@
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect, memo } from 'react';
+import { useHistory } from 'react-router-dom';
 import { Button, Modal, Form, Message, Icon } from 'semantic-ui-react';
 import { useAuthContext } from './context';
 import { useTransaction, useInputBinding } from '../../hooks/forms';
 import { AuthModel } from '../../managers/auth';
+import TextInput from '../forms/text-input';
 
 interface AuthButtonProps {
   fixed: boolean;
 }
 
+const getHtmlInput = (ref: React.RefObject<HTMLElement | undefined>) =>
+  ref?.current?.getElementsByTagName('input').item(0);
+
+const FocusOnMount = (props: any) => {
+  const { children } = props;
+  const componentRef = useRef<HTMLElement>();
+
+  useEffect(() => {
+    const element = getHtmlInput(componentRef);
+    element?.focus();
+  }, []);
+
+  return children(componentRef);
+};
+
 const defaultModel = new AuthModel({ email: '', password: '' });
 
 const AuthButton = (props: AuthButtonProps) => {
   const { fixed } = props;
+  const history = useHistory();
+  const passwordInputRef = useRef<HTMLElement>();
   const context = useAuthContext();
   const [isAuthenticated, setIsAuthenticated] = useState(
     // eslint-disable-next-line react/destructuring-assignment
@@ -38,7 +57,12 @@ const AuthButton = (props: AuthButtonProps) => {
     setIsAuthenticating(false);
     setIsAuthenticated(result?.success);
     setShouldShowMessage(true);
-  }, [context, model]);
+    getHtmlInput(passwordInputRef)?.focus();
+
+    if (result?.success) {
+      history.go(0);
+    }
+  }, [context, model, history]);
 
   const onModalClose = useCallback(() => {
     setIsModalOpen(false);
@@ -48,10 +72,20 @@ const AuthButton = (props: AuthButtonProps) => {
   const logoutOnClick = useCallback(async () => {
     await context?.logout();
     setIsAuthenticated(false);
-  }, [context]);
+    history.go(0);
+  }, [context, history]);
 
   const emailBinding = useInputBinding(model, 'email');
   const passwordBinding = useInputBinding(model, 'password');
+
+  const onEnterPress = useCallback(
+    event => {
+      if (event.keyCode === 13) {
+        submitOnClick();
+      }
+    },
+    [submitOnClick]
+  );
 
   if (isAuthenticated) {
     return (
@@ -78,18 +112,25 @@ const AuthButton = (props: AuthButtonProps) => {
         <Modal.Header>Login</Modal.Header>
         <Modal.Content>
           <Form size="large">
-            <Form.Input
-              {...emailBinding}
-              disabled={isAuthenticating}
-              fluid
-              icon="user"
-              iconPosition="left"
-              placeholder="E-mail address"
-              type="email"
-            />
-            <Form.Input
+            <FocusOnMount>
+              {(ref: React.Ref<HTMLElement>) => (
+                <TextInput
+                  {...emailBinding}
+                  ref={ref}
+                  disabled={isAuthenticating}
+                  fluid
+                  icon="user"
+                  iconPosition="left"
+                  placeholder="E-mail address"
+                  type="email"
+                />
+              )}
+            </FocusOnMount>
+            <TextInput
               {...passwordBinding}
+              ref={passwordInputRef}
               disabled={isAuthenticating}
+              onKeyDown={onEnterPress}
               fluid
               icon="lock"
               iconPosition="left"
@@ -112,4 +153,4 @@ const AuthButton = (props: AuthButtonProps) => {
   );
 };
 
-export default React.memo(AuthButton);
+export default memo(AuthButton);
