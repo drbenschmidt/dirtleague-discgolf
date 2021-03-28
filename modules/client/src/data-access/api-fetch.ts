@@ -1,4 +1,5 @@
 import DirtLeagueModel from '@dirtleague/common/src/model/dl-model';
+import { getConfig } from '../managers/config';
 
 const buildUrl = (
   baseUrl: string,
@@ -46,7 +47,7 @@ class ApiFetch {
   jwt: string | null;
 
   static getBaseUrl(): string {
-    const { REACT_APP_API_ROOT } = (window as any).dirtConfig;
+    const { REACT_APP_API_ROOT } = getConfig();
 
     const result = `${window.location.protocol}//${
       REACT_APP_API_ROOT || 'localhost:8080'

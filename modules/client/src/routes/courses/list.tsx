@@ -1,66 +1,10 @@
 import { CourseModel } from '@dirtleague/common';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { Link, useRouteMatch } from 'react-router-dom';
-import { Table, Button, Menu, Icon, Modal } from 'semantic-ui-react';
+import { Table, Button, Menu, Icon } from 'semantic-ui-react';
 import IfAdmin from '../../components/auth/if-admin';
-import RepositoryServices from '../../data-access/repository-services';
 import { useRepositoryServices } from '../../data-access/context';
-
-interface DeleteCourseButtonProps {
-  course: CourseModel;
-  services: RepositoryServices | null;
-  onDelete: () => void;
-}
-
-const DeletePlayerButton = (props: DeleteCourseButtonProps): ReactElement => {
-  const { course, services, onDelete } = props;
-  const [isOpen, setIsOpen] = useState(false);
-  const [isInFlight, setIsInFlight] = useState(false);
-
-  const button = (
-    <Button negative size="mini">
-      <Icon name="delete" />
-      Delete
-    </Button>
-  );
-
-  const onYesClick = useCallback(() => {
-    const deleteEntity = async () => {
-      try {
-        setIsInFlight(true);
-        await services?.courses.delete(course.id);
-        setIsOpen(false);
-        onDelete();
-      } finally {
-        setIsInFlight(false);
-      }
-    };
-
-    deleteEntity();
-  }, [services, course, onDelete]);
-
-  return (
-    <Modal
-      open={isOpen}
-      onOpen={() => setIsOpen(true)}
-      onClose={() => setIsOpen(false)}
-      trigger={button}
-    >
-      <Modal.Header>{`Delete ${course.name}`}</Modal.Header>
-      <Modal.Content>
-        <p>Are you sure you want to delete this course?</p>
-      </Modal.Content>
-      <Modal.Actions>
-        <Button disabled={isInFlight} onClick={() => setIsOpen(false)} negative>
-          No
-        </Button>
-        <Button loading={isInFlight} onClick={onYesClick} positive>
-          Yes
-        </Button>
-      </Modal.Actions>
-    </Modal>
-  );
-};
+import DeleteEntityButton from '../../components/generic/delete-entity-button';
 
 const CourseList = (): ReactElement => {
   const { url } = useRouteMatch();
@@ -68,9 +12,13 @@ const CourseList = (): ReactElement => {
   const [result, setResult] = useState<CourseModel[]>();
   const [dummy, setDummy] = useState(false);
 
-  const onDelete = useCallback(() => {
-    setDummy(v => !v);
-  }, []);
+  const onDelete = useCallback(
+    async id => {
+      await services?.courses.delete(id);
+      setDummy(v => !v);
+    },
+    [services?.courses]
+  );
 
   // Node: Check `dummy` so if it changes we requery data.
   useEffect(() => {
@@ -116,9 +64,9 @@ const CourseList = (): ReactElement => {
                     <Icon name="edit" />
                     Edit
                   </Button>
-                  <DeletePlayerButton
-                    course={course}
-                    services={services}
+                  <DeleteEntityButton
+                    id={course.id}
+                    modelName="Course"
                     onDelete={onDelete}
                   />
                 </IfAdmin>

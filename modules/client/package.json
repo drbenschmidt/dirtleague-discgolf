@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
     "start": "node scripts/start.js",
     "start:dev": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js"
+  },
+  "devDependencies": {
+    "source-map-explorer": "2.5.2"
   },
   "dependencies": {
     "react-semantic-ui-datepickers": "2.13.0",

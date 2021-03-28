@@ -1,7 +1,17 @@
-import { ReactElement, useCallback, useState } from 'react';
-import { Form, Input } from 'semantic-ui-react';
+import { CSSProperties, ReactElement, useCallback, useState } from 'react';
+import { Form, FormFieldProps, Input } from 'semantic-ui-react';
 
-const TextInput = (props: any): ReactElement => {
+export interface TextInputProps extends FormFieldProps {
+  value: any;
+  onChange: (event: any, data: any) => void;
+  control?: any;
+  type?: string;
+  size?: string;
+  style?: CSSProperties;
+  label?: string;
+}
+
+const TextInput = (props: TextInputProps): ReactElement => {
   const {
     value: originalValue,
     onChange: parentOnChange,

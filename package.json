@@ -20,6 +20,7 @@
     "typescript": "4.2.2"
   },
   "scripts": {
+    "analyze": "yarn workspace client analyze",
     "start": "concurrently -n client,server \"yarn start:client\" \"yarn start:server\"",
     "start:client": "yarn workspace client start",
     "start:server": "yarn workspace server start",

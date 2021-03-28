@@ -1,5 +1,5 @@
 import 'semantic-ui-css/semantic.min.css';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import useOnce from './hooks/useOnce';
 import AuthContext from './components/auth/context';
 import RepositoryContext from './data-access/context';
@@ -39,4 +39,4 @@ const App = () => {
   );
 };
 
-export default React.memo(App);
+export default memo(App);
