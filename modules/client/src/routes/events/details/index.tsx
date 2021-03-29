@@ -6,6 +6,8 @@ import { useRepositoryServices } from '../../../data-access/context';
 import { EntityDetailsParams } from '../../types';
 import TabCollection from '../../../components/forms/tab-collection';
 import RoundDetails from './round-details';
+import Breadcrumbs from '../../../components/generic/breadcrumbs';
+import { Events } from '../../../links';
 
 const EventDetails = (): ReactElement | null => {
   const { id } = useParams<EntityDetailsParams>();
@@ -28,8 +30,11 @@ const EventDetails = (): ReactElement | null => {
     return null;
   }
 
+  const { name } = result;
+
   return (
     <>
+      <Breadcrumbs path={[Events.List, [Events.Details, { id, name }]]} />
       <h1>{result.name}</h1>
       <Message>
         <Message.Header>Description</Message.Header>

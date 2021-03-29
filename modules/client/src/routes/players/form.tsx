@@ -8,6 +8,10 @@ import { useRepositoryServices } from '../../data-access/context';
 import { useInputBinding, useTransaction } from '../../hooks/forms';
 import { EntityDetailsParams } from '../types';
 import FocusOnMount from '../../components/generic/focus-on-mount';
+import Breadcrumbs, {
+  BreadcrumbPart,
+} from '../../components/generic/breadcrumbs';
+import { Players } from '../../links';
 
 const AliasFormRow = (props: any): ReactElement => {
   const { model } = props;
@@ -55,9 +59,18 @@ const PlayerFormComponent = (props: any): ReactElement | null => {
     submit();
   }, [isEditing, model, services?.players, history]);
 
+  const title = isEditing ? 'Edit Player' : 'New Player';
+  const pathPart = isEditing
+    ? ([
+        Players.Edit,
+        { name: model.current?.fullName, id: model.current?.id },
+      ] as BreadcrumbPart)
+    : Players.New;
+
   return (
     <>
-      <h1>{isEditing ? 'Edit Player' : 'New Player'}</h1>
+      <Breadcrumbs path={[Players.List, pathPart]} />
+      <h1>{title}</h1>
       <Form onSubmit={onFormSubmit} loading={isInFlight}>
         <Form.Group widths="equal">
           <FocusOnMount>

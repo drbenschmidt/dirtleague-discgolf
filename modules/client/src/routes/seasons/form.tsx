@@ -12,6 +12,10 @@ import {
 } from '../../hooks/forms';
 import { EntityDetailsParams } from '../types';
 import FocusOnMount from '../../components/generic/focus-on-mount';
+import Breadcrumbs, {
+  BreadcrumbPart,
+} from '../../components/generic/breadcrumbs';
+import { Seasons } from '../../links';
 
 const SeasonFormComponent = (props: any): ReactElement | null => {
   const { seasonModel, isEditing, services } = props;
@@ -46,9 +50,18 @@ const SeasonFormComponent = (props: any): ReactElement | null => {
     submit();
   }, [isEditing, model, services?.seasons, history]);
 
+  const title = isEditing ? 'Edit Season' : 'New Season';
+  const pathPart = isEditing
+    ? ([
+        Seasons.Edit,
+        { name: model.current?.name, id: model.current?.id },
+      ] as BreadcrumbPart)
+    : Seasons.New;
+
   return (
     <>
-      <h1>{isEditing ? 'Edit Seasons' : 'New Seasons'}</h1>
+      <Breadcrumbs path={[Seasons.List, pathPart]} />
+      <h1>{title}</h1>
       <Form onSubmit={onFormSubmit} loading={isInFlight}>
         <Form.Group widths="equal">
           <FocusOnMount>

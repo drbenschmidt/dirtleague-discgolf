@@ -9,6 +9,10 @@ import { useInputBinding, useTransaction } from '../../../hooks/forms';
 import { EntityDetailsParams } from '../../types';
 import CourseLayoutForm from './course-layout-form';
 import FocusOnMount from '../../../components/generic/focus-on-mount';
+import Breadcrumbs, {
+  BreadcrumbPart,
+} from '../../../components/generic/breadcrumbs';
+import { Courses } from '../../../links';
 
 const CourseFormComponent = (props: any): ReactElement | null => {
   const { entityModel, isEditing, services } = props;
@@ -49,9 +53,18 @@ const CourseFormComponent = (props: any): ReactElement | null => {
     });
   }, [model]);
 
+  const title = isEditing ? 'Edit Course' : 'New Course';
+  const pathPart = isEditing
+    ? ([
+        Courses.Edit,
+        { name: model.current?.name, id: model.current?.id },
+      ] as BreadcrumbPart)
+    : Courses.New;
+
   return (
     <>
-      <h1>{isEditing ? 'Edit Course' : 'New Course'}</h1>
+      <Breadcrumbs path={[Courses.List, pathPart]} />
+      <h1>{title}</h1>
       <Form onSubmit={onFormSubmit} loading={isInFlight}>
         <Form.Group widths="equal">
           <FocusOnMount>

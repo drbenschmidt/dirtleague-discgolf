@@ -11,6 +11,8 @@ import { useParams } from 'react-router-dom';
 import { useRepositoryServices } from '../../data-access/context';
 import { EntityDetailsParams } from '../types';
 import TabCollection from '../../components/forms/tab-collection';
+import Breadcrumbs from '../../components/generic/breadcrumbs';
+import { Events } from '../../links';
 
 interface RoundAggregate {
   playerGroup: PlayerGroupModel;
@@ -189,8 +191,11 @@ const EventResults = (): ReactElement | null => {
     return null;
   }
 
+  const { name } = result;
+
   return (
     <>
+      <Breadcrumbs path={[Events.List, [Events.Results, { name }]]} />
       <h1>{result.name} Results</h1>
       <TabCollection
         mode="details"

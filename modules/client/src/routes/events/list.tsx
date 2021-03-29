@@ -5,6 +5,8 @@ import { Table, Button, Menu, Icon } from 'semantic-ui-react';
 import IfAdmin from '../../components/auth/if-admin';
 import { useRepositoryServices } from '../../data-access/context';
 import DeleteEntityButton from '../../components/generic/delete-entity-button';
+import Breadcrumbs from '../../components/generic/breadcrumbs';
+import { Events } from '../../links';
 
 const EventList = (): ReactElement => {
   const { url } = useRouteMatch();
@@ -41,6 +43,7 @@ const EventList = (): ReactElement => {
 
   return (
     <>
+      <Breadcrumbs path={[Events.List]} />
       <h1>Events</h1>
       <Table celled>
         <Table.Header>

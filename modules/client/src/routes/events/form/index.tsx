@@ -18,6 +18,10 @@ import EntitySearch from '../../../components/forms/entity-search';
 import RepositoryServices from '../../../data-access/repository-services';
 import RoundForm from './round-form';
 import FocusOnMount from '../../../components/generic/focus-on-mount';
+import Breadcrumbs, {
+  BreadcrumbPart,
+} from '../../../components/generic/breadcrumbs';
+import { Events } from '../../../links';
 
 export interface EventFormComponentProps {
   entityModel: EventModel;
@@ -96,9 +100,18 @@ const EventFormComponent = (
     });
   }, [model]);
 
+  const title = isEditing ? 'Edit Event' : 'New Event';
+  const pathPart = isEditing
+    ? ([
+        Events.Edit,
+        { name: model.current?.name, id: model.current?.id },
+      ] as BreadcrumbPart)
+    : Events.New;
+
   return (
     <>
-      <h1>{isEditing ? 'Edit Event' : 'New Event'}</h1>
+      <Breadcrumbs path={[Events.List, pathPart]} />
+      <h1>{title}</h1>
       <Form onSubmit={onFormSubmit} loading={isInFlight}>
         <Form.Group widths="equal">
           <FocusOnMount>

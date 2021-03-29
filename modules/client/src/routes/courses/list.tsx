@@ -6,13 +6,7 @@ import IfAdmin from '../../components/auth/if-admin';
 import { useRepositoryServices } from '../../data-access/context';
 import DeleteEntityButton from '../../components/generic/delete-entity-button';
 import Breadcrumbs from '../../components/generic/breadcrumbs';
-
-const Links = {
-  List: {
-    content: 'Courses',
-    to: '/courses',
-  },
-};
+import { Courses } from '../../links';
 
 const CourseList = (): ReactElement => {
   const { url } = useRouteMatch();
@@ -49,7 +43,7 @@ const CourseList = (): ReactElement => {
 
   return (
     <>
-      <Breadcrumbs path={[Links.List]} />
+      <Breadcrumbs path={[Courses.List]} />
       <h1>Courses</h1>
       <Table celled>
         <Table.Header>
