@@ -5,6 +5,8 @@ import { Table, Button, Menu, Icon, Modal } from 'semantic-ui-react';
 import IfAdmin from '../../components/auth/if-admin';
 import RepositoryServices from '../../data-access/repository-services';
 import { useRepositoryServices } from '../../data-access/context';
+import Breadcrumbs from '../../components/generic/breadcrumbs';
+import { Seasons } from '../../links';
 
 interface DeleteSeasonButtonProps {
   season: SeasonModel;
@@ -93,6 +95,7 @@ const SeasonList = (): ReactElement => {
 
   return (
     <>
+      <Breadcrumbs path={[Seasons.List]} />
       <h1>Seasons</h1>
       <Table celled>
         <Table.Header>
@@ -112,7 +115,7 @@ const SeasonList = (): ReactElement => {
               <Table.Cell>{season.endDate.toDateString()}</Table.Cell>
               <Table.Cell textAlign="right">
                 <IfAdmin>
-                  <Button as={Link} to={`${url}/edit/${season.id}`} size="mini">
+                  <Button as={Link} to={`${url}/${season.id}/edit`} size="mini">
                     <Icon name="edit" />
                     Edit
                   </Button>

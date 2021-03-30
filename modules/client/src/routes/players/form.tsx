@@ -7,17 +7,29 @@ import Collection from '../../components/forms/collection';
 import { useRepositoryServices } from '../../data-access/context';
 import { useInputBinding, useTransaction } from '../../hooks/forms';
 import { EntityDetailsParams } from '../types';
+import FocusOnMount from '../../components/generic/focus-on-mount';
+import Breadcrumbs, {
+  BreadcrumbPart,
+} from '../../components/generic/breadcrumbs';
+import { Players } from '../../links';
 
 const AliasFormRow = (props: any): ReactElement => {
   const { model } = props;
   const modelRef = useRef(model);
   const bindings = useInputBinding(modelRef, 'value');
 
-  return <TextInput {...bindings} placeholder="Par Save Steve, etc." />;
+  return (
+    <FocusOnMount>
+      {ref => (
+        <TextInput ref={ref} {...bindings} placeholder="Par Save Steve, etc." />
+      )}
+    </FocusOnMount>
+  );
 };
 
 const PlayerFormComponent = (props: any): ReactElement | null => {
-  const { playerModel, isEditing, services } = props;
+  const { playerModel, isEditing } = props;
+  const services = useRepositoryServices();
   const { model } = useTransaction<PlayerModel>(playerModel);
   const firstNameBinding = useInputBinding(model, 'firstName');
   const lastNameBinding = useInputBinding(model, 'lastName');
@@ -34,10 +46,9 @@ const PlayerFormComponent = (props: any): ReactElement | null => {
 
             history.push(`/players/${model.current.id}`);
           } else {
-            await services?.players.create(model.current);
+            const response = await services?.players.create(model.current);
 
-            // TODO: Move to player view?
-            history.push('/players');
+            history.push(`/players/${response?.id}`);
           }
         } finally {
           setIsInFlight(false);
@@ -48,17 +59,31 @@ const PlayerFormComponent = (props: any): ReactElement | null => {
     submit();
   }, [isEditing, model, services?.players, history]);
 
+  const title = isEditing ? 'Edit Player' : 'New Player';
+  const pathPart = isEditing
+    ? ([
+        Players.Edit,
+        { name: model.current?.fullName, id: model.current?.id },
+      ] as BreadcrumbPart)
+    : Players.New;
+
   return (
     <>
-      <h1>{isEditing ? 'Edit Player' : 'New Player'}</h1>
+      <Breadcrumbs path={[Players.List, pathPart]} />
+      <h1>{title}</h1>
       <Form onSubmit={onFormSubmit} loading={isInFlight}>
         <Form.Group widths="equal">
-          <TextInput
-            {...firstNameBinding}
-            fluid
-            label="First name"
-            placeholder="First name"
-          />
+          <FocusOnMount>
+            {ref => (
+              <TextInput
+                {...firstNameBinding}
+                ref={ref}
+                fluid
+                label="First name"
+                placeholder="First name"
+              />
+            )}
+          </FocusOnMount>
           <TextInput
             {...lastNameBinding}
             fluid

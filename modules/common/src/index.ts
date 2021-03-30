@@ -7,6 +7,8 @@ export { default as asyncForEach } from './utils/asyncForEach';
 export { default as except } from './utils/except';
 export { default as getById } from './utils/getById';
 export { default as intersect } from './utils/intersect';
+export { default as clamper } from './utils/clamper';
+export { default as getHtmlInput } from './utils/getHtmlInput';
 
 export { default as Roles } from './security/roles';
 

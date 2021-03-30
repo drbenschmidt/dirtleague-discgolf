@@ -3,6 +3,7 @@ import {
   EventModel,
   PlayerGroupModel,
   RoundModel,
+  clamper,
 } from '@dirtleague/common';
 import { ReactElement, memo, useEffect, useState } from 'react';
 import { Grid, Label, Table, SemanticCOLORS } from 'semantic-ui-react';
@@ -10,6 +11,8 @@ import { useParams } from 'react-router-dom';
 import { useRepositoryServices } from '../../data-access/context';
 import { EntityDetailsParams } from '../types';
 import TabCollection from '../../components/forms/tab-collection';
+import Breadcrumbs from '../../components/generic/breadcrumbs';
+import { Events } from '../../links';
 
 interface RoundAggregate {
   playerGroup: PlayerGroupModel;
@@ -28,10 +31,6 @@ const scoreLabelMap = new Map<number, string | null>([
   [1, 'orange'],
   [2, 'red'],
 ]);
-
-// TODO: Move to common.
-const clamper = (min: number, max: number) => (x: number) =>
-  Math.max(min, Math.min(x, max));
 
 const CombinedCardResults = (props: CombinedCardResultsProps): ReactElement => {
   const { model, layout } = props;
@@ -192,8 +191,11 @@ const EventResults = (): ReactElement | null => {
     return null;
   }
 
+  const { name } = result;
+
   return (
     <>
+      <Breadcrumbs path={[Events.List, [Events.Results, { name }]]} />
       <h1>{result.name} Results</h1>
       <TabCollection
         mode="details"

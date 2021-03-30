@@ -5,6 +5,8 @@ import { Table, Button, Menu, Icon, Modal } from 'semantic-ui-react';
 import IfAdmin from '../../components/auth/if-admin';
 import RepositoryServices from '../../data-access/repository-services';
 import { useRepositoryServices } from '../../data-access/context';
+import Breadcrumbs from '../../components/generic/breadcrumbs';
+import { Players } from '../../links';
 
 interface DeletePlayerButtonProps {
   player: PlayerModel;
@@ -93,6 +95,7 @@ const PlayerList = (): ReactElement => {
 
   return (
     <>
+      <Breadcrumbs path={[Players.List]} />
       <h1>Players</h1>
       <Table celled>
         <Table.Header>
@@ -116,7 +119,7 @@ const PlayerList = (): ReactElement => {
                   View
                 </Button>
                 <IfAdmin>
-                  <Button as={Link} to={`${url}/edit/${player.id}`} size="mini">
+                  <Button as={Link} to={`${url}/${player.id}/edit`} size="mini">
                     <Icon name="edit" />
                     Edit
                   </Button>

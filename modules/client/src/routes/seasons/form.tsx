@@ -11,6 +11,11 @@ import {
   useDateBinding,
 } from '../../hooks/forms';
 import { EntityDetailsParams } from '../types';
+import FocusOnMount from '../../components/generic/focus-on-mount';
+import Breadcrumbs, {
+  BreadcrumbPart,
+} from '../../components/generic/breadcrumbs';
+import { Seasons } from '../../links';
 
 const SeasonFormComponent = (props: any): ReactElement | null => {
   const { seasonModel, isEditing, services } = props;
@@ -33,7 +38,6 @@ const SeasonFormComponent = (props: any): ReactElement | null => {
           } else {
             await services?.seasons.create(model.current);
 
-            // TODO: Move to season view?
             history.push('/seasons');
           }
         } finally {
@@ -45,17 +49,31 @@ const SeasonFormComponent = (props: any): ReactElement | null => {
     submit();
   }, [isEditing, model, services?.seasons, history]);
 
+  const title = isEditing ? 'Edit Season' : 'New Season';
+  const pathPart = isEditing
+    ? ([
+        Seasons.Edit,
+        { name: model.current?.name, id: model.current?.id },
+      ] as BreadcrumbPart)
+    : Seasons.New;
+
   return (
     <>
-      <h1>{isEditing ? 'Edit Seasons' : 'New Seasons'}</h1>
+      <Breadcrumbs path={[Seasons.List, pathPart]} />
+      <h1>{title}</h1>
       <Form onSubmit={onFormSubmit} loading={isInFlight}>
         <Form.Group widths="equal">
-          <TextInput
-            {...nameBinding}
-            fluid
-            label="Season Name"
-            placeholder="Season Name"
-          />
+          <FocusOnMount>
+            {ref => (
+              <TextInput
+                {...nameBinding}
+                ref={ref}
+                fluid
+                label="Season Name"
+                placeholder="Season Name"
+              />
+            )}
+          </FocusOnMount>
           <DateInput {...startDateBinding} label="Start Date" />
           <DateInput {...endDateBinding} label="End Date" />
         </Form.Group>

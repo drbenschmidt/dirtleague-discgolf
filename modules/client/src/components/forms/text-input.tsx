@@ -1,32 +1,54 @@
-import { ReactElement, useCallback, useState } from 'react';
-import { Form, Input } from 'semantic-ui-react';
+import {
+  CSSProperties,
+  ReactElement,
+  useCallback,
+  useState,
+  forwardRef,
+} from 'react';
+import { Form, FormFieldProps, Input, Ref } from 'semantic-ui-react';
 
-const TextInput = (props: any): ReactElement => {
-  const {
-    value: originalValue,
-    onChange: parentOnChange,
-    control = Input,
-    ...rest
-  } = props;
-  const [value, setValue] = useState(originalValue);
+export interface TextInputProps extends FormFieldProps {
+  value: any;
+  onChange: (event: any, data: any) => void;
+  control?: any;
+  type?: string;
+  size?: string;
+  style?: CSSProperties;
+  label?: string;
+}
 
-  const onChange = useCallback(
-    (event, data) => {
-      const { value: newValue } = data;
-      setValue(newValue);
-      parentOnChange(event, data);
-    },
-    [parentOnChange]
-  );
+const TextInput = forwardRef(
+  (props: TextInputProps, ref: any): ReactElement => {
+    const {
+      value: originalValue,
+      onChange: parentOnChange,
+      control = Input,
+      ...rest
+    } = props;
+    const [value, setValue] = useState(originalValue);
 
-  const inputProps = {
-    ...rest,
-    value,
-    onChange,
-    control,
-  };
+    const onChange = useCallback(
+      (event, data) => {
+        const { value: newValue } = data;
+        setValue(newValue);
+        parentOnChange(event, data);
+      },
+      [parentOnChange]
+    );
 
-  return <Form.Field {...inputProps} />;
-};
+    const inputProps = {
+      ...rest,
+      value,
+      onChange,
+      control,
+    };
+
+    return (
+      <Ref innerRef={ref}>
+        <Form.Field {...inputProps} />
+      </Ref>
+    );
+  }
+);
 
 export default TextInput;

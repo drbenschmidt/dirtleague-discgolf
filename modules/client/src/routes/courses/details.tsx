@@ -4,6 +4,8 @@ import { useParams } from 'react-router-dom';
 import { Grid, Table, Tab, Statistic } from 'semantic-ui-react';
 import { useRepositoryServices } from '../../data-access/context';
 import { EntityDetailsParams } from '../types';
+import Breadcrumbs from '../../components/generic/breadcrumbs';
+import { Courses } from '../../links';
 
 const CourseLayoutDetails = (props: {
   model: CourseLayoutModel;
@@ -88,8 +90,11 @@ const CourseDetails = (): ReactElement | null => {
       };
     }) || [];
 
+  const { name } = result;
+
   return (
     <>
+      <Breadcrumbs path={[Courses.List, [Courses.Details, { id, name }]]} />
       <h1>Course {result.name}</h1>
       <Tab panes={panes} />
     </>
