@@ -38,7 +38,6 @@ const SeasonFormComponent = (props: any): ReactElement | null => {
           } else {
             await services?.seasons.create(model.current);
 
-            // TODO: Move to season view?
             history.push('/seasons');
           }
         } finally {

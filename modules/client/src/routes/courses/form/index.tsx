@@ -15,7 +15,8 @@ import Breadcrumbs, {
 import { Courses } from '../../../links';
 
 const CourseFormComponent = (props: any): ReactElement | null => {
-  const { entityModel, isEditing, services } = props;
+  const { entityModel, isEditing } = props;
+  const services = useRepositoryServices();
   const { model } = useTransaction<CourseModel>(entityModel);
   const nameBinding = useInputBinding(model, 'name');
   const [isInFlight, setIsInFlight] = useState(false);
@@ -31,10 +32,9 @@ const CourseFormComponent = (props: any): ReactElement | null => {
 
             history.push(`/courses/${model.current.id}`);
           } else {
-            await services?.courses.create(model.current);
+            const response = await services?.courses.create(model.current);
 
-            // TODO: Move to course view?
-            history.push('/courses');
+            history.push(`/courses/${response?.id}`);
           }
         } finally {
           setIsInFlight(false);

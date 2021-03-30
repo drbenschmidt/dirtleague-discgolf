@@ -15,6 +15,15 @@ const calculateRating = (totalScore: number, dgcrSse: number) => {
   return Math.round(1000 + diff * multiplier);
 };
 
+const calculateRatingNew = (
+  totalScore: number,
+  dgcrSse: number,
+  multiplier = 8
+) => {
+  const diff = dgcrSse - totalScore;
+  return Math.round(1000 + diff * multiplier);
+};
+
 const buildRoute = (services: RepositoryServices): Router => {
   const router = express.Router();
 
@@ -107,7 +116,7 @@ const buildRoute = (services: RepositoryServices): Router => {
 
           const totalScore = sum(results.map(r => r.score));
           const { dgcrSse } = courseLayout;
-          const rating = calculateRating(totalScore, dgcrSse);
+          const rating = calculateRatingNew(totalScore, dgcrSse);
 
           const players = await services.playerGroupPlayers.getForPlayerGroup(
             playerGroup.id

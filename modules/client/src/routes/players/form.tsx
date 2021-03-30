@@ -28,7 +28,8 @@ const AliasFormRow = (props: any): ReactElement => {
 };
 
 const PlayerFormComponent = (props: any): ReactElement | null => {
-  const { playerModel, isEditing, services } = props;
+  const { playerModel, isEditing } = props;
+  const services = useRepositoryServices();
   const { model } = useTransaction<PlayerModel>(playerModel);
   const firstNameBinding = useInputBinding(model, 'firstName');
   const lastNameBinding = useInputBinding(model, 'lastName');
@@ -45,10 +46,9 @@ const PlayerFormComponent = (props: any): ReactElement | null => {
 
             history.push(`/players/${model.current.id}`);
           } else {
-            await services?.players.create(model.current);
+            const response = await services?.players.create(model.current);
 
-            // TODO: Move to player view?
-            history.push('/players');
+            history.push(`/players/${response?.id}`);
           }
         } finally {
           setIsInFlight(false);

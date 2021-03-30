@@ -9,7 +9,7 @@ export const Courses = {
   },
   Edit: {
     content: 'Edit :name',
-    to: '/courses/edit/:id',
+    to: '/courses/:id/edit',
   },
   Details: {
     content: ':name',
@@ -28,7 +28,7 @@ export const Events = {
   },
   Edit: {
     content: 'Edit :name',
-    to: '/events/edit/:id',
+    to: '/events/:id/edit',
   },
   Details: {
     content: ':name',
@@ -51,7 +51,7 @@ export const Players = {
   },
   Edit: {
     content: 'Edit :name',
-    to: '/players/edit/:id',
+    to: '/players/:id/edit',
   },
   Details: {
     content: ':name',
@@ -70,6 +70,6 @@ export const Seasons = {
   },
   Edit: {
     content: 'Edit :name',
-    to: '/seasons/edit/:id',
+    to: '/seasons/:id/edit',
   },
 };

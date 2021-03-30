@@ -71,7 +71,7 @@ const EventList = (): ReactElement => {
                   Results
                 </Button>
                 <IfAdmin>
-                  <Button as={Link} to={`${url}/edit/${entity.id}`} size="mini">
+                  <Button as={Link} to={`${url}/${entity.id}/edit`} size="mini">
                     <Icon name="edit" />
                     Edit
                   </Button>

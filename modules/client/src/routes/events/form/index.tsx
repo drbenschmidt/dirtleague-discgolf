@@ -32,7 +32,8 @@ export interface EventFormComponentProps {
 const EventFormComponent = (
   props: EventFormComponentProps
 ): ReactElement | null => {
-  const { entityModel, isEditing, services } = props;
+  const { entityModel, isEditing } = props;
+  const services = useRepositoryServices();
   const { model } = useTransaction<EventModel>(entityModel);
   const nameBinding = useInputBinding(model, 'name');
   const descriptionBinding = useInputBinding(model, 'description');
@@ -51,10 +52,9 @@ const EventFormComponent = (
 
             history.push(`/events/${model.current.id}`);
           } else {
-            await services?.events.create(model.current);
+            const response = await services?.events.create(model.current);
 
-            // TODO: Move to course view?
-            history.push('/events');
+            history.push(`/events/${response?.id}`);
           }
         } finally {
           setIsInFlight(false);

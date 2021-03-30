@@ -119,7 +119,7 @@ const PlayerList = (): ReactElement => {
                   View
                 </Button>
                 <IfAdmin>
-                  <Button as={Link} to={`${url}/edit/${player.id}`} size="mini">
+                  <Button as={Link} to={`${url}/${player.id}/edit`} size="mini">
                     <Icon name="edit" />
                     Edit
                   </Button>

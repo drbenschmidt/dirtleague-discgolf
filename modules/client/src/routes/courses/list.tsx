@@ -63,7 +63,7 @@ const CourseList = (): ReactElement => {
                   View
                 </Button>
                 <IfAdmin>
-                  <Button as={Link} to={`${url}/edit/${course.id}`} size="mini">
+                  <Button as={Link} to={`${url}/${course.id}/edit`} size="mini">
                     <Icon name="edit" />
                     Edit
                   </Button>

@@ -115,7 +115,7 @@ const SeasonList = (): ReactElement => {
               <Table.Cell>{season.endDate.toDateString()}</Table.Cell>
               <Table.Cell textAlign="right">
                 <IfAdmin>
-                  <Button as={Link} to={`${url}/edit/${season.id}`} size="mini">
+                  <Button as={Link} to={`${url}/${season.id}/edit`} size="mini">
                     <Icon name="edit" />
                     Edit
                   </Button>

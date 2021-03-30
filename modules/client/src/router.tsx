@@ -25,20 +25,20 @@ const Router = (): ReactElement => {
             <Route exact path="/" component={Home} />
             <Route exact path="/players" component={PlayerList} />
             <Route exact path="/players/new" component={PlayerForm} />
-            <Route exact path="/players/edit/:id" component={PlayerForm} />
             <Route exact path="/players/:id" component={PlayerDetails} />
+            <Route exact path="/players/:id/edit" component={PlayerForm} />
             <Route exact path="/courses" component={CourseList} />
             <Route exact path="/courses/new" component={CourseForm} />
-            <Route exact path="/courses/edit/:id" component={CourseForm} />
             <Route exact path="/courses/:id" component={CourseDetails} />
+            <Route exact path="/courses/:id/edit" component={CourseForm} />
             <Route exact path="/events" component={EventList} />
             <Route exact path="/events/new" component={EventForm} />
-            <Route exact path="/events/edit/:id" component={EventForm} />
             <Route exact path="/events/:id" component={EventDetails} />
+            <Route exact path="/events/:id/edit" component={EventForm} />
             <Route exact path="/events/:id/results" component={EventResults} />
             <Route exact path="/seasons" component={SeasonList} />
             <Route exact path="/seasons/new" component={SeasonForm} />
-            <Route exact path="/seasons/edit/:id" component={SeasonForm} />
+            <Route exact path="/seasons/:id/edit" component={SeasonForm} />
           </Switch>
         </Suspense>
       </Navigation>
