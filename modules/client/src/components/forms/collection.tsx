@@ -58,7 +58,7 @@ function CollectionComponent<TModel extends DirtLeagueModel<void>>(
               <Table.Cell width="14">
                 <RowComponent model={entity} />
               </Table.Cell>
-              <Table.Cell textAlign="right" width="2">
+              <Table.Cell verticalAlign="top" textAlign="right" width="2">
                 <Button
                   as="a"
                   onClick={onRemoveClick(entity)}
