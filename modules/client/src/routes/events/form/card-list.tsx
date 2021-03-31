@@ -18,6 +18,18 @@ const CardList = (props: CardListComponentProps): ReactElement => {
     setDummy(d => !d);
   }, [model]);
 
+  const removeCard = useCallback(
+    (card: CardModel) => {
+      if (model?.length === 1) {
+        model?.removeHead();
+      } else {
+        model?.remove(card);
+      }
+      setDummy(d => !d);
+    },
+    [model]
+  );
+
   if (model.length === 0) {
     return (
       <Segment placeholder>
@@ -36,7 +48,7 @@ const CardList = (props: CardListComponentProps): ReactElement => {
     <>
       <Segment>
         {model.toArray().map(card => (
-          <CardForm model={card} />
+          <CardForm model={card} onRemoveCard={removeCard} />
         ))}
         <Button primary as="a" onClick={addButton}>
           Add Card
