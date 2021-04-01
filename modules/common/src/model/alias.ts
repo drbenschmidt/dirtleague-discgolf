@@ -2,9 +2,7 @@ import DirtLeagueModel from './dl-model';
 
 export interface AliasAttributes {
   id?: number;
-
   playerId?: number;
-
   value?: string;
 }
 
@@ -14,7 +12,7 @@ export default class AliasModel extends DirtLeagueModel<AliasAttributes> {
   }
 
   set id(value: number) {
-    this.attributes.id = value;
+    this.set('id', value);
   }
 
   get playerId(): number {
@@ -22,7 +20,7 @@ export default class AliasModel extends DirtLeagueModel<AliasAttributes> {
   }
 
   set playerId(value: number) {
-    this.attributes.playerId = value;
+    this.set('playerId', value);
   }
 
   get value(): string {
@@ -30,6 +28,6 @@ export default class AliasModel extends DirtLeagueModel<AliasAttributes> {
   }
 
   set value(val: string) {
-    this.attributes.value = val;
+    this.set('value', val);
   }
 }

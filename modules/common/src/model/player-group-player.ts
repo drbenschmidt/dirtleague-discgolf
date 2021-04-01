@@ -25,7 +25,7 @@ export default class PlayerGroupPlayerModel
   }
 
   set playerGroupId(value: number) {
-    this.attributes.playerGroupId = value;
+    this.set('playerGroupId', value);
   }
 
   get playerId(): number {
@@ -33,7 +33,7 @@ export default class PlayerGroupPlayerModel
   }
 
   set playerId(value: number) {
-    this.attributes.playerId = value;
+    this.set('playerId', value);
   }
 
   @Memoize()

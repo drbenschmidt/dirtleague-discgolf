@@ -38,7 +38,7 @@ export default class RoundModel
   }
 
   set id(value: number) {
-    this.attributes.id = value;
+    this.set('id', value);
   }
 
   get eventId(): number {
@@ -46,7 +46,7 @@ export default class RoundModel
   }
 
   set eventId(value: number) {
-    this.attributes.eventId = value;
+    this.set('eventId', value);
   }
 
   get courseId(): number {
@@ -81,7 +81,7 @@ export default class RoundModel
   }
 
   set courseLayoutId(value: number) {
-    this.attributes.courseLayoutId = value;
+    this.set('courseLayoutId', value);
   }
 
   @Memoize()
@@ -101,8 +101,8 @@ export default class RoundModel
     return this.attributes.name;
   }
 
-  set name(val: string) {
-    this.attributes.name = val;
+  set name(value: string) {
+    this.set('name', value);
   }
 
   @Memoize()

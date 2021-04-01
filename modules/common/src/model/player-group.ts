@@ -36,7 +36,7 @@ export default class PlayerGroupModel
   }
 
   set id(value: number) {
-    this.attributes.id = value;
+    this.set('id', value);
   }
 
   get cardId(): number {
@@ -44,7 +44,7 @@ export default class PlayerGroupModel
   }
 
   set cardId(value: number) {
-    this.attributes.cardId = value;
+    this.set('cardId', value);
   }
 
   get teamName(): string {
@@ -52,7 +52,7 @@ export default class PlayerGroupModel
   }
 
   set teamName(value: string) {
-    this.attributes.teamName = value;
+    this.set('teamName', value);
   }
 
   @Memoize()

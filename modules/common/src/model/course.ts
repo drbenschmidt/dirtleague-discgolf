@@ -8,7 +8,6 @@ export interface CourseAttributes {
   id?: number;
   name?: string;
   layouts?: CourseLayoutAttributes[];
-  dgcrSse?: number;
 }
 
 export default class CourseModel
@@ -31,23 +30,15 @@ export default class CourseModel
   }
 
   set id(value: number) {
-    this.attributes.id = value;
+    this.set('id', value);
   }
 
   get name(): string {
     return this.attributes.name;
   }
 
-  set name(val: string) {
-    this.attributes.name = val;
-  }
-
-  get dgcrSse(): number {
-    return this.attributes.dgcrSse;
-  }
-
-  set dgcrSse(value: number) {
-    this.attributes.dgcrSse = value;
+  set name(value: string) {
+    this.set('name', value);
   }
 
   @Memoize()

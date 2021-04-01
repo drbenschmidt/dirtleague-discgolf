@@ -29,7 +29,7 @@ export default class CardModel
   }
 
   set id(value: number) {
-    this.attributes.id = value;
+    this.set('id', value);
   }
 
   get roundId(): number {
@@ -37,7 +37,7 @@ export default class CardModel
   }
 
   set roundId(value: number) {
-    this.attributes.roundId = value;
+    this.set('roundId', value);
   }
 
   @Memoize()

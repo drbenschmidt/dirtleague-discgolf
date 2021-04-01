@@ -3,13 +3,9 @@ import DirtLeagueModel from './dl-model';
 
 export interface CourseHoleAttributes {
   id?: number;
-
   courseLayoutId?: number;
-
   number?: number;
-
   distance?: number;
-
   par?: number;
 }
 
@@ -34,7 +30,7 @@ export default class CourseHoleModel
   }
 
   set id(value: number) {
-    this.attributes.id = value;
+    this.set('id', value);
   }
 
   get courseLayoutId(): number {
@@ -42,7 +38,7 @@ export default class CourseHoleModel
   }
 
   set courseLayoutId(value: number) {
-    this.attributes.courseLayoutId = value;
+    this.set('courseLayoutId', value);
   }
 
   get number(): number {
@@ -50,7 +46,7 @@ export default class CourseHoleModel
   }
 
   set number(value: number) {
-    this.attributes.number = value;
+    this.set('number', value);
   }
 
   get distance(): number {
@@ -58,7 +54,7 @@ export default class CourseHoleModel
   }
 
   set distance(value: number) {
-    this.attributes.distance = value;
+    this.set('distance', value);
   }
 
   get par(): number {
@@ -66,7 +62,7 @@ export default class CourseHoleModel
   }
 
   set par(value: number) {
-    this.attributes.par = value;
+    this.set('par', value);
   }
 
   clone(): CourseHoleModel {

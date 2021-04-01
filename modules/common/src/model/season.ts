@@ -3,11 +3,8 @@ import DirtLeagueModel from './dl-model';
 
 export interface SeasonAttributes {
   id?: number;
-
   name?: string;
-
   startDate?: Date;
-
   endDate?: Date;
 }
 
@@ -32,15 +29,15 @@ export default class SeasonModel
   }
 
   set id(value: number) {
-    this.attributes.id = value;
+    this.set('id', value);
   }
 
   get name(): string {
     return this.attributes.name;
   }
 
-  set name(val: string) {
-    this.attributes.name = val;
+  set name(value: string) {
+    this.set('name', value);
   }
 
   get startDate(): Date {
@@ -51,8 +48,8 @@ export default class SeasonModel
     return new Date(this.attributes.startDate);
   }
 
-  set startDate(val: Date) {
-    this.attributes.startDate = val;
+  set startDate(value: Date) {
+    this.set('startDate', value);
   }
 
   get endDate(): Date {
@@ -63,8 +60,8 @@ export default class SeasonModel
     return new Date(this.attributes.endDate);
   }
 
-  set endDate(val: Date) {
-    this.attributes.endDate = val;
+  set endDate(value: Date) {
+    this.set('endDate', value);
   }
 
   clone(): SeasonModel {

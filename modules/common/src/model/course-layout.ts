@@ -3,20 +3,13 @@ import { LinkedList } from 'linked-list-typescript';
 import Cloneable from '../interfaces/cloneable';
 import DirtLeagueModel from './dl-model';
 import CourseHoleModel, { CourseHoleAttributes } from './course-hole';
-
-const filledArray = (start: number, size: number): number[] => {
-  return new Array(size).fill(true).map((v, index) => start + index);
-};
+import filledArray from '../utils/filledArray';
 
 export interface CourseLayoutAttributes {
   id?: number;
-
   courseId?: number;
-
   dgcrSse?: number;
-
   name?: string;
-
   holes?: CourseHoleAttributes[];
 }
 
@@ -25,7 +18,9 @@ export default class CourseLayoutModel
   implements Cloneable<CourseLayoutModel> {
   static defaults = {
     name: 'Default Layout',
-    holes: [] as CourseHoleAttributes[],
+    holes: filledArray(1, 18).map(val => ({
+      number: val,
+    })) as CourseHoleAttributes[],
   };
 
   constructor(obj: Record<string, any> = {}) {
@@ -40,7 +35,7 @@ export default class CourseLayoutModel
   }
 
   set id(value: number) {
-    this.attributes.id = value;
+    this.set('id', value);
   }
 
   get courseId(): number {
@@ -48,7 +43,7 @@ export default class CourseLayoutModel
   }
 
   set courseId(value: number) {
-    this.attributes.courseId = value;
+    this.set('courseId', value);
   }
 
   get dgcrSse(): number {
@@ -56,15 +51,15 @@ export default class CourseLayoutModel
   }
 
   set dgcrSse(value: number) {
-    this.attributes.dgcrSse = value;
+    this.set('dgcrSse', value);
   }
 
   get name(): string {
     return this.attributes.name;
   }
 
-  set name(val: string) {
-    this.attributes.name = val;
+  set name(value: string) {
+    this.set('name', value);
   }
 
   @Memoize()
@@ -80,15 +75,5 @@ export default class CourseLayoutModel
     const obj = this.toJson();
 
     return new CourseLayoutModel(obj);
-  }
-
-  // TODO: Remove this.
-  static createDefault(): CourseLayoutModel {
-    return new CourseLayoutModel({
-      name: 'New Layout',
-      holes: filledArray(1, 18).map(val => ({
-        number: val,
-      })),
-    });
   }
 }

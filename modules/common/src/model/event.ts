@@ -34,7 +34,7 @@ export default class EventModel
   }
 
   set id(value: number) {
-    this.attributes.id = value;
+    this.set('id', value);
   }
 
   get seasonId(): number {
@@ -42,23 +42,23 @@ export default class EventModel
   }
 
   set seasonId(value: number) {
-    this.attributes.seasonId = value;
+    this.set('seasonId', value);
   }
 
   get name(): string {
     return this.attributes.name;
   }
 
-  set name(val: string) {
-    this.attributes.name = val;
+  set name(value: string) {
+    this.set('name', value);
   }
 
   get description(): string {
     return this.attributes.description;
   }
 
-  set description(val: string) {
-    this.attributes.description = val;
+  set description(value: string) {
+    this.set('description', value);
   }
 
   get startDate(): Date {
@@ -69,8 +69,8 @@ export default class EventModel
     return new Date(this.attributes.startDate);
   }
 
-  set startDate(val: Date) {
-    this.attributes.startDate = val;
+  set startDate(value: Date) {
+    this.set('startDate', value);
   }
 
   @Memoize()

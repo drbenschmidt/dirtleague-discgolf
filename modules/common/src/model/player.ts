@@ -6,13 +6,9 @@ import DirtLeagueModel from './dl-model';
 
 export interface PlayerAttributes {
   id?: number;
-
   firstName?: string;
-
   lastName?: string;
-
   currentRating?: number;
-
   aliases?: AliasAttributes[];
 }
 
@@ -22,8 +18,8 @@ class PlayerModel
   static defaults = {
     firstName: '',
     lastName: '',
-    aliases: [] as AliasAttributes[],
     currentRating: 0,
+    aliases: [] as AliasAttributes[],
   };
 
   constructor(obj: Record<string, any> = {}) {
@@ -38,7 +34,7 @@ class PlayerModel
   }
 
   set id(value: number) {
-    this.attributes.id = value;
+    this.set('id', value);
   }
 
   get firstName(): string {
@@ -46,7 +42,7 @@ class PlayerModel
   }
 
   set firstName(value: string) {
-    this.attributes.firstName = value;
+    this.set('firstName', value);
   }
 
   get lastName(): string {
@@ -54,7 +50,7 @@ class PlayerModel
   }
 
   set lastName(value: string) {
-    this.attributes.lastName = value;
+    this.set('lastName', value);
   }
 
   get currentRating(): number {
@@ -62,7 +58,7 @@ class PlayerModel
   }
 
   set currentRating(value: number) {
-    this.attributes.currentRating = value;
+    this.set('currentRating', value);
   }
 
   get fullName(): string {
