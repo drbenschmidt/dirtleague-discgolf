@@ -27,7 +27,6 @@ export { default as PlayerGroupModel } from './model/player-group';
 export { default as PlayerGroupPlayerModel } from './model/player-group-player';
 export { default as PlayerGroupResultModel } from './model/player-group-result';
 export { default as CardHoleResultModel } from './model/player-group-result';
-export { default as IdNamePairModel } from './model/id-name-pair';
 export type { AliasAttributes } from './model/alias';
 export type { CourseAttributes } from './model/course';
 export type { CourseHoleAttributes } from './model/course-hole';
@@ -40,7 +39,6 @@ export type { CardAttributes } from './model/card';
 export type { PlayerGroupAttributes } from './model/player-group';
 export type { PlayerGroupPlayerAttributes } from './model/player-group-player';
 export type { PlayerGroupResultAttributes } from './model/player-group-result';
-export type { IdNamePairAttributes } from './model/id-name-pair';
 
 export type { UserModel } from './model/user';
 

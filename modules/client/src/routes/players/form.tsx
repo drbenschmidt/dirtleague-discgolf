@@ -39,6 +39,13 @@ const PlayerFormComponent = (props: any): ReactElement | null => {
   const onFormSubmit = useCallback(() => {
     const submit = async () => {
       if (model.current) {
+        const result = await model.current.validate();
+
+        if (result.length) {
+          console.error(result);
+          return;
+        }
+
         try {
           setIsInFlight(true);
           if (isEditing) {

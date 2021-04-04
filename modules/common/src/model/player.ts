@@ -1,8 +1,15 @@
+import {
+  validate,
+  Length,
+  ValidationError,
+  ValidateNested,
+} from 'class-validator';
 import { Memoize } from 'typescript-memoize';
 import { LinkedList } from 'linked-list-typescript';
 import Cloneable from '../interfaces/cloneable';
 import AliasModel, { AliasAttributes } from './alias';
 import DirtLeagueModel from './dl-model';
+import Validatable from '../interfaces/validatable';
 
 export interface PlayerAttributes {
   id?: number;
@@ -14,7 +21,7 @@ export interface PlayerAttributes {
 
 class PlayerModel
   extends DirtLeagueModel<PlayerAttributes>
-  implements Cloneable<PlayerModel> {
+  implements Cloneable<PlayerModel>, Validatable {
   static defaults = {
     firstName: '',
     lastName: '',
@@ -37,6 +44,7 @@ class PlayerModel
     this.set('id', value);
   }
 
+  @Length(1, 128)
   get firstName(): string {
     return this.attributes.firstName;
   }
@@ -45,6 +53,7 @@ class PlayerModel
     this.set('firstName', value);
   }
 
+  @Length(1, 128)
   get lastName(): string {
     return this.attributes.lastName;
   }
@@ -65,6 +74,11 @@ class PlayerModel
     return `${this.firstName} ${this.lastName}`;
   }
 
+  @ValidateNested({ each: true })
+  private get aliasValidator(): AliasModel[] {
+    return this.aliases.toArray();
+  }
+
   @Memoize()
   get aliases(): LinkedList<AliasModel> {
     return new LinkedList<AliasModel>(
@@ -78,6 +92,12 @@ class PlayerModel
     const obj = this.toJson();
 
     return new PlayerModel(obj);
+  }
+
+  async validate(): Promise<ValidationError[]> {
+    const result = await validate(this);
+
+    return result;
   }
 }
 

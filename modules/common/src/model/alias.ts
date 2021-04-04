@@ -1,3 +1,6 @@
+import { validate, IsInt, Length, ValidationError } from 'class-validator';
+import Cloneable from '../interfaces/cloneable';
+import Validatable from '../interfaces/validatable';
 import DirtLeagueModel from './dl-model';
 
 export interface AliasAttributes {
@@ -6,7 +9,18 @@ export interface AliasAttributes {
   value?: string;
 }
 
-export default class AliasModel extends DirtLeagueModel<AliasAttributes> {
+export default class AliasModel
+  extends DirtLeagueModel<AliasAttributes>
+  implements Cloneable<AliasModel>, Validatable {
+  static defaults = {};
+
+  constructor(obj: Record<string, any> = {}) {
+    super({
+      ...AliasModel.defaults,
+      ...obj,
+    });
+  }
+
   get id(): number {
     return this.attributes.id;
   }
@@ -15,6 +29,7 @@ export default class AliasModel extends DirtLeagueModel<AliasAttributes> {
     this.set('id', value);
   }
 
+  @IsInt()
   get playerId(): number {
     return this.attributes.playerId;
   }
@@ -23,11 +38,24 @@ export default class AliasModel extends DirtLeagueModel<AliasAttributes> {
     this.set('playerId', value);
   }
 
+  @Length(1, 128)
   get value(): string {
     return this.attributes.value;
   }
 
   set value(val: string) {
     this.set('value', val);
+  }
+
+  clone(): AliasModel {
+    const obj = this.toJson();
+
+    return new AliasModel(obj);
+  }
+
+  async validate(): Promise<ValidationError[]> {
+    const result = await validate(this);
+
+    return result;
   }
 }

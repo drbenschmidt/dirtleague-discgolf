@@ -49,6 +49,10 @@ class DirtLeagueModel<TAttributes> {
     this.cid = ++cidCounter;
   }
 
+  private getTotalKeys(): Set<string> {
+    return new Set([...keys(this.attributes), ...keys(this.defaults)]);
+  }
+
   getAttribute<T>(key: string): T {
     const value = (this.attributes as any)[key] as T;
     const defaultValue = (this.defaults as any)[key] as T;
@@ -78,12 +82,8 @@ class DirtLeagueModel<TAttributes> {
 
   toJson(): Record<string, any> {
     const result = {} as Record<string, any>;
-    const totalKeys = new Set([
-      ...keys(this.attributes),
-      ...keys(this.defaults),
-    ]);
 
-    totalKeys.forEach(key => {
+    this.getTotalKeys().forEach(key => {
       const value = this.get(key);
 
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
