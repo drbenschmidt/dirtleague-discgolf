@@ -43,3 +43,4 @@ export type { PlayerGroupResultAttributes } from './model/player-group-result';
 export type { UserModel } from './model/user';
 
 export type { default as Cloneable } from './interfaces/cloneable';
+export type { default as Validatable } from './interfaces/validatable';

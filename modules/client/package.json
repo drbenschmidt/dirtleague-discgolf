@@ -77,6 +77,7 @@
     "react-router-dom": "^5.2.0",
     "resolve": "1.18.1",
     "resolve-url-loader": "^3.1.2",
+    "rxjs": "6.6.7",
     "sass-loader": "^10.0.5",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^2.0.3",

@@ -7,6 +7,7 @@ import AuthManager from './managers/auth';
 import ApiFetch from './data-access/api-fetch';
 import Router from './router';
 import RepositoryServices from './data-access/repository-services';
+import { NotificationsProvider } from './components/notifications/context';
 
 const App = () => {
   const apiFetch = useOnce(() => ApiFetch.CreateFromLocalStorage());
@@ -33,7 +34,9 @@ const App = () => {
   return (
     <RepositoryContext.Provider value={repositoryServices}>
       <AuthContext.Provider value={authManager}>
-        <Router />
+        <NotificationsProvider>
+          <Router />
+        </NotificationsProvider>
       </AuthContext.Provider>
     </RepositoryContext.Provider>
   );
