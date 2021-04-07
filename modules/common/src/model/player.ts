@@ -9,7 +9,7 @@ import { LinkedList } from 'linked-list-typescript';
 import Cloneable from '../interfaces/cloneable';
 import AliasModel, { AliasAttributes } from './alias';
 import DirtLeagueModel from './dl-model';
-import Validatable from '../interfaces/validatable';
+import Validatable, { onlyClient } from '../interfaces/validatable';
 
 export interface PlayerAttributes {
   id?: number;
@@ -44,7 +44,7 @@ class PlayerModel
     this.set('id', value);
   }
 
-  @Length(1, 128)
+  @Length(1, 128, onlyClient)
   get firstName(): string {
     return this.attributes.firstName;
   }
@@ -53,7 +53,7 @@ class PlayerModel
     this.set('firstName', value);
   }
 
-  @Length(1, 128)
+  @Length(1, 128, onlyClient)
   get lastName(): string {
     return this.attributes.lastName;
   }
@@ -74,7 +74,7 @@ class PlayerModel
     return `${this.firstName} ${this.lastName}`;
   }
 
-  @ValidateNested({ each: true })
+  @ValidateNested({ each: true, ...onlyClient })
   private get aliasValidator(): AliasModel[] {
     return this.aliases.toArray();
   }
@@ -95,7 +95,7 @@ class PlayerModel
   }
 
   async validate(): Promise<ValidationError[]> {
-    const result = await validate(this);
+    const result = await validate(this, onlyClient);
 
     return result;
   }

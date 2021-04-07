@@ -1,6 +1,6 @@
 import { validate, IsInt, Length, ValidationError } from 'class-validator';
 import Cloneable from '../interfaces/cloneable';
-import Validatable from '../interfaces/validatable';
+import Validatable, { onlyClient, onlyServer } from '../interfaces/validatable';
 import DirtLeagueModel from './dl-model';
 
 export interface AliasAttributes {
@@ -29,7 +29,7 @@ export default class AliasModel
     this.set('id', value);
   }
 
-  @IsInt()
+  @IsInt(onlyServer)
   get playerId(): number {
     return this.attributes.playerId;
   }
@@ -38,7 +38,7 @@ export default class AliasModel
     this.set('playerId', value);
   }
 
-  @Length(1, 128)
+  @Length(1, 128, onlyClient)
   get value(): string {
     return this.attributes.value;
   }
@@ -54,7 +54,7 @@ export default class AliasModel
   }
 
   async validate(): Promise<ValidationError[]> {
-    const result = await validate(this);
+    const result = await validate(this, onlyClient);
 
     return result;
   }

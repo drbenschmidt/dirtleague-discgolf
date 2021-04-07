@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, ReactElement } from 'react';
 import { useNotificationsContext } from './context';
 import type { Notification } from '../../managers/notifications';
 import Toast from './toast';
+import './toaster.css';
 
 const Toaster = (): ReactElement => {
   const [, setDummy] = useState(true);
@@ -27,16 +28,12 @@ const Toaster = (): ReactElement => {
     [manager.notifications]
   );
 
-  // Subscribe to the notifications onAdd.
-  // When that happens, toArray().map() through them and render.
-  // Each Toast component needs to click to dismiss or something.
-
   const notifications = manager.notifications.toArray();
 
   return (
     <div className="toaster">
       {notifications.map(n => (
-        <Toast model={n} onDismiss={onDismiss} />
+        <Toast key={n.id} model={n} onDismiss={onDismiss} />
       ))}
     </div>
   );

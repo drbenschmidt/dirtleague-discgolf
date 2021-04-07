@@ -36,7 +36,7 @@ const PlayerFormComponent = (props: any): ReactElement | null => {
   const lastNameBinding = useInputBinding(model, 'lastName');
   const [isInFlight, setIsInFlight] = useState(false);
   const history = useHistory();
-  const isValid = useModelValidation(playerModel);
+  const isValid = useModelValidation(model);
 
   const onFormSubmit = useCallback(() => {
     const submit = async () => {

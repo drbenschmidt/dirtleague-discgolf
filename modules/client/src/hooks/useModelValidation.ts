@@ -1,22 +1,40 @@
 import type { ValidationError } from 'class-validator';
 import { Validatable } from '@dirtleague/common';
-import { useCallback } from 'react';
+import { useCallback, RefObject } from 'react';
 import { useNotificationsContext } from '../components/notifications/context';
 
 const getErrorValue = (error: ValidationError) =>
   Object.values(error.constraints || {}).join(', ');
 
-const useModelValidation = (model: Validatable): (() => Promise<boolean>) => {
+const flattenErrors = (errors: ValidationError[]): ValidationError[] => {
+  return errors.flatMap(error => {
+    if (error.children && error.children.length > 0) {
+      return flattenErrors(error.children);
+    }
+
+    return [error];
+  });
+};
+
+const useModelValidation = (
+  model: RefObject<Validatable>
+): (() => Promise<boolean>) => {
   const notifications = useNotificationsContext();
 
   return useCallback(async () => {
-    const result = await model.validate();
+    if (!model.current) {
+      return true;
+    }
+
+    const result = await model.current?.validate();
 
     if (result.length === 0) {
       return true;
     }
 
-    result.forEach(error => notifications.addError(getErrorValue(error)));
+    const errors = flattenErrors(result);
+
+    errors.forEach(error => notifications.addError(getErrorValue(error)));
 
     return false;
   }, [model, notifications]);
