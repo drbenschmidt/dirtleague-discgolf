@@ -80,6 +80,10 @@ class DirtLeagueModel<TAttributes> {
     this.onChange.next({ key, value });
   }
 
+  setFloat(key: string, value: any): void {
+    this.set(key, parseFloat(value));
+  }
+
   toJson(): Record<string, any> {
     const result = {} as Record<string, any>;
 

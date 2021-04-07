@@ -1,9 +1,18 @@
+import {
+  validate,
+  ValidationError,
+  ValidateNested,
+  ArrayNotEmpty,
+  Length,
+  IsPositive,
+} from 'class-validator';
 import { Memoize } from 'typescript-memoize';
 import { LinkedList } from 'linked-list-typescript';
 import Cloneable from '../interfaces/cloneable';
 import DirtLeagueModel from './dl-model';
 import CourseHoleModel, { CourseHoleAttributes } from './course-hole';
 import filledArray from '../utils/filledArray';
+import Validatable, { onlyClient } from '../interfaces/validatable';
 
 export interface CourseLayoutAttributes {
   id?: number;
@@ -15,7 +24,7 @@ export interface CourseLayoutAttributes {
 
 export default class CourseLayoutModel
   extends DirtLeagueModel<CourseLayoutAttributes>
-  implements Cloneable<CourseLayoutModel> {
+  implements Cloneable<CourseLayoutModel>, Validatable {
   static defaults = {
     name: 'Default Layout',
     holes: filledArray(1, 18).map(val => ({
@@ -46,14 +55,16 @@ export default class CourseLayoutModel
     this.set('courseId', value);
   }
 
+  @IsPositive(onlyClient)
   get dgcrSse(): number {
     return this.attributes.dgcrSse;
   }
 
   set dgcrSse(value: number) {
-    this.set('dgcrSse', value);
+    this.setFloat('dgcrSse', value);
   }
 
+  @Length(1, 128, onlyClient)
   get name(): string {
     return this.attributes.name;
   }
@@ -71,9 +82,21 @@ export default class CourseLayoutModel
     );
   }
 
+  @ArrayNotEmpty(onlyClient)
+  @ValidateNested({ each: true, ...onlyClient })
+  private get holesValidator(): CourseHoleModel[] {
+    return this.holes.toArray();
+  }
+
   clone(): CourseLayoutModel {
     const obj = this.toJson();
 
     return new CourseLayoutModel(obj);
+  }
+
+  async validate(): Promise<ValidationError[]> {
+    const result = await validate(this, onlyClient);
+
+    return result;
   }
 }

@@ -1,5 +1,7 @@
+import { validate, ValidationError, IsInt, IsPositive } from 'class-validator';
 import Cloneable from '../interfaces/cloneable';
 import DirtLeagueModel from './dl-model';
+import Validatable, { onlyClient } from '../interfaces/validatable';
 
 export interface CourseHoleAttributes {
   id?: number;
@@ -11,10 +13,10 @@ export interface CourseHoleAttributes {
 
 export default class CourseHoleModel
   extends DirtLeagueModel<CourseHoleAttributes>
-  implements Cloneable<CourseHoleModel> {
+  implements Cloneable<CourseHoleModel>, Validatable {
   static defaults = {
     number: 0,
-    distance: 0,
+    distance: 1,
     par: 3,
   };
 
@@ -41,6 +43,8 @@ export default class CourseHoleModel
     this.set('courseLayoutId', value);
   }
 
+  @IsInt(onlyClient)
+  @IsPositive(onlyClient)
   get number(): number {
     return this.attributes.number;
   }
@@ -49,6 +53,8 @@ export default class CourseHoleModel
     this.set('number', value);
   }
 
+  @IsInt(onlyClient)
+  @IsPositive(onlyClient)
   get distance(): number {
     return this.attributes.distance;
   }
@@ -57,6 +63,8 @@ export default class CourseHoleModel
     this.set('distance', value);
   }
 
+  @IsInt(onlyClient)
+  @IsPositive(onlyClient)
   get par(): number {
     return this.attributes.par;
   }
@@ -69,5 +77,11 @@ export default class CourseHoleModel
     const obj = this.toJson();
 
     return new CourseHoleModel(obj);
+  }
+
+  async validate(): Promise<ValidationError[]> {
+    const result = await validate(this, onlyClient);
+
+    return result;
   }
 }
