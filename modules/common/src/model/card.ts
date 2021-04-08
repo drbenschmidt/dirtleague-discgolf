@@ -9,7 +9,7 @@ import { Memoize } from 'typescript-memoize';
 import Cloneable from '../interfaces/cloneable';
 import PlayerGroupModel, { PlayerGroupAttributes } from './player-group';
 import DirtLeagueModel from './dl-model';
-import Validatable from '../interfaces/validatable';
+import Validatable, { onlyClient, onlyServer } from '../interfaces/validatable';
 
 export interface CardAttributes {
   id?: number;
@@ -36,19 +36,18 @@ export default class CardModel
   }
 
   set id(value: number) {
-    this.set('id', value);
+    this.setInt('id', value);
   }
 
-  @IsInt()
+  @IsInt(onlyServer)
   get roundId(): number {
     return this.attributes.roundId;
   }
 
   set roundId(value: number) {
-    this.set('roundId', value);
+    this.setInt('roundId', value);
   }
 
-  @ValidateNested()
   @Memoize()
   get playerGroups(): LinkedList<PlayerGroupModel> {
     return new LinkedList<PlayerGroupModel>(
@@ -58,6 +57,11 @@ export default class CardModel
     );
   }
 
+  @ValidateNested({ each: true, ...onlyClient })
+  private get playerGroupsValidator(): PlayerGroupModel[] {
+    return this.playerGroups.toArray();
+  }
+
   clone(): CardModel {
     const obj = this.toJson();
 
@@ -65,7 +69,7 @@ export default class CardModel
   }
 
   async validate(): Promise<ValidationError[]> {
-    const result = await validate(this);
+    const result = await validate(this, onlyClient);
 
     return result;
   }

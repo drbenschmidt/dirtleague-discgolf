@@ -41,7 +41,7 @@ class PlayerModel
   }
 
   set id(value: number) {
-    this.set('id', value);
+    this.setInt('id', value);
   }
 
   @Length(1, 128, onlyClient)
@@ -67,16 +67,11 @@ class PlayerModel
   }
 
   set currentRating(value: number) {
-    this.set('currentRating', value);
+    this.setInt('currentRating', value);
   }
 
   get fullName(): string {
     return `${this.firstName} ${this.lastName}`;
-  }
-
-  @ValidateNested({ each: true, ...onlyClient })
-  private get aliasValidator(): AliasModel[] {
-    return this.aliases.toArray();
   }
 
   @Memoize()
@@ -86,6 +81,11 @@ class PlayerModel
         (v: AliasAttributes) => new AliasModel(v)
       )
     );
+  }
+
+  @ValidateNested({ each: true, ...onlyClient })
+  private get aliasValidator(): AliasModel[] {
+    return this.aliases.toArray();
   }
 
   clone(): PlayerModel {

@@ -1,8 +1,17 @@
+import {
+  validate,
+  Length,
+  ValidationError,
+  ValidateNested,
+  IsDate,
+  IsInt,
+} from 'class-validator';
 import { LinkedList } from 'linked-list-typescript';
 import { Memoize } from 'typescript-memoize';
 import Cloneable from '../interfaces/cloneable';
 import DirtLeagueModel from './dl-model';
 import RoundModel, { RoundAttributes } from './round';
+import Validatable, { onlyClient } from '../interfaces/validatable';
 
 export interface EventAttributes {
   id?: number;
@@ -15,7 +24,7 @@ export interface EventAttributes {
 
 export default class EventModel
   extends DirtLeagueModel<EventAttributes>
-  implements Cloneable<EventModel> {
+  implements Cloneable<EventModel>, Validatable {
   static defaults = {
     name: '',
     startDate: new Date(),
@@ -34,17 +43,19 @@ export default class EventModel
   }
 
   set id(value: number) {
-    this.set('id', value);
+    this.setInt('id', value);
   }
 
+  @IsInt(onlyClient)
   get seasonId(): number {
     return this.attributes.seasonId;
   }
 
   set seasonId(value: number) {
-    this.set('seasonId', value);
+    this.setInt('seasonId', value);
   }
 
+  @Length(1, 128, onlyClient)
   get name(): string {
     return this.attributes.name;
   }
@@ -53,6 +64,7 @@ export default class EventModel
     this.set('name', value);
   }
 
+  @Length(1, 128, onlyClient)
   get description(): string {
     return this.attributes.description;
   }
@@ -61,6 +73,7 @@ export default class EventModel
     this.set('description', value);
   }
 
+  @IsDate(onlyClient)
   get startDate(): Date {
     if (this.attributes.startDate instanceof Date) {
       return this.attributes.startDate;
@@ -80,9 +93,20 @@ export default class EventModel
     );
   }
 
+  @ValidateNested({ each: true, ...onlyClient })
+  private get roundsValidator(): RoundModel[] {
+    return this.rounds.toArray();
+  }
+
   clone(): EventModel {
     const obj = this.toJson();
 
     return new EventModel(obj);
+  }
+
+  async validate(): Promise<ValidationError[]> {
+    const result = await validate(this, onlyClient);
+
+    return result;
   }
 }

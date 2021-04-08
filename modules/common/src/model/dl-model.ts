@@ -84,6 +84,10 @@ class DirtLeagueModel<TAttributes> {
     this.set(key, parseFloat(value));
   }
 
+  setInt(key: string, value: any): void {
+    this.set(key, parseInt(value, 10));
+  }
+
   toJson(): Record<string, any> {
     const result = {} as Record<string, any>;
 

@@ -1,3 +1,11 @@
+import {
+  validate,
+  IsInt,
+  ValidationError,
+  ValidateNested,
+  Length,
+  IsOptional,
+} from 'class-validator';
 import { LinkedList } from 'linked-list-typescript';
 import { Memoize } from 'typescript-memoize';
 import Cloneable from '../interfaces/cloneable';
@@ -8,6 +16,7 @@ import PlayerGroupPlayerModel, {
 import PlayerGroupResultModel, {
   PlayerGroupResultAttributes,
 } from './player-group-result';
+import Validatable, { onlyClient } from '../interfaces/validatable';
 
 export interface PlayerGroupAttributes {
   id?: number;
@@ -18,7 +27,7 @@ export interface PlayerGroupAttributes {
 
 export default class PlayerGroupModel
   extends DirtLeagueModel<PlayerGroupAttributes>
-  implements Cloneable<PlayerGroupModel> {
+  implements Cloneable<PlayerGroupModel>, Validatable {
   static defaults = {
     teamName: '',
     players: [] as PlayerGroupPlayerAttributes[],
@@ -36,7 +45,7 @@ export default class PlayerGroupModel
   }
 
   set id(value: number) {
-    this.set('id', value);
+    this.setInt('id', value);
   }
 
   get cardId(): number {
@@ -44,9 +53,11 @@ export default class PlayerGroupModel
   }
 
   set cardId(value: number) {
-    this.set('cardId', value);
+    this.setInt('cardId', value);
   }
 
+  @IsOptional(onlyClient)
+  @Length(0, 128, onlyClient)
   get teamName(): string {
     return this.attributes.teamName;
   }
@@ -79,9 +90,20 @@ export default class PlayerGroupModel
     );
   }
 
+  @ValidateNested({ each: true, ...onlyClient })
+  private get playersValidator(): PlayerGroupPlayerModel[] {
+    return this.players.toArray();
+  }
+
   clone(): PlayerGroupModel {
     const obj = this.toJson();
 
     return new PlayerGroupModel(obj);
+  }
+
+  async validate(): Promise<ValidationError[]> {
+    const result = await validate(this, onlyClient);
+
+    return result;
   }
 }

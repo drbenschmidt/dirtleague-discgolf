@@ -1,3 +1,10 @@
+import {
+  validate,
+  Length,
+  ValidationError,
+  ValidateNested,
+  IsInt,
+} from 'class-validator';
 import { LinkedList } from 'linked-list-typescript';
 import { Memoize } from 'typescript-memoize';
 import CourseModel, { CourseAttributes } from './course';
@@ -5,6 +12,7 @@ import Cloneable from '../interfaces/cloneable';
 import CardModel, { CardAttributes } from './card';
 import CourseLayoutModel, { CourseLayoutAttributes } from './course-layout';
 import DirtLeagueModel from './dl-model';
+import Validatable, { onlyClient } from '../interfaces/validatable';
 
 export interface RoundAttributes {
   id?: number;
@@ -18,7 +26,7 @@ export interface RoundAttributes {
 
 export default class RoundModel
   extends DirtLeagueModel<RoundAttributes>
-  implements Cloneable<RoundModel> {
+  implements Cloneable<RoundModel>, Validatable {
   static defaults = {
     name: 'New Round',
     startDate: new Date(),
@@ -38,7 +46,7 @@ export default class RoundModel
   }
 
   set id(value: number) {
-    this.set('id', value);
+    this.setInt('id', value);
   }
 
   get eventId(): number {
@@ -46,15 +54,16 @@ export default class RoundModel
   }
 
   set eventId(value: number) {
-    this.set('eventId', value);
+    this.setInt('eventId', value);
   }
 
+  @IsInt(onlyClient)
   get courseId(): number {
     return this.attributes.courseId;
   }
 
   set courseId(value: number) {
-    this.set('courseId', value);
+    this.setInt('courseId', value);
   }
 
   get isComplete(): boolean {
@@ -76,12 +85,13 @@ export default class RoundModel
     return undefined;
   }
 
+  @IsInt(onlyClient)
   get courseLayoutId(): number {
     return this.attributes.courseLayoutId;
   }
 
   set courseLayoutId(value: number) {
-    this.set('courseLayoutId', value);
+    this.setInt('courseLayoutId', value);
   }
 
   @Memoize()
@@ -112,9 +122,20 @@ export default class RoundModel
     );
   }
 
+  @ValidateNested({ each: true, ...onlyClient })
+  private get cardsValidator(): CardModel[] {
+    return this.cards.toArray();
+  }
+
   clone(): RoundModel {
     const obj = this.toJson();
 
     return new RoundModel(obj);
+  }
+
+  async validate(): Promise<ValidationError[]> {
+    const result = await validate(this, onlyClient);
+
+    return result;
   }
 }
