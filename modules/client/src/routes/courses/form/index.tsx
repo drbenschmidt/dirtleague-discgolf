@@ -56,6 +56,7 @@ const CourseFormComponent = (props: any): ReactElement | null => {
 
     return new CourseLayoutModel({
       name: `Layout ${length + 1}`,
+      courseId: model.current?.id,
     });
   }, [model]);
 

@@ -16,6 +16,7 @@ import Breadcrumbs, {
   BreadcrumbPart,
 } from '../../components/generic/breadcrumbs';
 import { Seasons } from '../../links';
+import useModelValidation from '../../hooks/useModelValidation';
 
 const SeasonFormComponent = (props: any): ReactElement | null => {
   const { seasonModel, isEditing, services } = props;
@@ -25,10 +26,15 @@ const SeasonFormComponent = (props: any): ReactElement | null => {
   const endDateBinding = useDateBinding(model, 'endDate');
   const [isInFlight, setIsInFlight] = useState(false);
   const history = useHistory();
+  const isValid = useModelValidation(model);
 
   const onFormSubmit = useCallback(() => {
     const submit = async () => {
       if (model.current) {
+        if (!(await isValid())) {
+          return;
+        }
+
         try {
           setIsInFlight(true);
           if (isEditing) {
@@ -47,7 +53,7 @@ const SeasonFormComponent = (props: any): ReactElement | null => {
     };
 
     submit();
-  }, [isEditing, model, services?.seasons, history]);
+  }, [model, isValid, isEditing, services?.seasons, history]);
 
   const title = isEditing ? 'Edit Season' : 'New Season';
   const pathPart = isEditing
