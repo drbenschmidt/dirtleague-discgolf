@@ -13,6 +13,7 @@ import Breadcrumbs, {
   BreadcrumbPart,
 } from '../../../components/generic/breadcrumbs';
 import { Courses } from '../../../links';
+import useModelValidation from '../../../hooks/useModelValidation';
 
 const CourseFormComponent = (props: any): ReactElement | null => {
   const { entityModel, isEditing } = props;
@@ -21,10 +22,15 @@ const CourseFormComponent = (props: any): ReactElement | null => {
   const nameBinding = useInputBinding(model, 'name');
   const [isInFlight, setIsInFlight] = useState(false);
   const history = useHistory();
+  const isValid = useModelValidation(model);
 
   const onFormSubmit = useCallback(() => {
     const submit = async () => {
       if (model.current) {
+        if (!(await isValid())) {
+          return;
+        }
+
         try {
           setIsInFlight(true);
           if (isEditing) {
@@ -43,13 +49,14 @@ const CourseFormComponent = (props: any): ReactElement | null => {
     };
 
     submit();
-  }, [isEditing, model, services?.courses, history]);
+  }, [model, isValid, isEditing, services?.courses, history]);
 
   const modelFactory = useCallback(() => {
     const length = model.current?.layouts.length || 0;
 
     return new CourseLayoutModel({
       name: `Layout ${length + 1}`,
+      courseId: model.current?.id,
     });
   }, [model]);
 

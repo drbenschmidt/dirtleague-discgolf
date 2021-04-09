@@ -1,7 +1,9 @@
+import { validate, IsInt, ValidationError } from 'class-validator';
 import { Memoize } from 'typescript-memoize';
 import Cloneable from '../interfaces/cloneable';
 import DirtLeagueModel from './dl-model';
 import PlayerModel, { PlayerAttributes } from './player';
+import Validatable, { onlyClient } from '../interfaces/validatable';
 
 export interface PlayerGroupPlayerAttributes {
   playerGroupId?: number;
@@ -10,7 +12,7 @@ export interface PlayerGroupPlayerAttributes {
 
 export default class PlayerGroupPlayerModel
   extends DirtLeagueModel<PlayerGroupPlayerAttributes>
-  implements Cloneable<PlayerGroupPlayerModel> {
+  implements Cloneable<PlayerGroupPlayerModel>, Validatable {
   static defaults = {};
 
   constructor(obj: Record<string, any> = {}) {
@@ -25,15 +27,16 @@ export default class PlayerGroupPlayerModel
   }
 
   set playerGroupId(value: number) {
-    this.attributes.playerGroupId = value;
+    this.setInt('playerGroupId', value);
   }
 
   get playerId(): number {
     return this.attributes.playerId;
   }
 
+  @IsInt(onlyClient)
   set playerId(value: number) {
-    this.attributes.playerId = value;
+    this.setInt('playerId', value);
   }
 
   @Memoize()
@@ -62,5 +65,11 @@ export default class PlayerGroupPlayerModel
     const obj = this.toJson();
 
     return new PlayerGroupPlayerModel(obj);
+  }
+
+  async validate(): Promise<ValidationError[]> {
+    const result = await validate(this, onlyClient);
+
+    return result;
   }
 }

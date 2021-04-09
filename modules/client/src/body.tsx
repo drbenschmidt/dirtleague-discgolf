@@ -2,6 +2,7 @@ import { useState, useCallback, ReactElement } from 'react';
 import { Visibility, Segment, Menu, Container, Grid } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import AuthButton from './components/auth/button';
+import Toaster from './components/notifications/toaster';
 
 export const MenuLink = (props: any): ReactElement => {
   const { children } = props;
@@ -58,6 +59,7 @@ export const Navigation = (props: any): ReactElement => {
           </Grid.Row>
         </Grid>
       </Segment>
+      <Toaster />
     </>
   );
 };

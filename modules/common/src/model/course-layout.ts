@@ -1,31 +1,35 @@
+import {
+  validate,
+  ValidationError,
+  ValidateNested,
+  ArrayNotEmpty,
+  Length,
+  IsPositive,
+} from 'class-validator';
 import { Memoize } from 'typescript-memoize';
 import { LinkedList } from 'linked-list-typescript';
 import Cloneable from '../interfaces/cloneable';
 import DirtLeagueModel from './dl-model';
 import CourseHoleModel, { CourseHoleAttributes } from './course-hole';
-
-const filledArray = (start: number, size: number): number[] => {
-  return new Array(size).fill(true).map((v, index) => start + index);
-};
+import filledArray from '../utils/filledArray';
+import Validatable, { onlyClient } from '../interfaces/validatable';
 
 export interface CourseLayoutAttributes {
   id?: number;
-
   courseId?: number;
-
   dgcrSse?: number;
-
   name?: string;
-
   holes?: CourseHoleAttributes[];
 }
 
 export default class CourseLayoutModel
   extends DirtLeagueModel<CourseLayoutAttributes>
-  implements Cloneable<CourseLayoutModel> {
+  implements Cloneable<CourseLayoutModel>, Validatable {
   static defaults = {
     name: 'Default Layout',
-    holes: [] as CourseHoleAttributes[],
+    holes: filledArray(1, 18).map(val => ({
+      number: val,
+    })) as CourseHoleAttributes[],
   };
 
   constructor(obj: Record<string, any> = {}) {
@@ -40,7 +44,7 @@ export default class CourseLayoutModel
   }
 
   set id(value: number) {
-    this.attributes.id = value;
+    this.setInt('id', value);
   }
 
   get courseId(): number {
@@ -48,23 +52,25 @@ export default class CourseLayoutModel
   }
 
   set courseId(value: number) {
-    this.attributes.courseId = value;
+    this.setInt('courseId', value);
   }
 
+  @IsPositive(onlyClient)
   get dgcrSse(): number {
     return this.attributes.dgcrSse;
   }
 
   set dgcrSse(value: number) {
-    this.attributes.dgcrSse = value;
+    this.setFloat('dgcrSse', value);
   }
 
+  @Length(1, 128, onlyClient)
   get name(): string {
     return this.attributes.name;
   }
 
-  set name(val: string) {
-    this.attributes.name = val;
+  set name(value: string) {
+    this.set('name', value);
   }
 
   @Memoize()
@@ -76,19 +82,21 @@ export default class CourseLayoutModel
     );
   }
 
+  @ArrayNotEmpty(onlyClient)
+  @ValidateNested({ each: true, ...onlyClient })
+  private get holesValidator(): CourseHoleModel[] {
+    return this.holes.toArray();
+  }
+
   clone(): CourseLayoutModel {
     const obj = this.toJson();
 
     return new CourseLayoutModel(obj);
   }
 
-  // TODO: Remove this.
-  static createDefault(): CourseLayoutModel {
-    return new CourseLayoutModel({
-      name: 'New Layout',
-      holes: filledArray(1, 18).map(val => ({
-        number: val,
-      })),
-    });
+  async validate(): Promise<ValidationError[]> {
+    const result = await validate(this, onlyClient);
+
+    return result;
   }
 }

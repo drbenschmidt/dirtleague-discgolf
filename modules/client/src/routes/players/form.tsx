@@ -12,6 +12,7 @@ import Breadcrumbs, {
   BreadcrumbPart,
 } from '../../components/generic/breadcrumbs';
 import { Players } from '../../links';
+import useModelValidation from '../../hooks/useModelValidation';
 
 const AliasFormRow = (props: any): ReactElement => {
   const { model } = props;
@@ -35,10 +36,15 @@ const PlayerFormComponent = (props: any): ReactElement | null => {
   const lastNameBinding = useInputBinding(model, 'lastName');
   const [isInFlight, setIsInFlight] = useState(false);
   const history = useHistory();
+  const isValid = useModelValidation(model);
 
   const onFormSubmit = useCallback(() => {
     const submit = async () => {
       if (model.current) {
+        if (!(await isValid())) {
+          return;
+        }
+
         try {
           setIsInFlight(true);
           if (isEditing) {
@@ -57,7 +63,7 @@ const PlayerFormComponent = (props: any): ReactElement | null => {
     };
 
     submit();
-  }, [isEditing, model, services?.players, history]);
+  }, [model, isValid, isEditing, services?.players, history]);
 
   const title = isEditing ? 'Edit Player' : 'New Player';
   const pathPart = isEditing

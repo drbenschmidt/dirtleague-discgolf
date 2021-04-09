@@ -136,13 +136,15 @@ const buildRoute = (services: RepositoryServices): Router => {
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       // TODO: Technically, this should be a transaction.
-      const body = req.body as CourseModel;
+      const model = new CourseModel(req.body);
 
-      await services.courses.update(body);
+      await services.courses.update(model);
 
-      if (body.layouts) {
-        const requestLayouts = Array.from(body.layouts);
-        const dbLayouts = await services.courseLayouts.getAllForCourse(body.id);
+      if (model.layouts) {
+        const requestLayouts = Array.from(model.layouts);
+        const dbLayouts = await services.courseLayouts.getAllForCourse(
+          model.id
+        );
 
         const [layoutsToCreate, layoutsToUpdate, layoutsToDelete] = getCrud(
           requestLayouts,
@@ -151,7 +153,7 @@ const buildRoute = (services: RepositoryServices): Router => {
 
         await asyncForEach(layoutsToCreate, async entity => {
           // eslint-disable-next-line no-param-reassign
-          entity.courseId = body.id;
+          entity.courseId = model.id;
           const layoutJson = entity.toJson();
 
           const newLayoutId = await services.courseLayouts.create(

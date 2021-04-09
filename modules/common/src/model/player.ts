@@ -1,29 +1,32 @@
+import {
+  validate,
+  Length,
+  ValidationError,
+  ValidateNested,
+} from 'class-validator';
 import { Memoize } from 'typescript-memoize';
 import { LinkedList } from 'linked-list-typescript';
 import Cloneable from '../interfaces/cloneable';
 import AliasModel, { AliasAttributes } from './alias';
 import DirtLeagueModel from './dl-model';
+import Validatable, { onlyClient } from '../interfaces/validatable';
 
 export interface PlayerAttributes {
   id?: number;
-
   firstName?: string;
-
   lastName?: string;
-
   currentRating?: number;
-
   aliases?: AliasAttributes[];
 }
 
 class PlayerModel
   extends DirtLeagueModel<PlayerAttributes>
-  implements Cloneable<PlayerModel> {
+  implements Cloneable<PlayerModel>, Validatable {
   static defaults = {
     firstName: '',
     lastName: '',
-    aliases: [] as AliasAttributes[],
     currentRating: 0,
+    aliases: [] as AliasAttributes[],
   };
 
   constructor(obj: Record<string, any> = {}) {
@@ -38,23 +41,25 @@ class PlayerModel
   }
 
   set id(value: number) {
-    this.attributes.id = value;
+    this.setInt('id', value);
   }
 
+  @Length(1, 128, onlyClient)
   get firstName(): string {
     return this.attributes.firstName;
   }
 
   set firstName(value: string) {
-    this.attributes.firstName = value;
+    this.set('firstName', value);
   }
 
+  @Length(1, 128, onlyClient)
   get lastName(): string {
     return this.attributes.lastName;
   }
 
   set lastName(value: string) {
-    this.attributes.lastName = value;
+    this.set('lastName', value);
   }
 
   get currentRating(): number {
@@ -62,7 +67,7 @@ class PlayerModel
   }
 
   set currentRating(value: number) {
-    this.attributes.currentRating = value;
+    this.setInt('currentRating', value);
   }
 
   get fullName(): string {
@@ -78,10 +83,21 @@ class PlayerModel
     );
   }
 
+  @ValidateNested({ each: true, ...onlyClient })
+  private get aliasValidator(): AliasModel[] {
+    return this.aliases.toArray();
+  }
+
   clone(): PlayerModel {
     const obj = this.toJson();
 
     return new PlayerModel(obj);
+  }
+
+  async validate(): Promise<ValidationError[]> {
+    const result = await validate(this, onlyClient);
+
+    return result;
   }
 }
 

@@ -9,6 +9,7 @@
   "dependencies": {
     "typescript-memoize": "1.0.0",
     "linked-list-typescript": "1.0.15",
-    "rxjs": "6.6.6"
+    "rxjs": "6.6.7",
+    "class-validator": "0.13.1"
   }
 }

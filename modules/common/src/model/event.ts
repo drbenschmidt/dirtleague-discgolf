@@ -1,8 +1,17 @@
+import {
+  validate,
+  Length,
+  ValidationError,
+  ValidateNested,
+  IsDate,
+  IsInt,
+} from 'class-validator';
 import { LinkedList } from 'linked-list-typescript';
 import { Memoize } from 'typescript-memoize';
 import Cloneable from '../interfaces/cloneable';
 import DirtLeagueModel from './dl-model';
 import RoundModel, { RoundAttributes } from './round';
+import Validatable, { onlyClient } from '../interfaces/validatable';
 
 export interface EventAttributes {
   id?: number;
@@ -15,7 +24,7 @@ export interface EventAttributes {
 
 export default class EventModel
   extends DirtLeagueModel<EventAttributes>
-  implements Cloneable<EventModel> {
+  implements Cloneable<EventModel>, Validatable {
   static defaults = {
     name: '',
     startDate: new Date(),
@@ -34,33 +43,37 @@ export default class EventModel
   }
 
   set id(value: number) {
-    this.attributes.id = value;
+    this.setInt('id', value);
   }
 
+  @IsInt(onlyClient)
   get seasonId(): number {
     return this.attributes.seasonId;
   }
 
   set seasonId(value: number) {
-    this.attributes.seasonId = value;
+    this.setInt('seasonId', value);
   }
 
+  @Length(1, 128, onlyClient)
   get name(): string {
     return this.attributes.name;
   }
 
-  set name(val: string) {
-    this.attributes.name = val;
+  set name(value: string) {
+    this.set('name', value);
   }
 
+  @Length(1, 128, onlyClient)
   get description(): string {
     return this.attributes.description;
   }
 
-  set description(val: string) {
-    this.attributes.description = val;
+  set description(value: string) {
+    this.set('description', value);
   }
 
+  @IsDate(onlyClient)
   get startDate(): Date {
     if (this.attributes.startDate instanceof Date) {
       return this.attributes.startDate;
@@ -69,8 +82,8 @@ export default class EventModel
     return new Date(this.attributes.startDate);
   }
 
-  set startDate(val: Date) {
-    this.attributes.startDate = val;
+  set startDate(value: Date) {
+    this.set('startDate', value);
   }
 
   @Memoize()
@@ -80,9 +93,20 @@ export default class EventModel
     );
   }
 
+  @ValidateNested({ each: true, ...onlyClient })
+  private get roundsValidator(): RoundModel[] {
+    return this.rounds.toArray();
+  }
+
   clone(): EventModel {
     const obj = this.toJson();
 
     return new EventModel(obj);
+  }
+
+  async validate(): Promise<ValidationError[]> {
+    const result = await validate(this, onlyClient);
+
+    return result;
   }
 }

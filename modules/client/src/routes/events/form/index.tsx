@@ -22,6 +22,7 @@ import Breadcrumbs, {
   BreadcrumbPart,
 } from '../../../components/generic/breadcrumbs';
 import { Events } from '../../../links';
+import useModelValidation from '../../../hooks/useModelValidation';
 
 export interface EventFormComponentProps {
   entityModel: EventModel;
@@ -41,10 +42,15 @@ const EventFormComponent = (
   const seasonBinding = useSelectBinding(model, 'seasonId');
   const [isInFlight, setIsInFlight] = useState(false);
   const history = useHistory();
+  const isValid = useModelValidation(model);
 
   const onFormSubmit = useCallback(() => {
     const submit = async () => {
       if (model.current) {
+        if (!(await isValid())) {
+          return;
+        }
+
         try {
           setIsInFlight(true);
           if (isEditing) {
@@ -63,7 +69,7 @@ const EventFormComponent = (
     };
 
     submit();
-  }, [isEditing, model, services?.events, history]);
+  }, [model, isValid, isEditing, services?.events, history]);
 
   // TODO: This is a terrible design but I don't have time to make
   // this work correctly right now.
