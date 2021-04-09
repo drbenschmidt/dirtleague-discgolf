@@ -32,7 +32,7 @@ export default class CourseHoleModel
   }
 
   set id(value: number) {
-    this.set('id', value);
+    this.setInt('id', value);
   }
 
   get courseLayoutId(): number {
@@ -40,7 +40,7 @@ export default class CourseHoleModel
   }
 
   set courseLayoutId(value: number) {
-    this.set('courseLayoutId', value);
+    this.setInt('courseLayoutId', value);
   }
 
   @IsInt(onlyClient)
@@ -50,7 +50,7 @@ export default class CourseHoleModel
   }
 
   set number(value: number) {
-    this.set('number', value);
+    this.setInt('number', value);
   }
 
   @IsInt(onlyClient)
@@ -60,7 +60,7 @@ export default class CourseHoleModel
   }
 
   set distance(value: number) {
-    this.set('distance', value);
+    this.setInt('distance', value);
   }
 
   @IsInt(onlyClient)
@@ -70,7 +70,7 @@ export default class CourseHoleModel
   }
 
   set par(value: number) {
-    this.set('par', value);
+    this.setInt('par', value);
   }
 
   clone(): CourseHoleModel {

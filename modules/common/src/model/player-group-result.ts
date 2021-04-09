@@ -24,7 +24,7 @@ export default class PlayerGroupResultModel
   }
 
   set cardThrowerId(value: number) {
-    this.set('cardThrowerId', value);
+    this.setInt('cardThrowerId', value);
   }
 
   get courseHoleId(): number {
@@ -32,7 +32,7 @@ export default class PlayerGroupResultModel
   }
 
   set courseHoleId(value: number) {
-    this.set('courseHoleId', value);
+    this.setInt('courseHoleId', value);
   }
 
   get score(): number {
@@ -40,7 +40,7 @@ export default class PlayerGroupResultModel
   }
 
   set score(value: number) {
-    this.set('score', value);
+    this.setInt('score', value);
   }
 
   get courseHoleNumber(): number | undefined {

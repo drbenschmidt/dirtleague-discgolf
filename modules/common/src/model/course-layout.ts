@@ -44,7 +44,7 @@ export default class CourseLayoutModel
   }
 
   set id(value: number) {
-    this.set('id', value);
+    this.setInt('id', value);
   }
 
   get courseId(): number {
@@ -52,7 +52,7 @@ export default class CourseLayoutModel
   }
 
   set courseId(value: number) {
-    this.set('courseId', value);
+    this.setInt('courseId', value);
   }
 
   @IsPositive(onlyClient)

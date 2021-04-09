@@ -38,7 +38,7 @@ export default class CourseModel
   }
 
   set id(value: number) {
-    this.set('id', value);
+    this.setInt('id', value);
   }
 
   @Length(1, 128, onlyClient)

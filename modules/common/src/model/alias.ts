@@ -26,7 +26,7 @@ export default class AliasModel
   }
 
   set id(value: number) {
-    this.set('id', value);
+    this.setInt('id', value);
   }
 
   @IsInt(onlyServer)
@@ -35,7 +35,7 @@ export default class AliasModel
   }
 
   set playerId(value: number) {
-    this.set('playerId', value);
+    this.setInt('playerId', value);
   }
 
   @Length(1, 128, onlyClient)
