@@ -58,7 +58,15 @@ export const Navigation = (props: any): ReactElement => {
 */
 
 export const Footer = (): ReactElement => {
-  return <div>Dirt League</div>;
+  return (
+    <Grid inverted>
+      <Grid.Row>
+        <Grid.Column width="16" textAlign="center" verticalAlign="middle">
+          Dirt League
+        </Grid.Column>
+      </Grid.Row>
+    </Grid>
+  );
 };
 
 export const Body = (props: any): ReactElement => {

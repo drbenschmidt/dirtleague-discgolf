@@ -26,3 +26,7 @@ body {
   grid-row-start: 2;
   grid-row-end: 3;
 }
+
+.content {
+  margin-top: 60px;
+}
