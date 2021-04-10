@@ -1,6 +1,6 @@
 import { ReactElement, Suspense, lazy } from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
-import { Navigation } from './body';
+import { Body } from './body';
 
 const Home = lazy(() => import('./routes/home/index'));
 const PlayerForm = lazy(() => import('./routes/players/form'));
@@ -19,7 +19,7 @@ const SeasonForm = lazy(() => import('./routes/seasons/form'));
 const Router = (): ReactElement => {
   return (
     <BrowserRouter>
-      <Navigation>
+      <Body>
         <Suspense fallback={<div>Loading...</div>}>
           <Switch>
             <Route exact path="/" component={Home} />
@@ -41,7 +41,7 @@ const Router = (): ReactElement => {
             <Route exact path="/seasons/:id/edit" component={SeasonForm} />
           </Switch>
         </Suspense>
-      </Navigation>
+      </Body>
     </BrowserRouter>
   );
 };

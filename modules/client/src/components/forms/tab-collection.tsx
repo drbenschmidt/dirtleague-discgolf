@@ -94,7 +94,7 @@ function TabCollection<TModel extends TabModelProps>(
           </Menu.Item>
         ),
         render: () => (
-          <Tab.Pane>
+          <Tab.Pane style={{ overflowX: 'scroll' }}>
             <TabComponent key={entity.cid} model={entity} />
           </Tab.Pane>
         ),

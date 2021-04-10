@@ -25,7 +25,11 @@ const CourseLayoutDetails = (props: {
         </Grid.Column>
       </Grid.Row>
       <Grid.Row style={{ overflowX: 'scroll' }}>
-        <Table definition style={{ marginLeft: '5px', marginRight: '5px' }}>
+        <Table
+          unstackable
+          definition
+          style={{ marginLeft: '5px', marginRight: '5px' }}
+        >
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell key="blank" />
