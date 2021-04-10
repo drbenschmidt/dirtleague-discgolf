@@ -72,7 +72,11 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
 
   return (
     <>
-      <Table definition style={{ marginLeft: '5px', marginRight: '5px' }}>
+      <Table
+        unstackable
+        definition
+        style={{ marginLeft: '5px', marginRight: '5px' }}
+      >
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell key="blank" />
