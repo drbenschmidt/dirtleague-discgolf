@@ -1,4 +1,9 @@
-import { RoundModel, Roles, asyncForEach } from '@dirtleague/common';
+import {
+  RoundModel,
+  Roles,
+  asyncForEach,
+  RatingType,
+} from '@dirtleague/common';
 import express, { Router } from 'express';
 import { DbRound } from '../data-access/repositories/rounds';
 import RepositoryServices from '../data-access/repository-services';
@@ -129,6 +134,7 @@ const buildRoute = (services: RepositoryServices): Router => {
               cardId: card.id,
               date: new Date(), // TODO: Get from round?
               rating,
+              type: RatingType.Event,
             });
           });
         });

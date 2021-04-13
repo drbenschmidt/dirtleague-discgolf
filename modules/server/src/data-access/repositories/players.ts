@@ -6,6 +6,8 @@ interface DbPlayer {
   id?: number;
   firstName: string;
   lastName: string;
+  bio: string;
+  yearJoined: number;
   currentRating: number;
 }
 
@@ -18,8 +20,8 @@ class PlayerRepository implements Repository<DbPlayer> {
 
   async create(model: DbPlayer): Promise<number> {
     const [result] = await this.db.query(sql`
-      INSERT INTO players (firstName, lastName, currentRating)
-      VALUES (${model.firstName}, ${model.lastName}, ${model.currentRating});
+      INSERT INTO players (firstName, lastName, currentRating, bio, yearJoined)
+      VALUES (${model.firstName}, ${model.lastName}, ${model.currentRating}, ${model.bio}, ${model.yearJoined});
 
       SELECT LAST_INSERT_ID();
     `);
@@ -33,7 +35,12 @@ class PlayerRepository implements Repository<DbPlayer> {
   async update(model: DbPlayer): Promise<void> {
     await this.db.query(sql`
       UPDATE players
-      SET firstName=${model.firstName}, lastName=${model.lastName}, currentRating=${model.currentRating}
+      SET
+        firstName=${model.firstName},
+        lastName=${model.lastName},
+        currentRating=${model.currentRating},
+        bio=${model.bio},
+        yearJoined=${model.yearJoined}
       WHERE id=${model.id}
     `);
   }

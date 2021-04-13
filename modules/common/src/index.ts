@@ -40,6 +40,8 @@ export type { PlayerGroupAttributes } from './model/player-group';
 export type { PlayerGroupPlayerAttributes } from './model/player-group-player';
 export type { PlayerGroupResultAttributes } from './model/player-group-result';
 
+export { RatingType } from './model/player-rating';
+
 export type { UserModel } from './model/user';
 
 export type { default as Cloneable } from './interfaces/cloneable';

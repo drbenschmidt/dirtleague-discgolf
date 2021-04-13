@@ -22,11 +22,11 @@ body {
   grid-template-rows: 1fr auto;
 }
 
-.footer {
+body > .footer {
   grid-row-start: 2;
   grid-row-end: 3;
 }
 
-.content {
+body > .content {
   margin-top: 60px;
 }

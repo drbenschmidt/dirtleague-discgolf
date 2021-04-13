@@ -1,7 +1,7 @@
 import { AliasModel, isNil, PlayerModel } from '@dirtleague/common';
 import { ReactElement, useCallback, useEffect, useState, useRef } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { Form } from 'semantic-ui-react';
+import { Form, TextArea } from 'semantic-ui-react';
 import TextInput from '../../components/forms/text-input';
 import Collection from '../../components/forms/collection';
 import { useRepositoryServices } from '../../data-access/context';
@@ -34,6 +34,8 @@ const PlayerFormComponent = (props: any): ReactElement | null => {
   const { model } = useTransaction<PlayerModel>(playerModel);
   const firstNameBinding = useInputBinding(model, 'firstName');
   const lastNameBinding = useInputBinding(model, 'lastName');
+  const yearJoinedBinding = useInputBinding(model, 'yearJoined');
+  const bioBinding = useInputBinding(model, 'bio');
   const [isInFlight, setIsInFlight] = useState(false);
   const history = useHistory();
   const isValid = useModelValidation(model);
@@ -96,7 +98,14 @@ const PlayerFormComponent = (props: any): ReactElement | null => {
             label="Last name"
             placeholder="Last name"
           />
+          <TextInput
+            {...yearJoinedBinding}
+            fluid
+            label="Year Joined"
+            placeholder="2021"
+          />
         </Form.Group>
+        <TextInput {...bioBinding} fluid label="Short Bio" control={TextArea} />
         <Collection
           list={model.current?.aliases}
           RowComponent={AliasFormRow}

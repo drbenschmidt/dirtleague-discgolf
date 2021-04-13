@@ -8,6 +8,7 @@ export interface DbPlayerRating {
   cardId: number;
   date: Date;
   rating: number;
+  type: number;
 }
 
 class PlayerRatingRepository implements Repository<DbPlayerRating> {

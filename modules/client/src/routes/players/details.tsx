@@ -1,13 +1,11 @@
 import { PlayerModel } from '@dirtleague/common';
-import { lazy, ReactElement, useEffect, useState, Suspense } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Label, Grid, Image, Card, Statistic } from 'semantic-ui-react';
 import { useRepositoryServices } from '../../data-access/context';
 import { EntityDetailsParams } from '../types';
 import Breadcrumbs from '../../components/generic/breadcrumbs';
 import { Players } from '../../links';
-
-const LazyRatingChart = lazy(() => import('./rating-chart'));
 
 const PlayerDetails = (): ReactElement | null => {
   const { id } = useParams<EntityDetailsParams>();
@@ -33,22 +31,20 @@ const PlayerDetails = (): ReactElement | null => {
   return (
     <>
       <Breadcrumbs
-        path={[Players.List, [Players.Details, { name: result.fullName }]]}
+        path={[
+          Players.List,
+          [Players.Details, { name: result.fullName, id: result.id }],
+        ]}
       />
       <Grid style={{ marginTop: '1rem' }}>
         <Grid.Row>
           <Grid.Column width="4">
             <Card>
-              <Label color="red" ribbon style={{ left: '-1rem' }}>
-                3rd Place
-              </Label>
               <Image src="http://placekitten.com/300/300" wrapped ui={false} />
               <Card.Content>
                 <Card.Header>{result.fullName}</Card.Header>
-                <Card.Meta>Joined in 2021</Card.Meta>
-                <Card.Description>
-                  Lorem Ipsum or something, idk man.
-                </Card.Description>
+                <Card.Meta>Joined in {result.yearJoined}</Card.Meta>
+                <Card.Description>{result.bio}</Card.Description>
               </Card.Content>
               <Card.Content extra>
                 {result.aliases.toArray().map(alias => (
@@ -78,9 +74,6 @@ const PlayerDetails = (): ReactElement | null => {
                 <Statistic.Label>Best Round (doubles)</Statistic.Label>
               </Statistic>
             </Statistic.Group>
-            <Suspense fallback={<div>Loading...</div>}>
-              <LazyRatingChart />
-            </Suspense>
           </Grid.Column>
         </Grid.Row>
       </Grid>
