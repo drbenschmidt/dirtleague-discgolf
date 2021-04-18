@@ -24,6 +24,17 @@ export interface PlayerAttributes {
   aliases?: AliasAttributes[];
 }
 
+export type RatingTypeResult = {
+  event: number;
+  league: number;
+  personal: number;
+};
+
+export interface PlayerStats {
+  roundCounts: RatingTypeResult;
+  ratings: RatingTypeResult;
+}
+
 class PlayerModel
   extends DirtLeagueModel<PlayerAttributes>
   implements Cloneable<PlayerModel>, Validatable {
@@ -92,6 +103,16 @@ class PlayerModel
 
   set bio(value: string) {
     this.attributes.bio = value;
+  }
+
+  get stats(): PlayerStats | undefined {
+    const stats = this.getAttribute<PlayerStats>('stats');
+
+    if (stats) {
+      return stats;
+    }
+
+    return undefined;
   }
 
   @Memoize()

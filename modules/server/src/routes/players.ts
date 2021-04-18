@@ -26,7 +26,8 @@ const buildRoute = (services: RepositoryServices): Router => {
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const { include } = req.query;
-      const entity = await services.profiles.get(parseInt(id, 10));
+      const playerId = parseInt(id, 10);
+      const entity = await services.profiles.get(playerId);
 
       if (!entity) {
         res.status(404).json({ error: 'Entity Not Found' });
@@ -34,9 +35,22 @@ const buildRoute = (services: RepositoryServices): Router => {
 
       // TODO: parse it and check for entity types.
       if (include && entity) {
-        const aliases = await services.aliases.getForUserId(parseInt(id, 10));
+        const aliases = await services.aliases.getForUserId(playerId);
 
         (entity as any).aliases = aliases;
+
+        const ratings = await services.playerRatings.getRunningAverages(
+          playerId
+        );
+
+        const roundCounts = await services.playerRatings.getRatingCounts(
+          playerId
+        );
+
+        (entity as any).stats = {
+          roundCounts,
+          ratings,
+        };
       }
 
       res.json(entity);

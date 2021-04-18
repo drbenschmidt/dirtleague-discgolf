@@ -1,11 +1,32 @@
 import { PlayerModel } from '@dirtleague/common';
 import { ReactElement, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Label, Grid, Image, Card, Statistic } from 'semantic-ui-react';
+import {
+  Label,
+  Grid,
+  Image,
+  Card,
+  Statistic,
+  LabelGroup,
+} from 'semantic-ui-react';
 import { useRepositoryServices } from '../../data-access/context';
 import { EntityDetailsParams } from '../types';
 import Breadcrumbs from '../../components/generic/breadcrumbs';
 import { Players } from '../../links';
+
+const formatAverage = (input: string | number | undefined) => {
+  if (input === undefined) {
+    return 0;
+  }
+
+  let value = input;
+
+  if (typeof input === 'string') {
+    value = parseFloat(input);
+  }
+
+  return Math.floor(value as number);
+};
 
 const PlayerDetails = (): ReactElement | null => {
   const { id } = useParams<EntityDetailsParams>();
@@ -47,31 +68,55 @@ const PlayerDetails = (): ReactElement | null => {
                 <Card.Description>{result.bio}</Card.Description>
               </Card.Content>
               <Card.Content extra>
-                {result.aliases.toArray().map(alias => (
-                  <Label key={alias.cid} as="a" tag>
-                    {alias.value}
-                  </Label>
-                ))}
+                <LabelGroup tag>
+                  {result.aliases.toArray().map(alias => (
+                    <Label key={alias.cid} as="a">
+                      {alias.value}
+                    </Label>
+                  ))}
+                </LabelGroup>
               </Card.Content>
             </Card>
           </Grid.Column>
           <Grid.Column width="12">
             <Statistic.Group>
               <Statistic>
-                <Statistic.Value>{result.currentRating}</Statistic.Value>
-                <Statistic.Label>Current Rating</Statistic.Label>
+                <Statistic.Value>
+                  {formatAverage(result.stats?.ratings.event)}
+                </Statistic.Value>
+                <Statistic.Label>Event Rating</Statistic.Label>
               </Statistic>
               <Statistic>
-                <Statistic.Value>230</Statistic.Value>
-                <Statistic.Label>Rounds Played</Statistic.Label>
+                <Statistic.Value>
+                  {formatAverage(result.stats?.ratings.league)}
+                </Statistic.Value>
+                <Statistic.Label>League Rating</Statistic.Label>
               </Statistic>
               <Statistic>
-                <Statistic.Value>-4</Statistic.Value>
-                <Statistic.Label>Best Round (singles)</Statistic.Label>
+                <Statistic.Value>
+                  {formatAverage(result.stats?.ratings.personal)}
+                </Statistic.Value>
+                <Statistic.Label>Personal Rating</Statistic.Label>
+              </Statistic>
+            </Statistic.Group>
+            <Statistic.Group>
+              <Statistic>
+                <Statistic.Value>
+                  {result.stats?.roundCounts.event}
+                </Statistic.Value>
+                <Statistic.Label>Events Rounds</Statistic.Label>
               </Statistic>
               <Statistic>
-                <Statistic.Value>-12</Statistic.Value>
-                <Statistic.Label>Best Round (doubles)</Statistic.Label>
+                <Statistic.Value>
+                  {result.stats?.roundCounts.league}
+                </Statistic.Value>
+                <Statistic.Label>League Rounds</Statistic.Label>
+              </Statistic>
+              <Statistic>
+                <Statistic.Value>
+                  {result.stats?.roundCounts.personal}
+                </Statistic.Value>
+                <Statistic.Label>Personal Rounds</Statistic.Label>
               </Statistic>
             </Statistic.Group>
           </Grid.Column>
