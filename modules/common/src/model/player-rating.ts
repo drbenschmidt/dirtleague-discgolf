@@ -4,3 +4,12 @@ export enum RatingType {
   League,
   Personal,
 }
+
+export interface PlayerRatingAttributes {
+  id?: number;
+  playerId: number;
+  cardId: number;
+  date: Date;
+  rating: number;
+  type: number;
+}

@@ -57,6 +57,22 @@ const buildRoute = (services: RepositoryServices): Router => {
     })
   );
 
+  router.get(
+    '/:id/feed',
+    corsHandler,
+    withTryCatch(async (req, res) => {
+      const { id } = req.params;
+      const playerId = parseInt(id, 10);
+      const entity = await services.profiles.getFeed(playerId);
+
+      if (!entity) {
+        res.status(404).json({ error: 'Entity Not Found' });
+      }
+
+      res.json(entity);
+    })
+  );
+
   router.post(
     '/',
     corsHandler,

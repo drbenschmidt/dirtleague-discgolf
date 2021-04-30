@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+      "plugins": [{ "transform": "ts-transformer-keys/transformer" }],
       "module": "commonjs",
       "esModuleInterop": true,
       "target": "es2015",
@@ -19,6 +20,7 @@
       "src"
   ],
   "ts-node": {
+      "compiler": "ttypescript",
       "files": true
   },
   "files": [

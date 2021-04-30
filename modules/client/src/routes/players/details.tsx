@@ -1,5 +1,5 @@
 import { PlayerModel } from '@dirtleague/common';
-import { ReactElement, useEffect, useState } from 'react';
+import { ReactElement, useEffect, useState, lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   Label,
@@ -13,6 +13,8 @@ import { useRepositoryServices } from '../../data-access/context';
 import { EntityDetailsParams } from '../types';
 import Breadcrumbs from '../../components/generic/breadcrumbs';
 import { Players } from '../../links';
+
+const PlayerFeed = lazy(() => import('./feed'));
 
 const formatAverage = (input: string | number | undefined) => {
   if (input === undefined) {
@@ -30,12 +32,13 @@ const formatAverage = (input: string | number | undefined) => {
 
 const PlayerDetails = (): ReactElement | null => {
   const { id } = useParams<EntityDetailsParams>();
+  const playerId = parseInt(id, 10);
   const services = useRepositoryServices();
   const [result, setResult] = useState<PlayerModel>();
 
   useEffect(() => {
     const doWork = async () => {
-      const players = await services?.players.get(parseInt(id, 10), {
+      const players = await services?.players.get(playerId, {
         include: ['aliases'],
       });
 
@@ -43,7 +46,7 @@ const PlayerDetails = (): ReactElement | null => {
     };
 
     doWork();
-  }, [id, services?.players]);
+  }, [playerId, services?.players]);
 
   if (!result) {
     return null;
@@ -79,7 +82,7 @@ const PlayerDetails = (): ReactElement | null => {
             </Card>
           </Grid.Column>
           <Grid.Column width="12">
-            <Statistic.Group>
+            <Statistic.Group style={{ justifyContent: 'center' }}>
               <Statistic>
                 <Statistic.Value>
                   {formatAverage(result.stats?.ratings.event)}
@@ -98,8 +101,6 @@ const PlayerDetails = (): ReactElement | null => {
                 </Statistic.Value>
                 <Statistic.Label>Personal Rating</Statistic.Label>
               </Statistic>
-            </Statistic.Group>
-            <Statistic.Group>
               <Statistic>
                 <Statistic.Value>
                   {result.stats?.roundCounts.event}
@@ -119,6 +120,9 @@ const PlayerDetails = (): ReactElement | null => {
                 <Statistic.Label>Personal Rounds</Statistic.Label>
               </Statistic>
             </Statistic.Group>
+            <Suspense fallback={<div>Loading...</div>}>
+              <PlayerFeed id={playerId} />
+            </Suspense>
           </Grid.Column>
         </Grid.Row>
       </Grid>

@@ -5,6 +5,7 @@ import { Repository } from '../repository';
 export interface DbCard {
   id?: number;
   roundId?: number;
+  authorId?: number;
 }
 
 class CardsRepository implements Repository<DbCard> {

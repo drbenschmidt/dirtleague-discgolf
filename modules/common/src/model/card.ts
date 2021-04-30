@@ -15,6 +15,8 @@ export interface CardAttributes {
   id?: number;
   roundId?: number;
   playerGroups?: PlayerGroupAttributes[];
+  score?: number;
+  par?: number;
 }
 
 export default class CardModel
@@ -46,6 +48,24 @@ export default class CardModel
 
   set roundId(value: number) {
     this.setInt('roundId', value);
+  }
+
+  @IsInt(onlyServer)
+  get score(): number {
+    return this.attributes.score;
+  }
+
+  set score(value: number) {
+    this.setInt('score', value);
+  }
+
+  @IsInt(onlyServer)
+  get par(): number {
+    return this.attributes.par;
+  }
+
+  set par(value: number) {
+    this.setInt('par', value);
   }
 
   @Memoize()
