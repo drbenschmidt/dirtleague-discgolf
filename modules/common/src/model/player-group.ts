@@ -23,6 +23,8 @@ export interface PlayerGroupAttributes {
   cardId?: number;
   teamName?: string;
   players?: PlayerGroupPlayerAttributes[];
+  score?: number;
+  par?: number;
 }
 
 export default class PlayerGroupModel
@@ -54,6 +56,14 @@ export default class PlayerGroupModel
 
   set cardId(value: number) {
     this.setInt('cardId', value);
+  }
+
+  get par(): number {
+    return this.attributes.par;
+  }
+
+  get score(): number {
+    return this.attributes.score;
   }
 
   @IsOptional(onlyClient)

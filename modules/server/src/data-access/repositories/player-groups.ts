@@ -6,6 +6,8 @@ export interface DbPlayerGroup {
   id?: number;
   cardId?: number;
   teamName?: string;
+  score?: number;
+  par?: number;
 }
 
 class PlayerGroupsRepository implements Repository<DbPlayerGroup> {
@@ -32,7 +34,7 @@ class PlayerGroupsRepository implements Repository<DbPlayerGroup> {
   async update(model: DbPlayerGroup): Promise<void> {
     await this.db.query(sql`
       UPDATE playerGroups
-      SET teamName=${model.teamName}, cardId=${model.cardId}
+      SET teamName=${model.teamName}, cardId=${model.cardId}, score=${model.score}, par=${model.par}
       WHERE id=${model.id}
     `);
   }

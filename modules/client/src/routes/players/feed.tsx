@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 import { ReactElement, useEffect, useState } from 'react';
 import { Feed, Icon } from 'semantic-ui-react';
+import { DateTime } from 'luxon';
 import Avatar from 'react-avatar';
 import type { FeedModel } from '@dirtleague/common';
 import { RatingType } from '@dirtleague/common';
@@ -16,9 +17,15 @@ export interface PlayerFeedEntryProps {
 
 const PlayerFeedEntry = (props: PlayerFeedEntryProps): ReactElement => {
   const { model } = props;
-  const { par, score } = model.card;
-  const overall = par - score;
+  const { par, score } = model.group;
+  const overall = score - par;
   const type = RatingType[model.rating.type];
+
+  // TODO: The rating is an attribute type, which the date prop is a JS Date.
+  // This isn't true when it's coming from the server, it is never converted to a Date
+  // from the string it comes from.
+  const date = DateTime.fromISO((model.rating.date as unknown) as string);
+  const humanizedTime = date.toRelative();
 
   return (
     <Feed.Event key={model.card.id}>
@@ -29,7 +36,7 @@ const PlayerFeedEntry = (props: PlayerFeedEntryProps): ReactElement => {
         <Feed.Summary>
           <Feed.User>{model.player.fullName}</Feed.User> added a {type} card for{' '}
           {model.course.name}
-          <Feed.Date>1 Hour Ago</Feed.Date>
+          <Feed.Date>{humanizedTime}</Feed.Date>
         </Feed.Summary>
         <Feed.Meta>
           <Feed.Like>

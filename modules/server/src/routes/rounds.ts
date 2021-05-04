@@ -3,6 +3,7 @@ import {
   Roles,
   asyncForEach,
   RatingType,
+  sum,
 } from '@dirtleague/common';
 import express, { Router } from 'express';
 import { DbRound } from '../data-access/repositories/rounds';
@@ -10,9 +11,6 @@ import RepositoryServices from '../data-access/repository-services';
 import corsHandler from '../http/cors-handler';
 import { requireRoles } from '../auth/handler';
 import withTryCatch from '../http/withTryCatch';
-
-// TODO: Move to common.
-const sum = (arr: number[]): number => arr.reduce((acc, curr) => curr + acc, 0);
 
 const calculateRating = (totalScore: number, dgcrSse: number) => {
   const diff = dgcrSse - totalScore;
@@ -122,6 +120,16 @@ const buildRoute = (services: RepositoryServices): Router => {
           const totalScore = sum(results.map(r => r.score));
           const { dgcrSse } = courseLayout;
           const rating = calculateRatingNew(totalScore, dgcrSse);
+
+          // Update the player group with the score and par of the card so we can
+          // do other calculations in downstream flows.
+
+          // eslint-disable-next-line no-param-reassign
+          playerGroup.score = totalScore;
+          // eslint-disable-next-line no-param-reassign
+          playerGroup.par = courseLayout.par;
+
+          await services.playerGroups.update(playerGroup);
 
           const players = await services.playerGroupPlayers.getForPlayerGroup(
             playerGroup.id

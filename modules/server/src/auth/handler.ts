@@ -7,8 +7,9 @@ import { getDefaultConfigManager } from '../config/manager';
 
 const config = getDefaultConfigManager();
 
-interface RequestWithToken extends Request {
+export interface RequestWithToken extends Request {
   token: string;
+  user: UserModel;
 }
 
 interface JsonWebToken {
@@ -38,6 +39,10 @@ export const applyToken = (
 
   if (token) {
     req.token = token;
+
+    const { user } = jwt.decode(req.token, { json: true }) as JsonWebToken;
+
+    req.user = user;
   }
 
   next();

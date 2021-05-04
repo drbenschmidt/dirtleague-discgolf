@@ -7,6 +7,7 @@ export interface DbCourseLayout {
   name: string;
   courseId: number;
   dgcrSse: number;
+  par?: number;
 }
 
 class CourseLayoutsRepository implements Repository<DbCourseLayout> {
@@ -18,8 +19,8 @@ class CourseLayoutsRepository implements Repository<DbCourseLayout> {
 
   async create(model: DbCourseLayout): Promise<number> {
     const [result] = await this.db.query(sql`
-      INSERT INTO courseLayouts (name, courseId, dgcrSse)
-      VALUES (${model.name}, ${model.courseId}, ${model.dgcrSse});
+      INSERT INTO courseLayouts (name, courseId, dgcrSse, par)
+      VALUES (${model.name}, ${model.courseId}, ${model.dgcrSse}, ${model.par});
 
       SELECT LAST_INSERT_ID();
     `);
@@ -33,7 +34,7 @@ class CourseLayoutsRepository implements Repository<DbCourseLayout> {
   async update(model: DbCourseLayout): Promise<void> {
     await this.db.query(sql`
       UPDATE courseLayouts
-      SET name=${model.name}, dgcrSse=${model.dgcrSse}
+      SET name=${model.name}, dgcrSse=${model.dgcrSse}, par=${model.par}
       WHERE id=${model.id}
     `);
   }

@@ -3,6 +3,7 @@ import {
   CourseLayoutModel,
   PlayerGroupModel,
   clamper,
+  RatingType,
 } from '@dirtleague/common';
 import { ReactElement, useRef, useCallback } from 'react';
 import { Grid, Label, Table, SemanticCOLORS } from 'semantic-ui-react';
@@ -49,6 +50,9 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
   };
 
   const onUpload = useCallback(async () => {
+    if (!formDataRef.current.has('eventType')) {
+      formDataRef.current.set('eventType', RatingType.Event.toString());
+    }
     await services?.events.putCard(eventId, model.id, formDataRef.current);
   }, [eventId, model.id, services?.events]);
 

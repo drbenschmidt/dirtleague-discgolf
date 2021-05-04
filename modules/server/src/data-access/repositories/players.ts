@@ -145,6 +145,7 @@ class PlayerRepository implements Repository<DbPlayer> {
       JOIN courseLayouts as cl ON rnd.courseLayoutId = cl.id
       LEFT OUTER JOIN players as player on card.authorId = player.id
       WHERE playerId=${id}
+      ORDER BY pr.id DESC
       LIMIT 10
     `;
 

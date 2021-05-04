@@ -10,6 +10,7 @@ export { default as intersect } from './utils/intersect';
 export { default as clamper } from './utils/clamper';
 export { default as getHtmlInput } from './utils/getHtmlInput';
 export { default as filledArray } from './utils/filledArray';
+export { default as sum } from './utils/sum';
 
 export { default as Roles } from './security/roles';
 
