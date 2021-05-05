@@ -12,14 +12,15 @@ const CourseLayoutDetails = (props: {
 }): ReactElement => {
   const { model } = props;
 
-  const holesArray = Array.from(model.holes);
+  const holesArray = model.holes.toArray();
 
   return (
     <Grid>
       <Grid.Row>
         <Grid.Column>
-          <Statistic.Group widths="2">
+          <Statistic.Group style={{ justifyContent: 'center' }}>
             <Statistic label="Length" value={model.holes.length} />
+            <Statistic label="Par" value={model.par} />
             <Statistic label="Scratch Score Estimate" value={model.dgcrSse} />
           </Statistic.Group>
         </Grid.Column>
