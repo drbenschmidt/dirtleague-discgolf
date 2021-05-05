@@ -185,6 +185,7 @@ const buildRoute = (services: RepositoryServices): Router => {
     csvUpload.single('csv'),
     withTryCatch(async (req, res) => {
       const { id, cardId } = req.params;
+      const { user } = req;
       const csvData = req.file.buffer.toString('utf8');
       const scores = parseUDisc(csvData);
       const playerGroups = await services.playerGroups.getForCard(
@@ -242,6 +243,10 @@ const buildRoute = (services: RepositoryServices): Router => {
           });
         }
       });
+
+      // Update the card with the userId of who just uploaded this card.
+      card.authorId = user.id;
+      await services.cards.update(card);
 
       res.json({ success: true, scores });
     })

@@ -1,22 +1,44 @@
 import { PlayerModel } from '@dirtleague/common';
-import { lazy, ReactElement, useEffect, useState, Suspense } from 'react';
+import { ReactElement, useEffect, useState, lazy, Suspense } from 'react';
 import { useParams } from 'react-router-dom';
-import { Label, Grid, Image, Card, Statistic } from 'semantic-ui-react';
+import {
+  Label,
+  Grid,
+  Image,
+  Card,
+  Statistic,
+  LabelGroup,
+} from 'semantic-ui-react';
 import { useRepositoryServices } from '../../data-access/context';
 import { EntityDetailsParams } from '../types';
 import Breadcrumbs from '../../components/generic/breadcrumbs';
 import { Players } from '../../links';
 
-const LazyRatingChart = lazy(() => import('./rating-chart'));
+const PlayerFeed = lazy(() => import('./feed'));
+
+const formatAverage = (input: string | number | undefined) => {
+  if (input === undefined) {
+    return 0;
+  }
+
+  let value = input;
+
+  if (typeof input === 'string') {
+    value = parseFloat(input);
+  }
+
+  return Math.floor(value as number);
+};
 
 const PlayerDetails = (): ReactElement | null => {
   const { id } = useParams<EntityDetailsParams>();
+  const playerId = parseInt(id, 10);
   const services = useRepositoryServices();
   const [result, setResult] = useState<PlayerModel>();
 
   useEffect(() => {
     const doWork = async () => {
-      const players = await services?.players.get(parseInt(id, 10), {
+      const players = await services?.players.get(playerId, {
         include: ['aliases'],
       });
 
@@ -24,7 +46,7 @@ const PlayerDetails = (): ReactElement | null => {
     };
 
     doWork();
-  }, [id, services?.players]);
+  }, [playerId, services?.players]);
 
   if (!result) {
     return null;
@@ -33,53 +55,73 @@ const PlayerDetails = (): ReactElement | null => {
   return (
     <>
       <Breadcrumbs
-        path={[Players.List, [Players.Details, { name: result.fullName }]]}
+        path={[
+          Players.List,
+          [Players.Details, { name: result.fullName, id: result.id }],
+        ]}
       />
       <Grid style={{ marginTop: '1rem' }}>
         <Grid.Row>
           <Grid.Column width="4">
             <Card>
-              <Label color="red" ribbon style={{ left: '-1rem' }}>
-                3rd Place
-              </Label>
               <Image src="http://placekitten.com/300/300" wrapped ui={false} />
               <Card.Content>
                 <Card.Header>{result.fullName}</Card.Header>
-                <Card.Meta>Joined in 2021</Card.Meta>
-                <Card.Description>
-                  Lorem Ipsum or something, idk man.
-                </Card.Description>
+                <Card.Meta>Joined in {result.yearJoined}</Card.Meta>
+                <Card.Description>{result.bio}</Card.Description>
               </Card.Content>
               <Card.Content extra>
-                {result.aliases.toArray().map(alias => (
-                  <Label key={alias.cid} as="a" tag>
-                    {alias.value}
-                  </Label>
-                ))}
+                <LabelGroup tag>
+                  {result.aliases.toArray().map(alias => (
+                    <Label key={alias.cid} as="a">
+                      {alias.value}
+                    </Label>
+                  ))}
+                </LabelGroup>
               </Card.Content>
             </Card>
           </Grid.Column>
           <Grid.Column width="12">
-            <Statistic.Group>
+            <Statistic.Group style={{ justifyContent: 'center' }}>
               <Statistic>
-                <Statistic.Value>{result.currentRating}</Statistic.Value>
-                <Statistic.Label>Current Rating</Statistic.Label>
+                <Statistic.Value>
+                  {formatAverage(result.stats?.ratings.event)}
+                </Statistic.Value>
+                <Statistic.Label>Event Rating</Statistic.Label>
               </Statistic>
               <Statistic>
-                <Statistic.Value>230</Statistic.Value>
-                <Statistic.Label>Rounds Played</Statistic.Label>
+                <Statistic.Value>
+                  {formatAverage(result.stats?.ratings.league)}
+                </Statistic.Value>
+                <Statistic.Label>League Rating</Statistic.Label>
               </Statistic>
               <Statistic>
-                <Statistic.Value>-4</Statistic.Value>
-                <Statistic.Label>Best Round (singles)</Statistic.Label>
+                <Statistic.Value>
+                  {formatAverage(result.stats?.ratings.personal)}
+                </Statistic.Value>
+                <Statistic.Label>Personal Rating</Statistic.Label>
               </Statistic>
               <Statistic>
-                <Statistic.Value>-12</Statistic.Value>
-                <Statistic.Label>Best Round (doubles)</Statistic.Label>
+                <Statistic.Value>
+                  {result.stats?.roundCounts.event}
+                </Statistic.Value>
+                <Statistic.Label>Events Rounds</Statistic.Label>
+              </Statistic>
+              <Statistic>
+                <Statistic.Value>
+                  {result.stats?.roundCounts.league}
+                </Statistic.Value>
+                <Statistic.Label>League Rounds</Statistic.Label>
+              </Statistic>
+              <Statistic>
+                <Statistic.Value>
+                  {result.stats?.roundCounts.personal}
+                </Statistic.Value>
+                <Statistic.Label>Personal Rounds</Statistic.Label>
               </Statistic>
             </Statistic.Group>
             <Suspense fallback={<div>Loading...</div>}>
-              <LazyRatingChart />
+              <PlayerFeed id={playerId} />
             </Suspense>
           </Grid.Column>
         </Grid.Row>

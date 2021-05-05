@@ -27,7 +27,7 @@ CREATE TABLE `aliases` (
   `playerId` int(11) NOT NULL,
   `value` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,42 +40,10 @@ DROP TABLE IF EXISTS `cards`;
 CREATE TABLE `cards` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `roundId` int(11) NOT NULL,
+  `authorId` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `courses`
---
-
-DROP TABLE IF EXISTS `courses`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `courses` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(256) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `courseLayouts`
---
-
-DROP TABLE IF EXISTS `courseLayouts`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `courseLayouts` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `courseId` int(11) NOT NULL,
-  `name` varchar(256) NOT NULL,
-  `dgcrSse` double DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fk_courses_idx` (`courseId`),
-  CONSTRAINT `fk_courses` FOREIGN KEY (`courseId`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
 
 --
 -- Table structure for table `courseHoles`
@@ -93,9 +61,41 @@ CREATE TABLE `courseHoles` (
   PRIMARY KEY (`id`),
   KEY `fk_courseLayout_idx` (`courseLayoutId`),
   CONSTRAINT `fk_courseLayout` FOREIGN KEY (`courseLayoutId`) REFERENCES `courseLayouts` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=154 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Table structure for table `courseLayouts`
+--
+
+DROP TABLE IF EXISTS `courseLayouts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `courseLayouts` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `courseId` int(11) NOT NULL,
+  `name` varchar(256) NOT NULL,
+  `dgcrSse` double DEFAULT NULL,
+  `par` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_courses_idx` (`courseId`),
+  CONSTRAINT `fk_courses` FOREIGN KEY (`courseId`) REFERENCES `courses` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `courses`
+--
+
+DROP TABLE IF EXISTS `courses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `courses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(256) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Table structure for table `events`
@@ -111,7 +111,7 @@ CREATE TABLE `events` (
   `startDate` datetime DEFAULT NULL,
   `description` longtext,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -154,8 +154,10 @@ CREATE TABLE `playerGroups` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `cardId` int(11) NOT NULL,
   `teamName` varchar(128) DEFAULT NULL,
+  `score` int(11) DEFAULT NULL,
+  `par` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -171,8 +173,9 @@ CREATE TABLE `playerRatings` (
   `cardId` int(11) NOT NULL,
   `date` datetime NOT NULL,
   `rating` int(11) NOT NULL,
+  `type` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -186,9 +189,11 @@ CREATE TABLE `players` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `firstName` varchar(45) NOT NULL,
   `lastName` varchar(45) NOT NULL,
-  `currentRating` int(11) NOT NULL DEFAULT '0',
+  `currentRating` int(11) DEFAULT 0,
+  `bio` text,
+  `yearJoined` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -216,14 +221,14 @@ DROP TABLE IF EXISTS `rounds`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `rounds` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `eventId` int(11) NOT NULL,
+  `eventId` int(11) DEFAULT NULL,
   `courseId` int(11) NOT NULL,
   `courseLayoutId` int(11) NOT NULL,
   `name` varchar(45) DEFAULT NULL,
   `isComplete` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `fk_events_idx` (`eventId`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -239,7 +244,21 @@ CREATE TABLE `seasons` (
   `startDate` datetime NOT NULL,
   `endDate` datetime NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `userRoles`
+--
+
+DROP TABLE IF EXISTS `userRoles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `userRoles` (
+  `userId` int(11) NOT NULL,
+  `roleId` int(11) NOT NULL,
+  PRIMARY KEY (`userId`,`roleId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -255,9 +274,10 @@ CREATE TABLE `users` (
   `passwordHash` varchar(256) NOT NULL,
   `passwordSalt` varchar(256) NOT NULL,
   `isAdmin` tinyint(1) DEFAULT '0',
+  `playerId` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email_UNIQUE` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -269,4 +289,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-03-21 15:35:26
+-- Dump completed on 2021-05-05  8:28:53

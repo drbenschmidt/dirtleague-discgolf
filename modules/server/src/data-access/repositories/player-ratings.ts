@@ -1,5 +1,6 @@
 /* eslint-disable class-methods-use-this */
 import { ConnectionPool, sql } from '@databases/mysql';
+import { RatingType } from '@dirtleague/common';
 import { Repository } from '../repository';
 
 export interface DbPlayerRating {
@@ -8,7 +9,14 @@ export interface DbPlayerRating {
   cardId: number;
   date: Date;
   rating: number;
+  type: number;
 }
+
+export type RatingTypeResult = {
+  event: number;
+  league: number;
+  personal: number;
+};
 
 class PlayerRatingRepository implements Repository<DbPlayerRating> {
   db: ConnectionPool;
@@ -19,8 +27,8 @@ class PlayerRatingRepository implements Repository<DbPlayerRating> {
 
   async create(model: DbPlayerRating): Promise<number> {
     const [result] = await this.db.query(sql`
-      INSERT INTO playerRatings (playerId, cardId, date, rating)
-      VALUES (${model.playerId}, ${model.cardId}, ${model.date}, ${model.rating});
+      INSERT INTO playerRatings (playerId, cardId, date, rating, type)
+      VALUES (${model.playerId}, ${model.cardId}, ${model.date}, ${model.rating}, ${model.type});
 
       SELECT LAST_INSERT_ID();
     `);
@@ -34,7 +42,7 @@ class PlayerRatingRepository implements Repository<DbPlayerRating> {
   async update(model: DbPlayerRating): Promise<void> {
     await this.db.query(sql`
       UPDATE playerRatings
-      SET playerId=${model.playerId}, cardId=${model.cardId}, date=${model.date}, rating=${model.rating}
+      SET playerId=${model.playerId}, cardId=${model.cardId}, date=${model.date}, rating=${model.rating}, type=${model.type}
       WHERE id=${model.id}
     `);
   }
@@ -93,6 +101,72 @@ class PlayerRatingRepository implements Repository<DbPlayerRating> {
       SELECT * FROM playerRatings
       WHERE playerId=${playerId} AND cardId=${cardId}
     `);
+
+    return result;
+  }
+
+  async getRunningAverages(
+    playerId: number,
+    limit = 3
+  ): Promise<RatingTypeResult> {
+    const [{ avgRating: event }] = await this.db.query(sql`
+      SELECT AVG(rating) as avgRating FROM playerRatings
+      WHERE playerId=${playerId} AND type=${RatingType.Event}
+      ORDER BY id DESC
+      LIMIT ${limit}
+    `);
+
+    const [{ avgRating: league }] = await this.db.query(sql`
+      SELECT AVG(rating) as avgRating FROM playerRatings
+      WHERE playerId=${playerId} AND type=${RatingType.League}
+      ORDER BY id DESC
+      LIMIT ${limit}
+    `);
+
+    const [{ avgRating: personal }] = await this.db.query(sql`
+      SELECT AVG(rating) as avgRating FROM playerRatings
+      WHERE playerId=${playerId} AND type=${RatingType.Personal}
+      ORDER BY id DESC
+      LIMIT ${limit}
+    `);
+
+    return {
+      event,
+      league,
+      personal,
+    };
+  }
+
+  async getRatingCounts(playerId: number): Promise<RatingTypeResult> {
+    const result = {
+      event: 0,
+      league: 0,
+      personal: 0,
+    };
+
+    const results = await this.db.query(sql`
+      SELECT type, COUNT(*) as total FROM playerRatings
+      WHERE playerID=${playerId}
+      GROUP BY type
+    `);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const count of results) {
+      // eslint-disable-next-line default-case
+      switch (count?.type) {
+        case RatingType.Event:
+          result.event = count?.total;
+          break;
+
+        case RatingType.League:
+          result.league = count?.total;
+          break;
+
+        case RatingType.Personal:
+          result.personal = count?.total;
+          break;
+      }
+    }
 
     return result;
   }

@@ -13,6 +13,7 @@ import DirtLeagueModel from './dl-model';
 import CourseHoleModel, { CourseHoleAttributes } from './course-hole';
 import filledArray from '../utils/filledArray';
 import Validatable, { onlyClient } from '../interfaces/validatable';
+import sum from '../utils/sum';
 
 export interface CourseLayoutAttributes {
   id?: number;
@@ -71,6 +72,10 @@ export default class CourseLayoutModel
 
   set name(value: string) {
     this.set('name', value);
+  }
+
+  get par(): number {
+    return sum(this.holes.toArray().map(hole => hole.par));
   }
 
   @Memoize()

@@ -3,6 +3,9 @@ import {
   Length,
   ValidationError,
   ValidateNested,
+  Min,
+  Max,
+  IsOptional,
 } from 'class-validator';
 import { Memoize } from 'typescript-memoize';
 import { LinkedList } from 'linked-list-typescript';
@@ -16,7 +19,20 @@ export interface PlayerAttributes {
   firstName?: string;
   lastName?: string;
   currentRating?: number;
+  yearJoined: number;
+  bio: string;
   aliases?: AliasAttributes[];
+}
+
+export type RatingTypeResult = {
+  event: number;
+  league: number;
+  personal: number;
+};
+
+export interface PlayerStats {
+  roundCounts: RatingTypeResult;
+  ratings: RatingTypeResult;
 }
 
 class PlayerModel
@@ -25,7 +41,6 @@ class PlayerModel
   static defaults = {
     firstName: '',
     lastName: '',
-    currentRating: 0,
     aliases: [] as AliasAttributes[],
   };
 
@@ -66,12 +81,38 @@ class PlayerModel
     return this.attributes.currentRating;
   }
 
-  set currentRating(value: number) {
-    this.setInt('currentRating', value);
-  }
-
   get fullName(): string {
     return `${this.firstName} ${this.lastName}`;
+  }
+
+  @IsOptional(onlyClient)
+  @Min(2015, onlyClient)
+  @Max(2099, onlyClient)
+  get yearJoined(): number {
+    return this.attributes.yearJoined;
+  }
+
+  set yearJoined(value: number) {
+    this.setInt('yearJoined', value);
+  }
+
+  @Length(0, 1028, onlyClient)
+  get bio(): string {
+    return this.attributes.bio;
+  }
+
+  set bio(value: string) {
+    this.attributes.bio = value;
+  }
+
+  get stats(): PlayerStats | undefined {
+    const stats = this.getAttribute<PlayerStats>('stats');
+
+    if (stats) {
+      return stats;
+    }
+
+    return undefined;
   }
 
   @Memoize()

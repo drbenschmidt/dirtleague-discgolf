@@ -3,8 +3,10 @@ import {
   CourseLayoutModel,
   PlayerGroupModel,
   clamper,
+  RatingType,
 } from '@dirtleague/common';
 import { ReactElement, useRef, useCallback } from 'react';
+import { useHistory } from 'react-router-dom';
 import { Grid, Label, Table, SemanticCOLORS } from 'semantic-ui-react';
 import { useRepositoryServices } from '../../../data-access/context';
 import UploadButton from './upload-button';
@@ -29,6 +31,7 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
   const holes = layout?.holes;
   const formDataRef = useRef(new FormData());
   const services = useRepositoryServices();
+  const history = useHistory();
 
   const buildPlayerGroup = (playerGroup: PlayerGroupModel) => {
     const teamName =
@@ -49,8 +52,12 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
   };
 
   const onUpload = useCallback(async () => {
+    if (!formDataRef.current.has('eventType')) {
+      formDataRef.current.set('eventType', RatingType.Event.toString());
+    }
     await services?.events.putCard(eventId, model.id, formDataRef.current);
-  }, [eventId, model.id, services?.events]);
+    history.go(0);
+  }, [eventId, model.id, services?.events, history]);
 
   const scoreClamper = clamper(-2, 2);
 

@@ -5,6 +5,7 @@ import { Repository } from '../repository';
 export interface DbCard {
   id?: number;
   roundId?: number;
+  authorId?: number;
 }
 
 class CardsRepository implements Repository<DbCard> {
@@ -16,8 +17,8 @@ class CardsRepository implements Repository<DbCard> {
 
   async create(model: DbCard): Promise<number> {
     const [result] = await this.db.query(sql`
-      INSERT INTO cards (roundId)
-      VALUES (${model.roundId});
+      INSERT INTO cards (roundId, authorId)
+      VALUES (${model.roundId}, ${model.authorId});
 
       SELECT LAST_INSERT_ID();
     `);
@@ -31,7 +32,7 @@ class CardsRepository implements Repository<DbCard> {
   async update(model: DbCard): Promise<void> {
     await this.db.query(sql`
       UPDATE cards
-      SET roundId=${model.roundId}
+      SET roundId=${model.roundId}, authorId=${model.authorId}
       WHERE id=${model.id}
     `);
   }

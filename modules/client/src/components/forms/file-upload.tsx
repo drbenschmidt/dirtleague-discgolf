@@ -16,7 +16,6 @@ const FileUploadComponent = (props: FileUploadComponentProps) => {
   const onChange = useCallback(
     (e: any) => {
       const file = e.target.files[0];
-      console.log(file);
 
       formData.append(formPropName, file);
 
