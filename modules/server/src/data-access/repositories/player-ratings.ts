@@ -27,8 +27,8 @@ class PlayerRatingRepository implements Repository<DbPlayerRating> {
 
   async create(model: DbPlayerRating): Promise<number> {
     const [result] = await this.db.query(sql`
-      INSERT INTO playerRatings (playerId, cardId, date, rating)
-      VALUES (${model.playerId}, ${model.cardId}, ${model.date}, ${model.rating});
+      INSERT INTO playerRatings (playerId, cardId, date, rating, type)
+      VALUES (${model.playerId}, ${model.cardId}, ${model.date}, ${model.rating}, ${model.type});
 
       SELECT LAST_INSERT_ID();
     `);
@@ -42,7 +42,7 @@ class PlayerRatingRepository implements Repository<DbPlayerRating> {
   async update(model: DbPlayerRating): Promise<void> {
     await this.db.query(sql`
       UPDATE playerRatings
-      SET playerId=${model.playerId}, cardId=${model.cardId}, date=${model.date}, rating=${model.rating}
+      SET playerId=${model.playerId}, cardId=${model.cardId}, date=${model.date}, rating=${model.rating}, type=${model.type}
       WHERE id=${model.id}
     `);
   }

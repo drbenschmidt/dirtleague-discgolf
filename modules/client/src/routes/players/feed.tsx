@@ -27,14 +27,18 @@ const PlayerFeedEntry = (props: PlayerFeedEntryProps): ReactElement => {
   const date = DateTime.fromISO((model.rating.date as unknown) as string);
   const humanizedTime = date.toRelative();
 
+  // Just in case a user without a player profile uploads a card.
+  const badPlayerName = !model.player.firstName && !model.player.lastName;
+  const playerName = badPlayerName ? 'System User' : model.player.fullName;
+
   return (
     <Feed.Event key={model.card.id}>
       <Feed.Label>
-        <Avatar name={model.player.fullName} size="40" round />
+        <Avatar name={playerName} size="40" round />
       </Feed.Label>
       <Feed.Content>
         <Feed.Summary>
-          <Feed.User>{model.player.fullName}</Feed.User> added a {type} card for{' '}
+          <Feed.User>{playerName}</Feed.User> added a {type} card for{' '}
           {model.course.name}
           <Feed.Date>{humanizedTime}</Feed.Date>
         </Feed.Summary>
@@ -72,7 +76,7 @@ const PlayerFeed = (props: PlayerFeedProps): ReactElement | null => {
   return (
     <Feed>
       {results.map(model => (
-        <PlayerFeedEntry model={model} />
+        <PlayerFeedEntry model={model} key={model.rating.id} />
       ))}
     </Feed>
   );
