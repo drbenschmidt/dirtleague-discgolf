@@ -4,7 +4,6 @@ import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
 import { DbAlias } from '../data-access/repositories/aliases';
 import RepositoryServices from '../data-access/repository-services';
-import corsHandler from '../http/cors-handler';
 import getCrud from '../utils/getCrud';
 
 const buildRoute = (services: RepositoryServices): Router => {
@@ -12,7 +11,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.get(
     '/',
-    corsHandler,
     withTryCatch(async (req, res) => {
       const users = await services.profiles.getAll();
 
@@ -22,7 +20,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.get(
     '/:id',
-    corsHandler,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const { include } = req.query;
@@ -59,7 +56,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.get(
     '/:id/feed',
-    corsHandler,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const playerId = parseInt(id, 10);
@@ -75,7 +71,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.post(
     '/',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const model = new PlayerModel(req.body);
@@ -107,7 +102,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.delete(
     '/:id',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const { id } = req.params;
@@ -120,7 +114,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.patch(
     '/:id',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       // TODO: Technically, this should be a transaction.

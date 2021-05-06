@@ -1,21 +1,27 @@
+import { Roles } from '@dirtleague/common';
 import RepositoryServices from './data-access/repository-services';
 import hashPassword from './crypto/hash';
 
 const services = new RepositoryServices();
 
-const insertUser = async (
-  email: string,
-  password: string,
-  isAdmin = false
-): Promise<void> => {
+const insertUser = async (email: string, password: string): Promise<void> => {
   const { hash, salt } = await hashPassword(password);
 
-  await services.users.insert({
+  const playerId = await services.profiles.create({
+    firstName: 'New',
+    lastName: 'User',
+    yearJoined: new Date().getFullYear(),
+    bio: '',
+  });
+
+  const userId = await services.users.insert({
     email,
     passwordHash: hash,
     passwordSalt: salt,
-    isAdmin,
+    playerId,
   });
+
+  await services.userRoles.updateForUserId(userId, [Roles.Admin]);
 };
 
 // First two aren't what we want.
@@ -28,7 +34,7 @@ if (!email || !password) {
 }
 
 const work = async () => {
-  await insertUser(email, password, true);
+  await insertUser(email, password);
 };
 
 work()

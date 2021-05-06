@@ -68,15 +68,9 @@ export const requireToken = (
   }
 };
 
-export const applyRoles = (user: any, isAdmin: boolean): void => {
-  if (!user.roles) {
-    // eslint-disable-next-line no-param-reassign
-    user.roles = [];
-  }
-
-  if (isAdmin) {
-    user.roles.push(Roles.Admin);
-  }
+export const applyRoles = (user: UserModel, roles: Roles[]): void => {
+  // eslint-disable-next-line no-param-reassign
+  user.roles = roles;
 
   user.roles.push(Roles.User);
 };
@@ -121,14 +115,15 @@ export const authenticate = async (
     passwordSalt: password_salt,
     // eslint-disable-next-line @typescript-eslint/naming-convention
     passwordHash: password_hash,
-    isAdmin,
     ...user
   } = result;
 
   const { hash } = await hashPassword(password, password_salt);
 
   if (hash === password_hash) {
-    applyRoles(user, isAdmin);
+    const roles = await services.userRoles.getByUserId(result.id);
+
+    applyRoles(user as UserModel, roles);
 
     return user as UserModel;
   }

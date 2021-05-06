@@ -2,7 +2,6 @@ import express, { Request, Response, Router } from 'express';
 import jwt from 'jsonwebtoken';
 import { randomInt, sleep } from '@dirtleague/common';
 import { authenticate } from '../auth/handler';
-import corsHandler from '../http/cors-handler';
 import RepositoryServices from '../data-access/repository-services';
 import { getDefaultConfigManager } from '../config/manager';
 
@@ -15,7 +14,7 @@ interface RequestWithToken extends Request {
 const buildRoute = (services: RepositoryServices): Router => {
   const router = express.Router();
 
-  router.post('/', corsHandler, async (req, res) => {
+  router.post('/', async (req, res) => {
     const { email, password } = req.body;
 
     const user = await authenticate(email, password, services);
@@ -49,7 +48,7 @@ const buildRoute = (services: RepositoryServices): Router => {
   });
 
   // NOTE: This doesn't use requireToken because it's supposed to respond to anonymous requests.
-  router.get('/', corsHandler, async (req: RequestWithToken, res: Response) => {
+  router.get('/', async (req: RequestWithToken, res: Response) => {
     jwt.verify(
       req.token,
       config.props.DIRT_API_SESSION_SECRET,

@@ -44,7 +44,7 @@ interface DbPlayer {
   lastName: string;
   bio: string;
   yearJoined: number;
-  currentRating: number;
+  currentRating?: number;
 }
 
 interface FeedModel {

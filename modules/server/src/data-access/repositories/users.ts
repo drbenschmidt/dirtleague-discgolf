@@ -2,10 +2,10 @@ import { ConnectionPool, sql } from '@databases/mysql';
 
 interface DbUser {
   id?: number;
+  playerId?: number;
   email: string;
   passwordHash: string;
   passwordSalt: string;
-  isAdmin: boolean;
 }
 
 class UsersRepository {
@@ -15,22 +15,29 @@ class UsersRepository {
     this.db = db;
   }
 
-  insert = async (model: DbUser) => {
-    await this.db.query(sql`
-      INSERT INTO users (email, passwordHash, passwordSalt, isAdmin)
-      VALUES (${model.email}, ${model.passwordHash}, ${model.passwordSalt}, ${model.isAdmin})
+  insert = async (model: DbUser): Promise<number> => {
+    const [result] = await this.db.query(sql`
+      INSERT INTO users (email, passwordHash, passwordSalt, playerId)
+      VALUES (${model.email}, ${model.passwordHash}, ${model.passwordSalt}, ${model.playerId});
+
+      SELECT LAST_INSERT_ID();
     `);
+
+    // eslint-disable-next-line no-param-reassign
+    const id = result['LAST_INSERT_ID()'] as number;
+
+    return id;
   };
 
-  update = async (model: DbUser) => {
+  update = async (model: DbUser): Promise<void> => {
     await this.db.query(sql`
       UPDATE users
-      SET passwordHash=${model.passwordHash}, passwordSalt=${model.passwordSalt}, isAdmin=${model.isAdmin}
+      SET passwordHash=${model.passwordHash}, passwordSalt=${model.passwordSalt}, playerId=${model.playerId}
       WHERE email=${model.email}
     `);
   };
 
-  delete = async (id: number) => {
+  delete = async (id: number): Promise<void> => {
     await this.db.query(sql`
       DELETE FROM users
       WHERE id=${id}
