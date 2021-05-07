@@ -10,7 +10,6 @@ import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
 import RepositoryServices from '../data-access/repository-services';
-import corsHandler from '../http/cors-handler';
 import { DbRound } from '../data-access/repositories/rounds';
 import { DbCard } from '../data-access/repositories/cards';
 import { DbPlayerGroup } from '../data-access/repositories/player-groups';
@@ -75,7 +74,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.get(
     '/',
-    corsHandler,
     withTryCatch(async (req, res) => {
       const entities = await services.events.getAll();
 
@@ -85,7 +83,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.get(
     '/:id',
-    corsHandler,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const { include } = req.query;
@@ -161,7 +158,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.post(
     '/',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const model = new EventModel(req.body);
@@ -180,7 +176,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.put(
     '/:id/card/:cardId/upload',
-    corsHandler,
     requireRoles([Roles.Admin]),
     csvUpload.single('csv'),
     withTryCatch(async (req, res) => {
@@ -217,7 +212,9 @@ const buildRoute = (services: RepositoryServices): Router => {
           const player = await services.profiles.get(dbPlayer.playerId);
 
           // eslint-disable-next-line prettier/prettier
-          possibleNames.push(`${player.firstName.toLowerCase()} ${player.lastName.toLowerCase()}`);
+          possibleNames.push(
+            `${player.firstName.toLowerCase()} ${player.lastName.toLowerCase()}`
+          );
 
           const aliases = await services.aliases.getForUserId(player.id);
 
@@ -254,7 +251,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.delete(
     '/:id',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const { id } = req.params;
@@ -268,7 +264,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.patch(
     '/:id',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       // TODO: Technically, this should be a transaction.

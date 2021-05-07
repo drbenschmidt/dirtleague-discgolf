@@ -3,7 +3,6 @@ import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
 import RepositoryServices from '../data-access/repository-services';
-import corsHandler from '../http/cors-handler';
 import { DbCourseLayout } from '../data-access/repositories/course-layouts';
 import { DbCourseHole } from '../data-access/repositories/course-holes';
 import getCrud from '../utils/getCrud';
@@ -13,7 +12,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.get(
     '/',
-    corsHandler,
     withTryCatch(async (req, res) => {
       const users = await services.courses.getAll();
 
@@ -23,7 +21,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.get(
     '/:id',
-    corsHandler,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const { include } = req.query;
@@ -57,7 +54,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.get(
     '/:id/layouts',
-    corsHandler,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const entity = await services.courses.get(parseInt(id, 10));
@@ -76,7 +72,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.post(
     '/',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const model = new CourseModel(req.body);
@@ -118,7 +113,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.delete(
     '/:id',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const { id } = req.params;
@@ -132,7 +126,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.patch(
     '/:id',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       // TODO: Technically, this should be a transaction.
