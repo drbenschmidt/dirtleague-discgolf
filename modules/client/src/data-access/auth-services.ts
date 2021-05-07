@@ -50,7 +50,7 @@ class AuthServices {
     const response = await this.api.post<AuthResponse>('auth', request);
 
     if (response.token) {
-      this.api.setToken(response.token);
+      this.setToken(response.token);
     }
 
     return response;
@@ -65,6 +65,10 @@ class AuthServices {
 
     return result;
   };
+
+  setToken(token: string): void {
+    this.api.setToken(token);
+  }
 }
 
 export default AuthServices;

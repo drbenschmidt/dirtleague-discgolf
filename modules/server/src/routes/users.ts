@@ -1,10 +1,13 @@
 import { PlayerModel, Roles, UserModel } from '@dirtleague/common';
 import express, { Router } from 'express';
+import jwt from 'jsonwebtoken';
 import withTryCatch from '../http/withTryCatch';
 import RepositoryServices from '../data-access/repository-services';
-import corsHandler from '../http/cors-handler';
 import hashPassword from '../crypto/hash';
 import { requireRoles } from '../auth/handler';
+import { getDefaultConfigManager } from '../config/manager';
+
+const config = getDefaultConfigManager();
 
 export interface NewUserRequest {
   user: UserModel;
@@ -54,10 +57,39 @@ const buildRoute = (services: RepositoryServices): Router => {
         playerId,
       });
 
-      res.json({
-        userId,
-        playerId,
-      });
+      // TODO: Another spot where the routes should be calling a single repository function
+      // to get a user and it's roles. This logic is duplicated in the auth route.
+      const result = await services.users.get(userId);
+
+      const {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        passwordSalt: password_salt,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        passwordHash: password_hash,
+        ...user
+      } = result;
+
+      (user as UserModel).roles = await services.userRoles.getByUserId(userId);
+
+      // TODO: Make secret key configurable or use certificate.
+      jwt.sign(
+        { user },
+        config.props.DIRT_API_SESSION_SECRET,
+        (error: Error | null, token: string | null) => {
+          if (error) {
+            res.status(500).json({
+              success: false,
+              error,
+            });
+          }
+
+          res.json({
+            success: true,
+            user,
+            token,
+          });
+        }
+      );
     })
   );
 

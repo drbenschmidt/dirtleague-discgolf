@@ -7,6 +7,7 @@ import RepositoryServices from '../../data-access/repository-services';
 import { useRepositoryServices } from '../../data-access/context';
 import Breadcrumbs from '../../components/generic/breadcrumbs';
 import { Players } from '../../links';
+import { useAuthContext } from '../../components/auth/context';
 
 interface DeletePlayerButtonProps {
   player: PlayerModel;
@@ -69,6 +70,7 @@ const PlayerList = (): ReactElement => {
   const services = useRepositoryServices();
   const [result, setResult] = useState<PlayerModel[]>();
   const [dummy, setDummy] = useState(false);
+  const authManager = useAuthContext();
 
   const onDelete = useCallback(() => {
     setDummy(v => !v);
@@ -118,11 +120,13 @@ const PlayerList = (): ReactElement => {
                   <Icon name="address book" />
                   View
                 </Button>
-                <IfAdmin>
+                <IfAdmin or={() => player.id === authManager?.user?.id}>
                   <Button as={Link} to={`${url}/${player.id}/edit`} size="mini">
                     <Icon name="edit" />
                     Edit
                   </Button>
+                </IfAdmin>
+                <IfAdmin>
                   <DeletePlayerButton
                     player={player}
                     services={services}

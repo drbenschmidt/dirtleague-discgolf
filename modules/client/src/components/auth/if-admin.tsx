@@ -1,17 +1,21 @@
 import { Roles } from '@dirtleague/common';
-import { ReactElement } from 'react';
+import React, { ReactElement } from 'react';
 import { useAuthContext } from './context';
 
-const IfAdmin = (props: { children: any }): ReactElement | null => {
-  const { children } = props;
+interface IfAdminProps extends React.PropsWithChildren<unknown> {
+  or?: () => boolean;
+}
+
+const IfAdmin = (props: IfAdminProps): ReactElement | null => {
+  const { children, or } = props;
   const authContext = useAuthContext();
 
   if (!authContext?.isAuthenticated) {
     return null;
   }
 
-  if (authContext.user?.roles.includes(Roles.Admin)) {
-    return children;
+  if (authContext.user?.roles.includes(Roles.Admin) || or?.()) {
+    return <>{children}</>;
   }
 
   return null;

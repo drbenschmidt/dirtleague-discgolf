@@ -31,9 +31,7 @@ export class AuthModel
 
 class AuthManager {
   service: AuthServices;
-
   isAuthenticated = false;
-
   user?: UserModel;
 
   constructor(apiFetch: ApiFetch) {
@@ -49,8 +47,7 @@ class AuthManager {
     );
 
     if (result.token) {
-      this.isAuthenticated = true;
-      this.user = result.user;
+      this.setUser(result.user, result.token);
     }
 
     return result;
@@ -71,6 +68,12 @@ class AuthManager {
     }
 
     return result.isAuthenticated;
+  };
+
+  setUser = (user: UserModel, token: string): void => {
+    this.isAuthenticated = true;
+    this.user = user;
+    this.service.setToken(token);
   };
 }
 

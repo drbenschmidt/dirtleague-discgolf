@@ -1,13 +1,20 @@
 import { PlayerModel, asyncForEach, Roles } from '@dirtleague/common';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
-import { requireRoles } from '../auth/handler';
+import { RequestWithToken, requireRoles } from '../auth/handler';
 import { DbAlias } from '../data-access/repositories/aliases';
 import RepositoryServices from '../data-access/repository-services';
 import getCrud from '../utils/getCrud';
 
 const buildRoute = (services: RepositoryServices): Router => {
   const router = express.Router();
+
+  const isUserEditingOwn = (req: RequestWithToken) => {
+    const { id } = req.params;
+    const { user } = req;
+
+    return user.id === parseInt(id, 10);
+  };
 
   router.get(
     '/',
@@ -114,7 +121,7 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.patch(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Roles.Admin], isUserEditingOwn),
     withTryCatch(async (req, res) => {
       // TODO: Technically, this should be a transaction.
       const body = req.body as PlayerModel;

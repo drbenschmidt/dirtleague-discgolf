@@ -75,19 +75,21 @@ export const applyRoles = (user: UserModel, roles: Roles[]): void => {
   user.roles.push(Roles.User);
 };
 
-export const requireRoles = (roles: Roles[]) => (
-  req: RequestWithToken,
-  res: Response,
-  next: NextFunction
-): void => {
+export const requireRoles = (
+  roles: Roles[],
+  or?: (req: RequestWithToken) => boolean
+) => (req: RequestWithToken, res: Response, next: NextFunction): void => {
   if (req.token) {
     const { user } = jwt.decode(req.token, { json: true }) as JsonWebToken;
     const isAdmin = user.roles.includes(Roles.Admin);
     const isAuthorized = roles.every(role => user.roles.includes(role));
 
-    // NOTE: We're going to assume that Roles.Admin gets everything, no need to verify
-    // individual roles yet.
-    if (!isAuthorized && !isAdmin) {
+    if (isAdmin || or?.(req)) {
+      next();
+      return;
+    }
+
+    if (!isAuthorized) {
       // Forbidden
       res.status(403).json({ error: 'Unauthorized' });
     }
