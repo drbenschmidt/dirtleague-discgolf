@@ -15,6 +15,7 @@ const EventForm = lazy(() => import('./routes/events/form'));
 const EventResults = lazy(() => import('./routes/events/results'));
 const SeasonList = lazy(() => import('./routes/seasons/list'));
 const SeasonForm = lazy(() => import('./routes/seasons/form'));
+const AdminArea = lazy(() => import('./routes/admin'));
 
 const Router = (): ReactElement => {
   return (
@@ -39,6 +40,7 @@ const Router = (): ReactElement => {
             <Route exact path="/seasons" component={SeasonList} />
             <Route exact path="/seasons/new" component={SeasonForm} />
             <Route exact path="/seasons/:id/edit" component={SeasonForm} />
+            <Route path="/admin" component={AdminArea} />
           </Switch>
         </Suspense>
       </Body>

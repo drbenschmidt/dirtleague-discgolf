@@ -9,12 +9,14 @@ interface IfAdminProps extends React.PropsWithChildren<unknown> {
 const IfAdmin = (props: IfAdminProps): ReactElement | null => {
   const { children, or } = props;
   const authContext = useAuthContext();
+  const roles = authContext?.user?.roles;
+  const rolesInclude = roles?.includes(Roles.Admin);
 
   if (!authContext?.isAuthenticated) {
     return null;
   }
 
-  if (authContext.user?.roles.includes(Roles.Admin) || or?.()) {
+  if (rolesInclude || or?.()) {
     return <>{children}</>;
   }
 

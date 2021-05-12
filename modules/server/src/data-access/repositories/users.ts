@@ -1,6 +1,6 @@
 import { ConnectionPool, sql } from '@databases/mysql';
 
-interface DbUser {
+export interface DbUser {
   id?: number;
   playerId?: number;
   email: string;

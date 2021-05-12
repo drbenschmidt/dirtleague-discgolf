@@ -1,6 +1,8 @@
+import { Memoize } from 'typescript-memoize';
 import Cloneable from '../interfaces/cloneable';
 import type Role from '../security/roles';
 import DirtLeagueModel from './dl-model';
+import PlayerModel from './player';
 
 export interface UserAttributes {
   id: number;
@@ -48,6 +50,11 @@ export default class UserModel
 
   get password(): string {
     return this.attributes.password;
+  }
+
+  @Memoize()
+  get player(): PlayerModel {
+    return new PlayerModel(this.get('player'));
   }
 
   clone(): UserModel {

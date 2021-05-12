@@ -6,8 +6,18 @@ import RepositoryServices from '../data-access/repository-services';
 import hashPassword from '../crypto/hash';
 import { requireRoles } from '../auth/handler';
 import { getDefaultConfigManager } from '../config/manager';
+import type { DbUser } from '../data-access/repositories/users';
 
 const config = getDefaultConfigManager();
+
+const cleanUser = (user: DbUser) => {
+  // eslint-disable-next-line no-param-reassign
+  delete user.passwordHash;
+  // eslint-disable-next-line no-param-reassign
+  delete user.passwordSalt;
+
+  return user;
+};
 
 export interface NewUserRequest {
   user: UserModel;
@@ -22,7 +32,7 @@ const buildRoute = (services: RepositoryServices): Router => {
     withTryCatch(async (req, res) => {
       const users = await services.users.getAll();
 
-      res.json(users);
+      res.json(users.map(cleanUser));
     })
   );
 
@@ -32,7 +42,19 @@ const buildRoute = (services: RepositoryServices): Router => {
       const { id } = req.params;
       const user = await services.users.get(parseInt(id, 10));
 
-      res.json(user);
+      // TODO: Check to see if we're requesting the player as well.
+      if (user.playerId) {
+        const player = await services.profiles.get(user.playerId);
+
+        (user as any).player = player;
+      }
+
+      // TODO: Check to see if we're requesting the roles as well.
+      const roles = await services.userRoles.getByUserId(user.id);
+
+      (user as any).roles = roles;
+
+      res.json(cleanUser(user));
     })
   );
 
