@@ -161,6 +161,27 @@ const buildRoute = (services: RepositoryServices): Router => {
     })
   );
 
+  router.post(
+    '/:id/updatePassword',
+    requireRoles([Role.Admin]),
+    withTryCatch(async (req, res) => {
+      const { id } = req.params;
+      const { password } = req.body;
+      const userId = parseInt(id, 10);
+
+      const dbUser = await services.users.get(userId);
+
+      const { hash, salt } = await hashPassword(password);
+
+      dbUser.passwordHash = hash;
+      dbUser.passwordSalt = salt;
+
+      await services.users.update(dbUser);
+
+      res.json({ success: true });
+    })
+  );
+
   return router;
 };
 

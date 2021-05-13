@@ -48,6 +48,10 @@ class UsersRepository extends ApiRepository implements Repository<UserModel> {
   async removeRole(userId: number, roleId: Roles): Promise<void> {
     await this.api.post(`users/${userId}/removeRole`, { roleId });
   }
+
+  async updatePassword(userId: number, password: string): Promise<void> {
+    await this.api.post(`users/${userId}/updatePassword`, { password });
+  }
 }
 
 export default UsersRepository;

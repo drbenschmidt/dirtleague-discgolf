@@ -6,13 +6,55 @@ import {
   useMemo,
   memo,
   FormEvent,
+  useRef,
 } from 'react';
-import { Table, Checkbox, CheckboxProps } from 'semantic-ui-react';
+import {
+  Table,
+  Checkbox,
+  CheckboxProps,
+  Form,
+  Button,
+} from 'semantic-ui-react';
 import { UserModel, Role } from '@dirtleague/common';
 import UserDropdown from '../../../components/selection/user-dropdown';
 import useRequest from '../../../hooks/useRequest';
 import RepositoryServices from '../../../data-access/repository-services';
 import { useRepositoryServices } from '../../../data-access/context';
+import IfAdmin from '../../../components/auth/if-admin';
+
+interface SetPasswordProps {
+  model: UserModel;
+}
+
+const SetPassword = (props: SetPasswordProps): ReactElement => {
+  const { model } = props;
+  const passwordRef = useRef<string>();
+  const services = useRepositoryServices();
+
+  const onClick = useCallback(() => {
+    if (passwordRef.current) {
+      services.users.updatePassword(model.id, passwordRef.current);
+    }
+  }, [model.id, services.users]);
+
+  const onChange = useCallback((event, data) => {
+    const { value } = data;
+
+    passwordRef.current = value;
+  }, []);
+
+  return (
+    <Form>
+      <Form.Group>
+        <Form.Input
+          label="Enter Password to set"
+          onChange={onChange}
+          action={<Button onClick={onClick}>Update</Button>}
+        />
+      </Form.Group>
+    </Form>
+  );
+};
 
 const StatefulCheckbox = (props: CheckboxProps): ReactElement => {
   const { checked: parentChecked, onChange: parentOnChanged, ...rest } = props;
@@ -125,6 +167,11 @@ const UserProfileHOC = (props: any): ReactElement | null => {
   return (
     <>
       {userData && <UserProfileMapper model={userData} />}
+      {userData && (
+        <IfAdmin>
+          <SetPassword model={userData} />
+        </IfAdmin>
+      )}
       {userData && <UserRolesEditor model={userData} />}
     </>
   );
