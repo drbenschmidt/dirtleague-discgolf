@@ -79,15 +79,23 @@ class ApiFetch {
 
   post = async <TResponse>(
     url = '',
-    data: DirtLeagueModel<unknown>,
+    data: DirtLeagueModel<unknown> | Record<string, unknown>,
     queryParams = {}
   ): Promise<TResponse> => {
+    let body = {};
+
+    if (data instanceof DirtLeagueModel) {
+      body = data.toJson();
+    } else {
+      body = data;
+    }
+
     // Default options are marked with *
     const response = await fetch(
       buildUrl(ApiFetch.getBaseUrl(), url, queryParams),
       buildRequestOptions(this.jwt, {
         method: 'POST',
-        body: JSON.stringify(data?.toJson() || {}),
+        body: JSON.stringify(body || {}),
       })
     );
 

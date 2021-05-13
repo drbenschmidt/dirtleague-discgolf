@@ -1,4 +1,4 @@
-import { UserAttributes, UserModel } from '@dirtleague/common';
+import { Roles, UserAttributes, UserModel } from '@dirtleague/common';
 import { SignUpModel } from '../../components/sign-up/model';
 import { ApiRepository, Repository } from '../repository';
 
@@ -39,6 +39,14 @@ class UsersRepository extends ApiRepository implements Repository<UserModel> {
     const result = await this.api.get<UserAttributes[]>('users');
 
     return result.map(user => new UserModel(user));
+  }
+
+  async addRole(userId: number, roleId: Roles): Promise<void> {
+    await this.api.post(`users/${userId}/addRole`, { roleId });
+  }
+
+  async removeRole(userId: number, roleId: Roles): Promise<void> {
+    await this.api.post(`users/${userId}/removeRole`, { roleId });
   }
 }
 

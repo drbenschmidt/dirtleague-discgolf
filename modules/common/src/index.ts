@@ -13,6 +13,7 @@ export { default as filledArray } from './utils/filledArray';
 export { default as sum } from './utils/sum';
 
 export { default as Roles } from './security/roles';
+export { default as Role } from './security/roles';
 
 export { default as DirtLeagueModel } from './model/dl-model';
 export { default as AliasModel } from './model/alias';

@@ -1,4 +1,4 @@
-import { PlayerModel, Roles, UserModel } from '@dirtleague/common';
+import { PlayerModel, Role, UserModel } from '@dirtleague/common';
 import express, { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import withTryCatch from '../http/withTryCatch';
@@ -29,6 +29,7 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.get(
     '/',
+    requireRoles([Role.Admin]),
     withTryCatch(async (req, res) => {
       const users = await services.users.getAll();
 
@@ -38,6 +39,7 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.get(
     '/:id',
+    requireRoles([Role.Admin]),
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const user = await services.users.get(parseInt(id, 10));
@@ -58,6 +60,7 @@ const buildRoute = (services: RepositoryServices): Router => {
     })
   );
 
+  // New User Request comes from anonymous.
   router.post(
     '/',
     withTryCatch(async (req, res) => {
@@ -117,7 +120,7 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.delete(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.Admin]),
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const userId = parseInt(id, 10);
@@ -127,6 +130,34 @@ const buildRoute = (services: RepositoryServices): Router => {
       res.json({
         success: true,
       });
+    })
+  );
+
+  router.post(
+    '/:id/addRole',
+    requireRoles([Role.Admin]),
+    withTryCatch(async (req, res) => {
+      const { id } = req.params;
+      const { roleId } = req.body;
+      const userId = parseInt(id, 10);
+
+      await services.userRoles.insert({ userId, roleId });
+
+      res.json({ success: true });
+    })
+  );
+
+  router.post(
+    '/:id/removeRole',
+    requireRoles([Role.Admin]),
+    withTryCatch(async (req, res) => {
+      const { id } = req.params;
+      const { roleId } = req.body;
+      const userId = parseInt(id, 10);
+
+      await services.userRoles.delete({ userId, roleId });
+
+      res.json({ success: true });
     })
   );
 

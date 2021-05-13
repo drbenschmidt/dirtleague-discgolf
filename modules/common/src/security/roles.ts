@@ -1,4 +1,4 @@
-enum Roles {
+enum Role {
   Admin = 0,
   User = 1,
 
@@ -8,4 +8,4 @@ enum Roles {
   SeasonManagement = 5,
 }
 
-export default Roles;
+export default Role;

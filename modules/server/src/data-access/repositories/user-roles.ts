@@ -21,6 +21,13 @@ class UserRolesRepository {
     `);
   };
 
+  delete = async (model: DbUserRole): Promise<void> => {
+    await this.db.query(sql`
+      DELETE FROM userRoles
+      WHERE userId=${model.userId} AND roleId=${model.roleId}
+    `);
+  };
+
   getByUserId = async (userId: number): Promise<Roles[]> => {
     const roles = await this.db.query(sql`
       SELECT roleId FROM userRoles
