@@ -19,7 +19,7 @@ const debugLoggers = {
       } results`
     );
   },
-  onQueryError: (_query: any, { text }: any, err: { message: any; }) => {
+  onQueryError: (_query: any, { text }: any, err: { message: any }) => {
     console.log(
       `${new Date().toISOString()} ERROR QUERY ${text} - ${err.message}`
     );
@@ -39,10 +39,12 @@ if (enableDebugLogging) {
 const db = createConnectionPool(options);
 
 // Make sure we clean up our mess when the process exists.
-process.once('SIGTERM', () => {
-  db.dispose().catch(ex => {
-    console.error(ex);
+if (process.env.NODE_ENV === 'development') {
+  process.once('SIGTERM', () => {
+    db.dispose().catch(ex => {
+      console.error(ex);
+    });
   });
-});
+}
 
 export default db;

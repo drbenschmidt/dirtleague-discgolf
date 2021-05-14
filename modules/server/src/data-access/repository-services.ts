@@ -13,9 +13,12 @@ import PlayerGroupsRepository from './repositories/player-groups';
 import PlayerGroupPlayersRepository from './repositories/player-group-players';
 import PlayerGroupResultsRepository from './repositories/player-group-results';
 import PlayerRatingsRepository from './repositories/player-ratings';
+import UserRolesRepository from './repositories/user-roles';
 
 class RepositoryServices {
   users: UsersRepository = null;
+
+  userRoles: UserRolesRepository = null;
 
   profiles: ProfilesRepository = null;
 
@@ -45,6 +48,7 @@ class RepositoryServices {
 
   constructor() {
     this.users = new UsersRepository(db);
+    this.userRoles = new UserRolesRepository(db);
     this.profiles = new ProfilesRepository(db);
     this.aliases = new AliasesRepository(db);
     this.courses = new CoursesRepository(db);

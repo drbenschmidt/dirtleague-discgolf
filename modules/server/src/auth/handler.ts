@@ -68,32 +68,28 @@ export const requireToken = (
   }
 };
 
-export const applyRoles = (user: any, isAdmin: boolean): void => {
-  if (!user.roles) {
-    // eslint-disable-next-line no-param-reassign
-    user.roles = [];
-  }
-
-  if (isAdmin) {
-    user.roles.push(Roles.Admin);
-  }
+export const applyRoles = (user: UserModel, roles: Roles[]): void => {
+  // eslint-disable-next-line no-param-reassign
+  user.roles = roles;
 
   user.roles.push(Roles.User);
 };
 
-export const requireRoles = (roles: Roles[]) => (
-  req: RequestWithToken,
-  res: Response,
-  next: NextFunction
-): void => {
+export const requireRoles = (
+  roles: Roles[],
+  or?: (req: RequestWithToken) => boolean
+) => (req: RequestWithToken, res: Response, next: NextFunction): void => {
   if (req.token) {
     const { user } = jwt.decode(req.token, { json: true }) as JsonWebToken;
     const isAdmin = user.roles.includes(Roles.Admin);
     const isAuthorized = roles.every(role => user.roles.includes(role));
 
-    // NOTE: We're going to assume that Roles.Admin gets everything, no need to verify
-    // individual roles yet.
-    if (!isAuthorized && !isAdmin) {
+    if (isAdmin || or?.(req)) {
+      next();
+      return;
+    }
+
+    if (!isAuthorized) {
       // Forbidden
       res.status(403).json({ error: 'Unauthorized' });
     }
@@ -121,14 +117,15 @@ export const authenticate = async (
     passwordSalt: password_salt,
     // eslint-disable-next-line @typescript-eslint/naming-convention
     passwordHash: password_hash,
-    isAdmin,
     ...user
   } = result;
 
   const { hash } = await hashPassword(password, password_salt);
 
   if (hash === password_hash) {
-    applyRoles(user, isAdmin);
+    const roles = await services.userRoles.getByUserId(result.id);
+
+    applyRoles(user as UserModel, roles);
 
     return user as UserModel;
   }

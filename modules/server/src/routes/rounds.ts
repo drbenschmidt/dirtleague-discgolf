@@ -8,7 +8,6 @@ import {
 import express, { Router } from 'express';
 import { DbRound } from '../data-access/repositories/rounds';
 import RepositoryServices from '../data-access/repository-services';
-import corsHandler from '../http/cors-handler';
 import { requireRoles } from '../auth/handler';
 import withTryCatch from '../http/withTryCatch';
 import calculateRating from '../utils/calculateRating';
@@ -18,7 +17,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.get(
     '/',
-    corsHandler,
     withTryCatch(async (req, res) => {
       const entities = await services.rounds.getAll();
 
@@ -28,7 +26,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.get(
     '/:id',
-    corsHandler,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const entity = await services.rounds.get(parseInt(id, 10));
@@ -39,7 +36,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.post(
     '/',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const body = new RoundModel(req.body);
@@ -53,7 +49,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.delete(
     '/:id',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const { id } = req.params;
@@ -66,7 +61,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.patch(
     '/:id',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const body = req.body as DbRound;
@@ -80,7 +74,6 @@ const buildRoute = (services: RepositoryServices): Router => {
   // TODO: Why is this a get? Should be POST.
   router.get(
     '/:id/complete',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const { id } = req.params;

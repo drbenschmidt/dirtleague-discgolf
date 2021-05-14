@@ -1,7 +1,6 @@
 import { Roles, CourseLayoutModel } from '@dirtleague/common';
 import express, { Router } from 'express';
 import RepositoryServices from '../data-access/repository-services';
-import corsHandler from '../http/cors-handler';
 import { requireRoles } from '../auth/handler';
 import withTryCatch from '../http/withTryCatch';
 import { DbCourseLayout } from '../data-access/repositories/course-layouts';
@@ -11,7 +10,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.get(
     '/',
-    corsHandler,
     withTryCatch(async (req, res) => {
       const entities = await services.courseLayouts.getAll();
 
@@ -21,7 +19,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.get(
     '/:id',
-    corsHandler,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const entity = await services.courseLayouts.get(parseInt(id, 10));
@@ -32,7 +29,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.post(
     '/',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const entity = new CourseLayoutModel(req.body);
@@ -46,7 +42,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.delete(
     '/:id',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const { id } = req.params;
@@ -59,7 +54,6 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.patch(
     '/:id',
-    corsHandler,
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const body = req.body as DbCourseLayout;

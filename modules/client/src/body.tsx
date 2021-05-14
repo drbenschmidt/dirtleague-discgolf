@@ -2,7 +2,9 @@ import { ReactElement } from 'react';
 import { Dropdown, Menu, Grid } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import AuthButton from './components/auth/button';
+import SignUpButton from './components/sign-up/button';
 import Toaster from './components/notifications/toaster';
+import IfAdmin from './components/auth/if-admin';
 
 export const MenuLink = (props: any): ReactElement => {
   const { children } = props;
@@ -21,41 +23,6 @@ export const DropdownLink = (props: any): ReactElement => {
     </Dropdown.Item>
   );
 };
-
-/*
-export const Navigation = (props: any): ReactElement => {
-  const { children } = props;
-  const [fixed, setFixed] = useState(false);
-  const showFixedMenu = useCallback(() => setFixed(true), []);
-  const hideFixedMenu = useCallback(() => setFixed(false), []);
-
-  return (
-    <>
-      <Visibility
-        once={false}
-        onBottomPassed={showFixedMenu}
-        onBottomPassedReverse={hideFixedMenu}
-      >
-        <Segment
-          inverted
-          textAlign="center"
-          style={{ padding: '1em 0em' }}
-          vertical
-        >
-          
-        </Segment>
-      </Visibility>
-      <Segment style={{ padding: '2em 0em' }} vertical>
-        <Grid container stackable verticalAlign="middle">
-          <Grid.Row>
-            <Grid.Column width={16}>{children}</Grid.Column>
-          </Grid.Row>
-        </Grid>
-      </Segment>
-    </>
-  );
-};
-*/
 
 export const Footer = (): ReactElement => {
   return (
@@ -82,7 +49,11 @@ export const Body = (props: any): ReactElement => {
             <MenuLink to="/courses">Courses</MenuLink>
             <MenuLink to="/events">Events</MenuLink>
             <MenuLink to="/seasons">Seasons</MenuLink>
+            <IfAdmin>
+              <MenuLink to="/admin">Admin</MenuLink>
+            </IfAdmin>
             <Menu.Item position="right">
+              <SignUpButton fixed={false} />
               <AuthButton fixed={false} />
             </Menu.Item>
           </Grid.Row>
@@ -94,9 +65,13 @@ export const Body = (props: any): ReactElement => {
                 <DropdownLink to="/courses">Courses</DropdownLink>
                 <DropdownLink to="/events">Events</DropdownLink>
                 <DropdownLink to="/seasons">Seasons</DropdownLink>
+                <IfAdmin>
+                  <DropdownLink to="/admin">Admin</DropdownLink>
+                </IfAdmin>
               </Dropdown.Menu>
             </Dropdown>
             <Menu.Item position="right">
+              <SignUpButton fixed={false} />
               <AuthButton fixed={false} />
             </Menu.Item>
           </Grid.Row>

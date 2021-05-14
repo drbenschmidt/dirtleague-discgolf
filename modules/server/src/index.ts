@@ -22,6 +22,9 @@ const app = express();
 const port = config.props.DIRT_API_PORT;
 const services = new RepositoryServices();
 
+// CORS handling needs to come first.
+app.use(corsHandler);
+
 // Setup our handlers/middlewares.
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -33,7 +36,7 @@ app.use('/static', express.static('../client/build/static'));
 app.set('views', path.join(__dirname, '../../client/build'));
 app.engine('html', renderFile);
 
-const rootUrls = ['/players', '/courses', '/events', '/seasons'];
+const rootUrls = ['/players', '/courses', '/events', '/seasons', '/admin'];
 
 const allUrls = rootUrls.reduce((acc, cur) => {
   acc.push(cur);
@@ -47,9 +50,6 @@ app.get(['/', ...allUrls], (req, res) => {
 
   res.render('index.html', { CONFIG_STRING: configEncoded });
 });
-
-// For now, just tell express that any OPTIONS request should follow the same CORS rules.
-app.options('*', corsHandler);
 
 // TODO: Switch this between dev/prod.
 app.use(morgan('dev'));
