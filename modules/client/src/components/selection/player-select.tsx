@@ -5,11 +5,12 @@ import EntitySearch from '../forms/entity-search';
 
 export interface PlayerSelectProps {
   onChange: (event: any, value: any) => void;
-  value: any;
+  value?: any;
+  [key: string]: unknown;
 }
 
 const PlayerSelect = (props: PlayerSelectProps): ReactElement => {
-  const { onChange, value } = props;
+  const { onChange, value, ...rest } = props;
   const services = useRepositoryServices();
 
   const playerSearch = useCallback(
@@ -38,7 +39,12 @@ const PlayerSelect = (props: PlayerSelectProps): ReactElement => {
   );
 
   return (
-    <EntitySearch onChange={onChange} searcher={playerSearch} value={value} />
+    <EntitySearch
+      onChange={onChange}
+      searcher={playerSearch}
+      value={value}
+      {...rest}
+    />
   );
 };
 

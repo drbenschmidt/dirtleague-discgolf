@@ -182,6 +182,19 @@ const buildRoute = (services: RepositoryServices): Router => {
     })
   );
 
+  router.patch(
+    '/:id',
+    requireRoles([Role.Admin]),
+    withTryCatch(async (req, res) => {
+      const { id } = req.params;
+      const userId = parseInt(id, 10);
+
+      await services.users.patch(userId, req.body);
+
+      res.json({ success: true });
+    })
+  );
+
   return router;
 };
 

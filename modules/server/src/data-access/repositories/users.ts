@@ -1,4 +1,27 @@
-import { ConnectionPool, sql } from '@databases/mysql';
+import { ConnectionPool, sql, SQLQuery } from '@databases/mysql';
+import { keys } from 'ts-transformer-keys';
+
+const buildSet = (columnName: string, value: unknown): SQLQuery => {
+  const dbValue = sql`${value}`;
+  // eslint-disable-next-line no-underscore-dangle
+  const dbColumn = sql.__dangerous__rawValue(columnName);
+
+  // eslint-disable-next-line no-underscore-dangle
+  return sql`${dbColumn}=${dbValue}`;
+};
+
+const buildSets = (
+  props: Record<string, unknown>,
+  validKeys: string[]
+): SQLQuery => {
+  return sql.join(
+    Object.entries(props)
+      .filter(([key]) => validKeys.includes(key))
+      .filter(([key]) => key !== 'id')
+      .map(([key, value]) => buildSet(key, value)),
+    ', '
+  );
+};
 
 export interface DbUser {
   id?: number;
@@ -76,6 +99,22 @@ class UsersRepository {
     `);
 
     return users || [];
+  };
+
+  patch = async (id: number, props: Record<string, unknown>): Promise<void> => {
+    const validKeys = keys<DbUser>();
+    const setClause = buildSets(props, validKeys);
+
+    // eslint-disable-next-line no-underscore-dangle
+    if ((setClause as any)._items.length === 0) {
+      throw new Error('Error, props did not contain any valid properties.');
+    }
+
+    await this.db.query(sql`
+      UPDATE users
+      SET ${setClause}
+      WHERE id=${id}
+    `);
   };
 }
 

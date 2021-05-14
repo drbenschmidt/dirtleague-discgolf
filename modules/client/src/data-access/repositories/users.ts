@@ -52,6 +52,10 @@ class UsersRepository extends ApiRepository implements Repository<UserModel> {
   async updatePassword(userId: number, password: string): Promise<void> {
     await this.api.post(`users/${userId}/updatePassword`, { password });
   }
+
+  async patch(userId: number, props: Record<string, unknown>): Promise<void> {
+    await this.api.patch(`users/${userId}`, props);
+  }
 }
 
 export default UsersRepository;

@@ -17,6 +17,7 @@ import {
 } from 'semantic-ui-react';
 import { UserModel, Role } from '@dirtleague/common';
 import UserDropdown from '../../../components/selection/user-dropdown';
+import PlayerSelect from '../../../components/selection/player-select';
 import useRequest from '../../../hooks/useRequest';
 import RepositoryServices from '../../../data-access/repository-services';
 import { useRepositoryServices } from '../../../data-access/context';
@@ -113,7 +114,7 @@ const UserRolesEditor = (props: UserRolesEditorProps): ReactElement | null => {
       <Table.Body>
         {getRoles().map(([name, role]) => {
           return (
-            <Table.Row>
+            <Table.Row key={role}>
               <Table.Cell>{name}</Table.Cell>
               <Table.Cell>
                 <StatefulCheckbox
@@ -140,11 +141,30 @@ const UserProfileMapper = (
   props: UserProfileMapperProps
 ): ReactElement | null => {
   const { model } = props;
+  const profileIdRef = useRef(model.playerId);
+  const services = useRepositoryServices();
+
+  const onChange = useCallback((event, value) => {
+    profileIdRef.current = value;
+  }, []);
+
+  const onClick = useCallback(() => {
+    if (profileIdRef.current) {
+      services.users.patch(model.id, { playerId: profileIdRef.current });
+    }
+  }, [model.id, services.users]);
 
   return (
-    <div>
-      UserID: {model.id}, PlayerID: {model.playerId}
-    </div>
+    <Form onSubmit={() => {}}>
+      <Form.Group>
+        <PlayerSelect
+          value={model.playerId}
+          label="Player Profile"
+          onChange={onChange}
+        />
+        <Button onClick={onClick}>Update</Button>
+      </Form.Group>
+    </Form>
   );
 };
 

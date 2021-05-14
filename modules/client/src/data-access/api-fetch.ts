@@ -126,14 +126,22 @@ class ApiFetch {
 
   patch = async <TResponse>(
     url = '',
-    data: DirtLeagueModel<unknown>,
+    data: DirtLeagueModel<unknown> | Record<string, unknown>,
     queryParams = {}
   ): Promise<TResponse | null> => {
+    let body = {};
+
+    if (data instanceof DirtLeagueModel) {
+      body = data.toJson();
+    } else {
+      body = data;
+    }
+
     const response = await fetch(
       buildUrl(ApiFetch.getBaseUrl(), url, queryParams),
       buildRequestOptions(this.jwt, {
         method: 'PATCH',
-        body: JSON.stringify(data?.toJson() || {}),
+        body: JSON.stringify(body || {}),
       })
     );
 
