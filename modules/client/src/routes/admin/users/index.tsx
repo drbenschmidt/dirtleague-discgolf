@@ -5,168 +5,15 @@ import {
   useState,
   useMemo,
   memo,
-  FormEvent,
-  useRef,
 } from 'react';
-import {
-  Table,
-  Checkbox,
-  CheckboxProps,
-  Form,
-  Button,
-} from 'semantic-ui-react';
-import { UserModel, Role } from '@dirtleague/common';
+import { Form, Segment } from 'semantic-ui-react';
+import { UserModel } from '@dirtleague/common';
 import UserDropdown from '../../../components/selection/user-dropdown';
-import PlayerSelect from '../../../components/selection/player-select';
 import useRequest from '../../../hooks/useRequest';
 import RepositoryServices from '../../../data-access/repository-services';
-import { useRepositoryServices } from '../../../data-access/context';
-import IfAdmin from '../../../components/auth/if-admin';
-
-interface SetPasswordProps {
-  model: UserModel;
-}
-
-const SetPassword = (props: SetPasswordProps): ReactElement => {
-  const { model } = props;
-  const passwordRef = useRef<string>();
-  const services = useRepositoryServices();
-
-  const onClick = useCallback(() => {
-    if (passwordRef.current) {
-      services.users.updatePassword(model.id, passwordRef.current);
-    }
-  }, [model.id, services.users]);
-
-  const onChange = useCallback((event, data) => {
-    const { value } = data;
-
-    passwordRef.current = value;
-  }, []);
-
-  return (
-    <Form>
-      <Form.Group>
-        <Form.Input
-          label="Enter Password to set"
-          onChange={onChange}
-          action={<Button onClick={onClick}>Update</Button>}
-        />
-      </Form.Group>
-    </Form>
-  );
-};
-
-const StatefulCheckbox = (props: CheckboxProps): ReactElement => {
-  const { checked: parentChecked, onChange: parentOnChanged, ...rest } = props;
-  const [checked, setChecked] = useState(parentChecked);
-  const onChange = useCallback(
-    (event, data) => {
-      setChecked(prev => !prev);
-      parentOnChanged?.(event, data);
-    },
-    [parentOnChanged]
-  );
-
-  return <Checkbox {...rest} checked={checked} onChange={onChange} />;
-};
-
-const getRoles = (): [name: string, id: Role][] => {
-  const entries = Object.entries(Role);
-
-  return entries.slice(entries.length / 2) as [name: string, id: Role][];
-};
-
-const isBannedRole = (role: Role) => [Role.User].includes(role);
-
-interface UserRolesEditorProps {
-  model: UserModel;
-}
-
-const UserRolesEditor = (props: UserRolesEditorProps): ReactElement | null => {
-  const { model } = props;
-  const services = useRepositoryServices();
-
-  const hasRole = (roleId: string | Role) =>
-    model.roles.includes(roleId as number);
-
-  const onRoleChange = useCallback(
-    (event: FormEvent<HTMLInputElement>, data: CheckboxProps) => {
-      const { checked, roleId } = data;
-
-      if (checked) {
-        services.users.addRole(model.id, roleId);
-      } else {
-        services.users.removeRole(model.id, roleId);
-      }
-    },
-    [model.id, services.users]
-  );
-
-  return (
-    <Table celled padded>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>Role Name</Table.HeaderCell>
-          <Table.HeaderCell>Granted</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {getRoles().map(([name, role]) => {
-          return (
-            <Table.Row key={role}>
-              <Table.Cell>{name}</Table.Cell>
-              <Table.Cell>
-                <StatefulCheckbox
-                  disabled={isBannedRole(role)}
-                  slider
-                  checked={hasRole(role)}
-                  roleId={role}
-                  onChange={onRoleChange}
-                />
-              </Table.Cell>
-            </Table.Row>
-          );
-        })}
-      </Table.Body>
-    </Table>
-  );
-};
-
-interface UserProfileMapperProps {
-  model: UserModel;
-}
-
-const UserProfileMapper = (
-  props: UserProfileMapperProps
-): ReactElement | null => {
-  const { model } = props;
-  const profileIdRef = useRef(model.playerId);
-  const services = useRepositoryServices();
-
-  const onChange = useCallback((event, value) => {
-    profileIdRef.current = value;
-  }, []);
-
-  const onClick = useCallback(() => {
-    if (profileIdRef.current) {
-      services.users.patch(model.id, { playerId: profileIdRef.current });
-    }
-  }, [model.id, services.users]);
-
-  return (
-    <Form onSubmit={() => {}}>
-      <Form.Group>
-        <PlayerSelect
-          value={model.playerId}
-          label="Player Profile"
-          onChange={onChange}
-        />
-        <Button onClick={onClick}>Update</Button>
-      </Form.Group>
-    </Form>
-  );
-};
+import UserProfileMapper from './user-profile-mapper';
+import SetPassword from './set-password';
+import UserRolesEditor from './user-roles-editor';
 
 const UserProfileHOC = (props: any): ReactElement | null => {
   const { userId } = props;
@@ -185,15 +32,11 @@ const UserProfileHOC = (props: any): ReactElement | null => {
   useRequest<UserModel>(query);
 
   return (
-    <>
+    <Segment>
       {userData && <UserProfileMapper model={userData} />}
-      {userData && (
-        <IfAdmin>
-          <SetPassword model={userData} />
-        </IfAdmin>
-      )}
+      {userData && <SetPassword model={userData} />}
       {userData && <UserRolesEditor model={userData} />}
-    </>
+    </Segment>
   );
 };
 
@@ -208,8 +51,9 @@ const AdminUsers = (): ReactElement => {
 
   return (
     <>
-      <div>ADMIN USERS</div>
-      <UserDropdown onChange={onUserSelect} label="User Email" />
+      <Form>
+        <UserDropdown onChange={onUserSelect} label="User Email" />
+      </Form>
       {userId && <UserProfileHOC userId={userId} key={userId} />}
     </>
   );
