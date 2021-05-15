@@ -1,6 +1,6 @@
-/* eslint-disable class-methods-use-this */
-import { Queryable, sql } from '@databases/mysql';
-import { EntityTable } from './entity-table';
+import { sql } from '@databases/mysql';
+import { keys } from 'ts-transformer-keys';
+import { Table } from './entity-table';
 
 export interface DbCourseLayout {
   id?: number;
@@ -10,61 +10,13 @@ export interface DbCourseLayout {
   par?: number;
 }
 
-class CourseLayoutsTable implements EntityTable<DbCourseLayout> {
-  db: Queryable;
-
-  constructor(db: Queryable) {
-    this.db = db;
+class CourseLayoutsTable extends Table<DbCourseLayout> {
+  get columns(): Array<keyof DbCourseLayout> {
+    return keys<DbCourseLayout>();
   }
 
-  async create(model: DbCourseLayout): Promise<number> {
-    const [result] = await this.db.query(sql`
-      INSERT INTO courseLayouts (name, courseId, dgcrSse, par)
-      VALUES (${model.name}, ${model.courseId}, ${model.dgcrSse}, ${model.par});
-
-      SELECT LAST_INSERT_ID();
-    `);
-
-    // eslint-disable-next-line no-param-reassign
-    const id = result['LAST_INSERT_ID()'] as number;
-
-    return id;
-  }
-
-  async update(model: DbCourseLayout): Promise<void> {
-    await this.db.query(sql`
-      UPDATE courseLayouts
-      SET name=${model.name}, dgcrSse=${model.dgcrSse}, par=${model.par}
-      WHERE id=${model.id}
-    `);
-  }
-
-  async delete(id: number): Promise<void> {
-    await this.db.query(sql`
-      DELETE FROM courseLayouts
-      WHERE id=${id}
-    `);
-  }
-
-  async get(id: number): Promise<DbCourseLayout> {
-    const [entity] = await this.db.query(sql`
-      SELECT * FROM courseLayouts
-      WHERE id=${id}
-    `);
-
-    if (entity) {
-      return entity;
-    }
-
-    return null;
-  }
-
-  async getAll(): Promise<DbCourseLayout[]> {
-    const entities = await this.db.query(sql`
-      SELECT * FROM courseLayouts
-    `);
-
-    return entities;
+  get tableName(): string {
+    return 'courseLayouts';
   }
 
   async getAllForCourse(id: number): Promise<DbCourseLayout[]> {

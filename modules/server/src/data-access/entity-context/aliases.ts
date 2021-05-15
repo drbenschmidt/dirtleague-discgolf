@@ -1,6 +1,6 @@
-/* eslint-disable class-methods-use-this */
-import { Queryable, sql } from '@databases/mysql';
-import { EntityTable } from './entity-table';
+import { sql } from '@databases/mysql';
+import { keys } from 'ts-transformer-keys';
+import { Table } from './entity-table';
 
 export interface DbAlias {
   id?: number;
@@ -8,61 +8,13 @@ export interface DbAlias {
   value: string;
 }
 
-class AliasesTable implements EntityTable<DbAlias> {
-  db: Queryable;
-
-  constructor(db: Queryable) {
-    this.db = db;
+class AliasesTable extends Table<DbAlias> {
+  get columns(): Array<keyof DbAlias> {
+    return keys<DbAlias>();
   }
 
-  async create(model: DbAlias): Promise<number> {
-    const [result] = await this.db.query(sql`
-      INSERT INTO aliases (playerId, value)
-      VALUES (${model.playerId}, ${model.value});
-
-      SELECT LAST_INSERT_ID();
-    `);
-
-    // eslint-disable-next-line no-param-reassign
-    const id = result['LAST_INSERT_ID()'] as number;
-
-    return id;
-  }
-
-  async update(model: DbAlias): Promise<void> {
-    await this.db.query(sql`
-      UPDATE aliases
-      SET playerId=${model.playerId}, value=${model.value}
-      WHERE id=${model.id}
-    `);
-  }
-
-  async delete(id: number): Promise<void> {
-    await this.db.query(sql`
-      DELETE FROM aliases
-      WHERE id=${id}
-    `);
-  }
-
-  async get(id: number): Promise<DbAlias> {
-    const [entity] = await this.db.query(sql`
-      SELECT * FROM aliases
-      WHERE id=${id}
-    `);
-
-    if (entity) {
-      return entity;
-    }
-
-    return null;
-  }
-
-  async getAll(): Promise<DbAlias[]> {
-    const entities = await this.db.query(sql`
-      SELECT * FROM aliases
-    `);
-
-    return entities;
+  get tableName(): string {
+    return 'aliases';
   }
 
   async getForPlayerId(playerId: number): Promise<DbAlias[]> {

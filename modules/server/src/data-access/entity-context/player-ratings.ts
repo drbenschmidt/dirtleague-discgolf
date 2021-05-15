@@ -1,7 +1,7 @@
-/* eslint-disable class-methods-use-this */
-import { Queryable, sql } from '@databases/mysql';
+import { sql } from '@databases/mysql';
 import { RatingType } from '@dirtleague/common';
-import { EntityTable } from './entity-table';
+import { keys } from 'ts-transformer-keys';
+import { Table } from './entity-table';
 
 export interface DbPlayerRating {
   id?: number;
@@ -18,61 +18,13 @@ export type RatingTypeResult = {
   personal: number;
 };
 
-class PlayerRatingTable implements EntityTable<DbPlayerRating> {
-  db: Queryable;
-
-  constructor(db: Queryable) {
-    this.db = db;
+class PlayerRatingTable extends Table<DbPlayerRating> {
+  get columns(): Array<keyof DbPlayerRating> {
+    return keys<DbPlayerRating>();
   }
 
-  async create(model: DbPlayerRating): Promise<number> {
-    const [result] = await this.db.query(sql`
-      INSERT INTO playerRatings (playerId, cardId, date, rating, type)
-      VALUES (${model.playerId}, ${model.cardId}, ${model.date}, ${model.rating}, ${model.type});
-
-      SELECT LAST_INSERT_ID();
-    `);
-
-    // eslint-disable-next-line no-param-reassign
-    const id = result['LAST_INSERT_ID()'] as number;
-
-    return id;
-  }
-
-  async update(model: DbPlayerRating): Promise<void> {
-    await this.db.query(sql`
-      UPDATE playerRatings
-      SET playerId=${model.playerId}, cardId=${model.cardId}, date=${model.date}, rating=${model.rating}, type=${model.type}
-      WHERE id=${model.id}
-    `);
-  }
-
-  async delete(id: number): Promise<void> {
-    await this.db.query(sql`
-      DELETE FROM playerRatings
-      WHERE id=${id}
-    `);
-  }
-
-  async get(id: number): Promise<DbPlayerRating> {
-    const [entity] = await this.db.query(sql`
-      SELECT * FROM playerRatings
-      WHERE id=${id}
-    `);
-
-    if (entity) {
-      return entity;
-    }
-
-    return null;
-  }
-
-  async getAll(): Promise<DbPlayerRating[]> {
-    const entities = await this.db.query(sql`
-      SELECT * FROM playerRatings
-    `);
-
-    return entities;
+  get tableName(): string {
+    return 'playerRatings';
   }
 
   async getForCardId(cardId: number): Promise<DbPlayerRating[]> {

@@ -4,7 +4,22 @@ export const isEmptyQuery = (query: SQLQuery): boolean =>
   // eslint-disable-next-line no-underscore-dangle,@typescript-eslint/no-explicit-any
   (query as any)._items.length === 0;
 
-const validTableNames = ['users'];
+const validTableNames = [
+  'aliases',
+  'cards',
+  'courseHoles',
+  'courseLayouts',
+  'courses',
+  'events',
+  'playerGroupPlayers',
+  'playerGroupResults',
+  'playerRatings',
+  'players',
+  'rounds',
+  'seasons',
+  'userRoles',
+  'users',
+];
 
 export const getTableName = (tableName: string): SQLQuery => {
   if (!validTableNames.includes(tableName)) {

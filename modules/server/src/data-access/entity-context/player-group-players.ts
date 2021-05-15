@@ -1,63 +1,19 @@
-/* eslint-disable class-methods-use-this */
-import { Queryable, sql } from '@databases/mysql';
-import { EntityTable } from './entity-table';
+import { sql } from '@databases/mysql';
+import { keys } from 'ts-transformer-keys';
+import { JoinTable } from './entity-table';
 
 export interface DbPlayerGroupPlayer {
   playerGroupId?: number;
   playerId?: number;
 }
 
-// TODO: Don't extend Repository<TDBModel> for join tables.
-class PlayerGroupPlayersTable implements EntityTable<DbPlayerGroupPlayer> {
-  db: Queryable;
-
-  constructor(db: Queryable) {
-    this.db = db;
+class PlayerGroupPlayersTable extends JoinTable<DbPlayerGroupPlayer> {
+  get columns(): Array<keyof DbPlayerGroupPlayer> {
+    return keys<DbPlayerGroupPlayer>();
   }
 
-  async create(model: DbPlayerGroupPlayer): Promise<number> {
-    const result = await this.db.query(sql`
-      INSERT INTO playerGroupPlayers (playerGroupId, playerId)
-      VALUES (${model.playerGroupId}, ${model.playerId});
-
-      SELECT LAST_INSERT_ID();
-    `);
-
-    console.log(result);
-
-    // eslint-disable-next-line no-param-reassign
-    const id = ([result] as any)['LAST_INSERT_ID()'] as number;
-
-    return id;
-  }
-
-  async update(model: DbPlayerGroupPlayer): Promise<void> {
-    throw new Error('UPDATE does not work on a JOIN table');
-  }
-
-  async delete(id: number): Promise<void> {
-    throw new Error('delete(id) does not work on a JOIN table');
-  }
-
-  async get(id: number): Promise<DbPlayerGroupPlayer> {
-    const [entity] = await this.db.query(sql`
-      SELECT * FROM playerGroupPlayers
-      WHERE playerGroupId=${id}
-    `);
-
-    if (entity) {
-      return entity;
-    }
-
-    return null;
-  }
-
-  async getAll(): Promise<DbPlayerGroupPlayer[]> {
-    const entities = await this.db.query(sql`
-      SELECT * FROM playerGroupPlayers
-    `);
-
-    return entities;
+  get tableName(): string {
+    return 'playerGroupPlayers';
   }
 
   async getForPlayerGroup(id: number): Promise<DbPlayerGroupPlayer[]> {

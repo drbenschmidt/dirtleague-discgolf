@@ -1,6 +1,7 @@
 /* eslint-disable class-methods-use-this */
-import { Queryable, sql } from '@databases/mysql';
-import { EntityTable } from './entity-table';
+import { sql } from '@databases/mysql';
+import { keys } from 'ts-transformer-keys';
+import { JoinTable } from './entity-table';
 
 export interface DbPlayerGroupResult {
   playerGroupId?: number;
@@ -8,52 +9,15 @@ export interface DbPlayerGroupResult {
   score?: number;
 }
 
-class PlayerGroupResultsTable implements EntityTable<DbPlayerGroupResult> {
-  db: Queryable;
-
-  constructor(db: Queryable) {
-    this.db = db;
+class PlayerGroupResultsTable extends JoinTable<DbPlayerGroupResult> {
+  get columns(): Array<keyof DbPlayerGroupResult> {
+    return keys<DbPlayerGroupResult>();
   }
 
-  async create(model: DbPlayerGroupResult): Promise<number> {
-    const [result] = await this.db.query(sql`
-      INSERT INTO playerGroupResults (playerGroupId, courseHoleId, score)
-      VALUES (${model.playerGroupId}, ${model.courseHoleId}, ${model.score});
-
-      SELECT LAST_INSERT_ID();
-    `);
-
-    // eslint-disable-next-line no-param-reassign
-    const id = result['LAST_INSERT_ID()'] as number;
-
-    return id;
+  get tableName(): string {
+    return 'playerGroupResults';
   }
 
-  async update(model: DbPlayerGroupResult): Promise<void> {
-    throw new Error('Many to Many cant do this.');
-  }
-
-  async delete(id: number): Promise<void> {
-    throw new Error('Many to Many cant do this.');
-  }
-
-  async get(id: number): Promise<DbPlayerGroupResult> {
-    throw new Error('Many to Many cant do this.');
-  }
-
-  async getAll(): Promise<DbPlayerGroupResult[]> {
-    const entities = await this.db.query(sql`
-      SELECT * FROM playerGroupResults
-    `);
-
-    return entities;
-  }
-
-  /*
-  SELECT pgr.*, ch.number FROM `test-db`.playerGroupResults as pgr
-JOIN `test-db`.courseHoles as ch ON pgr.courseHoleId = ch.id
-ORDER BY ch.number ASC
-*/
   async getAllForGroup(playerGroupId: number): Promise<DbPlayerGroupResult[]> {
     const entities = await this.db.query(sql`
       SELECT pgr.*, ch.number as courseHoleNumber FROM playerGroupResults as pgr

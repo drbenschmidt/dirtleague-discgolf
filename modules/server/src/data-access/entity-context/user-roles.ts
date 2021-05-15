@@ -1,32 +1,22 @@
-import { Queryable, sql } from '@databases/mysql';
+import { keys } from 'ts-transformer-keys';
+import { sql } from '@databases/mysql';
 import { asyncForEach } from '@dirtleague/common';
 import type { Roles } from '@dirtleague/common';
+import { JoinTable } from './entity-table';
 
 interface DbUserRole {
   userId: number;
   roleId: Roles;
 }
 
-class UserRolesTable {
-  db: Queryable;
-
-  constructor(db: Queryable) {
-    this.db = db;
+class UserRolesTable extends JoinTable<DbUserRole> {
+  get columns(): Array<keyof DbUserRole> {
+    return keys<DbUserRole>();
   }
 
-  insert = async (model: DbUserRole): Promise<void> => {
-    await this.db.query(sql`
-      INSERT INTO userRoles (userId, roleId)
-      VALUES (${model.userId}, ${model.roleId});
-    `);
-  };
-
-  delete = async (model: DbUserRole): Promise<void> => {
-    await this.db.query(sql`
-      DELETE FROM userRoles
-      WHERE userId=${model.userId} AND roleId=${model.roleId}
-    `);
-  };
+  get tableName(): string {
+    return 'userRoles';
+  }
 
   getByUserId = async (userId: number): Promise<Roles[]> => {
     const roles = await this.db.query(sql`

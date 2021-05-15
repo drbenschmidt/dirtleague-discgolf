@@ -1,7 +1,6 @@
-/* eslint-disable max-classes-per-file */
 import { sql } from '@databases/mysql';
 import { keys } from 'ts-transformer-keys';
-import Table from './table';
+import { Table } from './entity-table';
 
 export interface DbUser {
   id?: number;

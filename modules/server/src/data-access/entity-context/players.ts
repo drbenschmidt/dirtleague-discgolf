@@ -1,7 +1,6 @@
-/* eslint-disable class-methods-use-this */
-import { Queryable, sql } from '@databases/mysql';
+import { sql } from '@databases/mysql';
 import { keys } from 'ts-transformer-keys';
-import { EntityTable } from './entity-table';
+import { Table } from './entity-table';
 import { DbCard } from './cards';
 import { DbCourseLayout } from './course-layouts';
 import { DbCourse } from './courses';
@@ -29,72 +28,13 @@ interface FeedModel {
   courseLayout: DbCourseLayout;
 }
 
-class PlayersTable implements EntityTable<DbPlayer> {
-  db: Queryable;
-
-  constructor(db: Queryable) {
-    this.db = db;
+class PlayersTable extends Table<DbPlayer> {
+  get columns(): Array<keyof DbPlayer> {
+    return keys<DbPlayer>();
   }
 
-  async create(model: DbPlayer): Promise<number> {
-    const [result] = await this.db.query(sql`
-      INSERT INTO players (firstName, lastName, currentRating, bio, yearJoined)
-      VALUES (${model.firstName}, ${model.lastName}, ${model.currentRating}, ${model.bio}, ${model.yearJoined});
-
-      SELECT LAST_INSERT_ID();
-    `);
-
-    // eslint-disable-next-line no-param-reassign
-    const id = result['LAST_INSERT_ID()'] as number;
-
-    return id;
-  }
-
-  async update(model: DbPlayer): Promise<void> {
-    await this.db.query(sql`
-      UPDATE players
-      SET
-        firstName=${model.firstName},
-        lastName=${model.lastName},
-        currentRating=${model.currentRating},
-        bio=${model.bio},
-        yearJoined=${model.yearJoined}
-      WHERE id=${model.id}
-    `);
-  }
-
-  async delete(id: number): Promise<void> {
-    await this.db.query(sql`
-      DELETE FROM players
-      WHERE id=${id}
-    `);
-
-    // TODO: Re-learn how to make foreign keys so I can make cascading deletes.
-    await this.db.query(sql`
-      DELETE FROM aliases
-      WHERE playerId=${id}
-    `);
-  }
-
-  async get(id: number): Promise<DbPlayer> {
-    const [entity] = await this.db.query(sql`
-      SELECT * FROM players
-      WHERE id=${id}
-    `);
-
-    if (entity) {
-      return entity;
-    }
-
-    return null;
-  }
-
-  async getAll(): Promise<DbPlayer[]> {
-    const entities = await this.db.query(sql`
-      SELECT * FROM players
-    `);
-
-    return entities;
+  get tableName(): string {
+    return 'players';
   }
 
   async getFeed(id: number): Promise<FeedModel[]> {

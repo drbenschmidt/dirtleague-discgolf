@@ -1,6 +1,6 @@
-/* eslint-disable class-methods-use-this */
-import { Queryable, sql } from '@databases/mysql';
-import { EntityTable } from './entity-table';
+import { sql } from '@databases/mysql';
+import { keys } from 'ts-transformer-keys';
+import { Table } from './entity-table';
 
 export interface DbPlayerGroup {
   id?: number;
@@ -10,61 +10,13 @@ export interface DbPlayerGroup {
   par?: number;
 }
 
-class PlayerGroupsTable implements EntityTable<DbPlayerGroup> {
-  db: Queryable;
-
-  constructor(db: Queryable) {
-    this.db = db;
+class PlayerGroupsTable extends Table<DbPlayerGroup> {
+  get columns(): Array<keyof DbPlayerGroup> {
+    return keys<DbPlayerGroup>();
   }
 
-  async create(model: DbPlayerGroup): Promise<number> {
-    const [result] = await this.db.query(sql`
-      INSERT INTO playerGroups (teamName, cardId)
-      VALUES (${model.teamName}, ${model.cardId});
-
-      SELECT LAST_INSERT_ID();
-    `);
-
-    // eslint-disable-next-line no-param-reassign
-    const id = result['LAST_INSERT_ID()'] as number;
-
-    return id;
-  }
-
-  async update(model: DbPlayerGroup): Promise<void> {
-    await this.db.query(sql`
-      UPDATE playerGroups
-      SET teamName=${model.teamName}, cardId=${model.cardId}, score=${model.score}, par=${model.par}
-      WHERE id=${model.id}
-    `);
-  }
-
-  async delete(id: number): Promise<void> {
-    await this.db.query(sql`
-      DELETE FROM playerGroups
-      WHERE id=${id}
-    `);
-  }
-
-  async get(id: number): Promise<DbPlayerGroup> {
-    const [entity] = await this.db.query(sql`
-      SELECT * FROM playerGroups
-      WHERE id=${id}
-    `);
-
-    if (entity) {
-      return entity;
-    }
-
-    return null;
-  }
-
-  async getAll(): Promise<DbPlayerGroup[]> {
-    const entities = await this.db.query(sql`
-      SELECT * FROM playerGroups
-    `);
-
-    return entities;
+  get tableName(): string {
+    return 'playerGroups';
   }
 
   async getForCard(id: number): Promise<DbPlayerGroup[]> {
