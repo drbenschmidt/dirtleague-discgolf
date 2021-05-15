@@ -216,7 +216,7 @@ const buildRoute = (services: EntityContext): Router => {
             `${player.firstName.toLowerCase()} ${player.lastName.toLowerCase()}`
           );
 
-          const aliases = await services.aliases.getForUserId(player.id);
+          const aliases = await services.aliases.getForPlayerId(player.id);
 
           possibleNames.push(...aliases.map(a => a.value.toLowerCase()));
         });

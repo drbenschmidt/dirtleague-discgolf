@@ -1,15 +1,15 @@
 import { PlayerModel, asyncForEach, Roles } from '@dirtleague/common';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
-import { RequestWithToken, requireRoles } from '../auth/handler';
+import { DirtLeagueRequest, requireRoles } from '../auth/handler';
 import { DbAlias } from '../data-access/entity-context/aliases';
+import withRepositoryServices from '../http/withRepositoryServices';
 import EntityContext from '../data-access/entity-context';
-import getCrud from '../utils/getCrud';
 
-const buildRoute = (services: EntityContext): Router => {
+const buildRoute = (): Router => {
   const router = express.Router();
 
-  const isUserEditingOwn = (req: RequestWithToken) => {
+  const isUserEditingOwn = (req: DirtLeagueRequest) => {
     const { id } = req.params;
     const { user } = req;
 
@@ -19,6 +19,7 @@ const buildRoute = (services: EntityContext): Router => {
   router.get(
     '/',
     withTryCatch(async (req, res) => {
+      const services = EntityContext.CreateFromPool();
       const users = await services.profiles.getAll();
 
       res.json(users);
@@ -28,6 +29,7 @@ const buildRoute = (services: EntityContext): Router => {
   router.get(
     '/:id',
     withTryCatch(async (req, res) => {
+      const services = EntityContext.CreateFromPool();
       const { id } = req.params;
       const { include } = req.query;
       const playerId = parseInt(id, 10);
@@ -39,7 +41,7 @@ const buildRoute = (services: EntityContext): Router => {
 
       // TODO: parse it and check for entity types.
       if (include && entity) {
-        const aliases = await services.aliases.getForUserId(playerId);
+        const aliases = await services.aliases.getForPlayerId(playerId);
 
         (entity as any).aliases = aliases;
 
@@ -64,6 +66,7 @@ const buildRoute = (services: EntityContext): Router => {
   router.get(
     '/:id/feed',
     withTryCatch(async (req, res) => {
+      const services = EntityContext.CreateFromPool();
       const { id } = req.params;
       const playerId = parseInt(id, 10);
       const entity = await services.profiles.getFeed(playerId);
@@ -80,6 +83,7 @@ const buildRoute = (services: EntityContext): Router => {
     '/',
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
+      const services = EntityContext.CreateFromPool();
       const model = new PlayerModel(req.body);
       const newId = await services.profiles.create(model);
 
@@ -111,6 +115,7 @@ const buildRoute = (services: EntityContext): Router => {
     '/:id',
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
+      const services = EntityContext.CreateFromPool();
       const { id } = req.params;
 
       await services.profiles.delete(parseInt(id, 10));
@@ -122,36 +127,21 @@ const buildRoute = (services: EntityContext): Router => {
   router.patch(
     '/:id',
     requireRoles([Roles.Admin], isUserEditingOwn),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
-      // TODO: Technically, this should be a transaction.
-      const body = req.body as PlayerModel;
+      const { services, body } = req;
+      const model = new PlayerModel(body);
 
-      await services.profiles.update(body);
+      await services.tx(async transaction => {
+        await transaction.players.update(model);
 
-      if (body.aliases) {
-        const requestAliases = Array.from(body.aliases);
-        const dbAliases = await services.aliases.getForUserId(body.id);
-
-        const [aliasesToCreate, aliasesToUpdate, aliasesToDelete] = getCrud(
-          requestAliases,
-          dbAliases
-        );
-
-        await asyncForEach(aliasesToCreate, async alias => {
-          // eslint-disable-next-line no-param-reassign
-          alias.playerId = body.id;
-
-          await services.aliases.create(alias);
-        });
-
-        await asyncForEach(aliasesToUpdate, async alias => {
-          await services.aliases.update(alias);
-        });
-
-        await asyncForEach(aliasesToDelete, async alias => {
-          await services.aliases.delete(alias.id);
-        });
-      }
+        if (model.aliases) {
+          await transaction.aliases.updateForPlayer(
+            model.id,
+            model.aliases.toArray()
+          );
+        }
+      });
 
       res.json(null);
     })
