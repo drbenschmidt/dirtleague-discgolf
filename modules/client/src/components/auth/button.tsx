@@ -17,7 +17,7 @@ const defaultModel = new AuthModel({ email: '', password: '' });
 const AuthButton = (props: AuthButtonProps) => {
   const { fixed } = props;
   const history = useHistory();
-  const passwordInputRef = useRef<HTMLElement>();
+  const passwordInputRef = useRef<HTMLElement>(null);
   const context = useAuthContext();
   const [isAuthenticated, setIsAuthenticated] = useState(
     // eslint-disable-next-line react/destructuring-assignment

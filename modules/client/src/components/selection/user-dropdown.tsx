@@ -1,15 +1,18 @@
 import { UserModel } from '@dirtleague/common';
-import { ReactElement, useCallback, memo } from 'react';
+import { ReactElement, useCallback, memo, SyntheticEvent } from 'react';
 import { useRepositoryServices } from '../../data-access/context';
-import EntitySearch from '../forms/entity-search';
+import EntitySearch, { EntitySearchValue } from '../forms/entity-search';
 
-export interface PlayerSelectProps {
-  onChange: (event: any, value: any) => void;
-  value?: any;
+export interface UserDropdownProps {
+  onChange: (
+    event: SyntheticEvent<HTMLElement, Event>,
+    data: EntitySearchValue
+  ) => void;
+  value?: EntitySearchValue;
   [key: string]: unknown;
 }
 
-const UserDropdown = (props: PlayerSelectProps): ReactElement => {
+const UserDropdown = (props: UserDropdownProps): ReactElement => {
   const { onChange, value, ...rest } = props;
   const services = useRepositoryServices();
 

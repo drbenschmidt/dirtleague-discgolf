@@ -26,14 +26,19 @@
     -->
     <title>Dirt League</title>
     <script>
-      const configEncoded = "\<\%= CONFIG_STRING \%\>";
-      const configRaw = decodeURIComponent(configEncoded);
       try {
-        window.dirtConfig = JSON.parse(configRaw);
+        const configEncoded = "\<\%= CONFIG_STRING \%\>";
+
+        if (configEncoded.length !== 20) {
+          const configRaw = decodeURIComponent(configEncoded);
+      
+          window.dirtConfig = JSON.parse(configRaw);
+        }
       } catch (e) { console.error(e) }
     </script>
   </head>
-  <body id="root">
+  <body>
+    <div id="root"></div>
     <noscript>You need to enable JavaScript to run this app.</noscript>
   </body>
 </html>

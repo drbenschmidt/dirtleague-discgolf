@@ -18,7 +18,7 @@ const defaultModel = new SignUpModel();
 const SignUpButton = (props: AuthButtonProps) => {
   const { fixed } = props;
   const history = useHistory();
-  const passwordInputRef = useRef<HTMLElement>();
+  const passwordInputRef = useRef<HTMLElement>(null);
   const context = useAuthContext();
   const [isAuthenticated, setIsAuthenticated] = useState(
     // eslint-disable-next-line react/destructuring-assignment
@@ -64,15 +64,6 @@ const SignUpButton = (props: AuthButtonProps) => {
   const password2Binding = useInputBinding(model, 'password2');
   const firstNameBinding = useInputBinding(model, 'firstName');
   const lastNameBinding = useInputBinding(model, 'lastName');
-
-  const onEnterPress = useCallback(
-    event => {
-      if (event.keyCode === 13) {
-        submitOnClick();
-      }
-    },
-    [submitOnClick]
-  );
 
   if (isAuthenticated) {
     return null;

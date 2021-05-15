@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { PropsWithChildren, ReactElement, useContext } from 'react';
 import NotificationsManager from '../../managers/notifications';
 
 export const notificationsManagerInstance = new NotificationsManager();
@@ -15,7 +15,9 @@ export const useNotificationsContext = (): NotificationsManager => {
   return value;
 };
 
-export const NotificationsProvider = (props: any) => {
+export const NotificationsProvider = (
+  props: PropsWithChildren<unknown>
+): ReactElement => {
   const { children } = props;
 
   return (

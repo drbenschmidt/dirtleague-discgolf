@@ -1,6 +1,14 @@
-import React, { useRef, useCallback, useMemo, ChangeEvent } from 'react';
+import React, {
+  useRef,
+  useCallback,
+  useMemo,
+  ChangeEvent,
+  SyntheticEvent,
+  RefObject,
+} from 'react';
 import { InputOnChangeData } from 'semantic-ui-react';
-import { Cloneable, deepClone } from '@dirtleague/common';
+import { Cloneable, deepClone, get, set } from '@dirtleague/common';
+import { EntitySearchValue } from '../components/forms/entity-search';
 
 export interface Transaction<TModel> {
   model: React.RefObject<TModel>;
@@ -15,9 +23,17 @@ export interface InputBinding {
   value: string;
 }
 
-export interface DateBinding {
-  onChange: (value: Date) => void;
+export interface SelectBinding {
+  onChange: (
+    event: SyntheticEvent<HTMLElement, Event>,
+    data: EntitySearchValue
+  ) => void;
   value: string;
+}
+
+export interface DateBinding {
+  onChange: (value: Date | Date[] | null | undefined) => void;
+  value: Date | Date[] | null | undefined;
 }
 
 function orDefault<T>(obj: T) {
@@ -43,61 +59,53 @@ export const useTransaction = <TModel extends Cloneable<TModel>>(
   };
 };
 
-export const useInputBinding = <TModel extends Record<string, any> | undefined>(
-  modelRef: React.RefObject<TModel>,
+export const useInputBinding = <TModel>(
+  modelRef: RefObject<TModel>,
   propName: string
 ): InputBinding => {
-  const originalValue = (modelRef.current as any)[propName];
+  const originalValue = get<string>(modelRef.current, propName);
 
   const onChange = useCallback(
     (_event, { value }) => {
-      // TODO: Figure out how to get TS to like this.
-      // eslint-disable-next-line no-param-reassign
-      (modelRef.current as any)[propName] = value;
+      set(modelRef.current, propName, value);
     },
     [modelRef, propName]
   );
 
   return {
     onChange,
-    value: originalValue,
+    value: originalValue ?? '',
   };
 };
 
-export const useSelectBinding = <
-  TModel extends Record<string, any> | undefined
->(
-  modelRef: React.RefObject<TModel>,
+export const useSelectBinding = <TModel>(
+  modelRef: RefObject<TModel>,
   propName: string
-): InputBinding => {
-  const originalValue = (modelRef.current as any)[propName];
+): SelectBinding => {
+  const originalValue = get<string>(modelRef.current, propName);
 
   const onChange = useCallback(
-    (_event, value) => {
-      // TODO: Figure out how to get TS to like this.
-      // eslint-disable-next-line no-param-reassign
-      (modelRef.current as any)[propName] = value;
+    (event: SyntheticEvent<HTMLElement, Event>, value: EntitySearchValue) => {
+      set(modelRef.current, propName, value);
     },
     [modelRef, propName]
   );
 
   return {
     onChange,
-    value: originalValue,
+    value: originalValue ?? '',
   };
 };
 
-export const useDateBinding = <TModel extends Record<string, any> | undefined>(
-  modelRef: React.RefObject<TModel>,
+export const useDateBinding = <TModel>(
+  modelRef: RefObject<TModel>,
   propName: string
 ): DateBinding => {
-  const originalValue = (modelRef.current as any)[propName];
+  const originalValue = get<Date>(modelRef.current, propName);
 
   const onChange = useCallback(
-    (value: Date) => {
-      // TODO: Figure out how to get TS to like this.
-      // eslint-disable-next-line no-param-reassign
-      (modelRef.current as any)[propName] = value;
+    (value: Date | Date[] | null | undefined) => {
+      set(modelRef.current, propName, value);
     },
     [modelRef, propName]
   );

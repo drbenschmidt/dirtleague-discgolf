@@ -1,8 +1,24 @@
-import { ReactElement, useCallback, useState } from 'react';
-import { Form } from 'semantic-ui-react';
+import { memo, ReactElement, useCallback, useState, useMemo } from 'react';
+import { DropdownItemProps, DropdownProps, Form } from 'semantic-ui-react';
 
-const SelectInput = (props: any): ReactElement => {
-  const { value: originalValue, onChange: parentOnChange, ...rest } = props;
+export interface SelectInputProps {
+  value: boolean | number | string | (boolean | number | string)[];
+  onChange: (
+    event: React.SyntheticEvent<HTMLElement>,
+    data: DropdownProps
+  ) => void;
+  options: DropdownItemProps[];
+  label?: string;
+  dropdownProps?: DropdownProps;
+}
+
+const SelectInput = (props: SelectInputProps): ReactElement => {
+  const {
+    value: originalValue,
+    onChange: parentOnChange,
+    label,
+    dropdownProps,
+  } = props;
   const [value, setValue] = useState(originalValue);
 
   const onChange = useCallback(
@@ -13,13 +29,17 @@ const SelectInput = (props: any): ReactElement => {
     [parentOnChange]
   );
 
-  const controlProps = {
-    ...rest,
-    value,
-    onChange,
-  };
+  const controlProps = useMemo(
+    () => ({
+      ...dropdownProps,
+      label,
+      value,
+      onChange,
+    }),
+    [dropdownProps, label, onChange, value]
+  );
 
   return <Form.Dropdown selection {...controlProps} />;
 };
 
-export default SelectInput;
+export default memo(SelectInput);

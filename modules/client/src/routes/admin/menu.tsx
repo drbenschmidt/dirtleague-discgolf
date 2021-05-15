@@ -2,7 +2,12 @@ import { Menu } from 'semantic-ui-react';
 import { Link, useRouteMatch } from 'react-router-dom';
 import { ReactElement } from 'react';
 
-const AdminMenuLink = (props: any): ReactElement => {
+interface AdminMenuLinkProps {
+  to: string;
+  text: string;
+}
+
+const AdminMenuLink = (props: AdminMenuLinkProps): ReactElement => {
   const { to, text } = props;
 
   const match = useRouteMatch({
@@ -24,8 +29,8 @@ const AdminMenu = (): ReactElement => {
 
   return (
     <Menu vertical size="small">
-      <AdminMenuLink to={`${path}`} name="dashboard" text="Dashboard" />
-      <AdminMenuLink to={`${path}/users`} name="users" text="Users" />
+      <AdminMenuLink to={`${path}`} text="Dashboard" />
+      <AdminMenuLink to={`${path}/users`} text="Users" />
     </Menu>
   );
 };

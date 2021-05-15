@@ -11,6 +11,8 @@ export { default as clamper } from './utils/clamper';
 export { default as getHtmlInput } from './utils/getHtmlInput';
 export { default as filledArray } from './utils/filledArray';
 export { default as sum } from './utils/sum';
+export { default as get } from './utils/get';
+export { default as set } from './utils/set';
 
 export { default as Roles } from './security/roles';
 export { default as Role } from './security/roles';

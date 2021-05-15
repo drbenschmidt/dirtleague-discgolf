@@ -6,6 +6,7 @@ import { Tab, Button, Menu, Label, Icon } from 'semantic-ui-react';
 export interface TabCollectionProps<TModel> {
   list?: LinkedList<TModel>;
   modelFactory?: () => TModel;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   TabComponent: (props: any) => ReactElement;
   label?: string;
   mode: 'form' | 'details';

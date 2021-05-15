@@ -1,11 +1,14 @@
 import { PlayerModel } from '@dirtleague/common';
-import { ReactElement, useCallback } from 'react';
+import { ReactElement, SyntheticEvent, useCallback } from 'react';
 import { useRepositoryServices } from '../../data-access/context';
-import EntitySearch from '../forms/entity-search';
+import EntitySearch, { EntitySearchValue } from '../forms/entity-search';
 
 export interface PlayerSelectProps {
-  onChange: (event: any, value: any) => void;
-  value?: any;
+  onChange: (
+    event: SyntheticEvent<HTMLElement, Event>,
+    data: EntitySearchValue
+  ) => void;
+  value: EntitySearchValue;
   [key: string]: unknown;
 }
 

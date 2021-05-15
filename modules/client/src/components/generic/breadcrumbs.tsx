@@ -1,6 +1,7 @@
 import { ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import { Breadcrumb } from 'semantic-ui-react';
+import { get } from '@dirtleague/common';
 
 // eslint-disable-next-line no-useless-escape
 const keyRegex = /\:\w*/g;
@@ -32,7 +33,7 @@ const applyState = (input: string, state?: BreadcrumbState): string => {
   matches.forEach(match => {
     const [accessor] = match;
     const [, key] = accessor.split(':'); // Split? meh.
-    const value = (state as any)[key];
+    const value = get<string>(state, key);
 
     if (value) {
       result = result.replaceAll(accessor, value);

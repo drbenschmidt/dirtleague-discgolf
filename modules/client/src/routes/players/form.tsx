@@ -14,7 +14,11 @@ import Breadcrumbs, {
 import { Players } from '../../links';
 import useModelValidation from '../../hooks/useModelValidation';
 
-const AliasFormRow = (props: any): ReactElement => {
+interface AliasFormRowProps {
+  model: AliasModel;
+}
+
+const AliasFormRow = (props: AliasFormRowProps): ReactElement => {
   const { model } = props;
   const modelRef = useRef(model);
   const bindings = useInputBinding(modelRef, 'value');
@@ -28,7 +32,14 @@ const AliasFormRow = (props: any): ReactElement => {
   );
 };
 
-const PlayerFormComponent = (props: any): ReactElement | null => {
+interface PlayerFormComponentProps {
+  playerModel: PlayerModel;
+  isEditing: boolean;
+}
+
+const PlayerFormComponent = (
+  props: PlayerFormComponentProps
+): ReactElement | null => {
   const { playerModel, isEditing } = props;
   const services = useRepositoryServices();
   const { model } = useTransaction<PlayerModel>(playerModel);
@@ -151,11 +162,7 @@ const PlayerForm = (): ReactElement | null => {
   }
 
   return (
-    <PlayerFormComponent
-      playerModel={playerModel}
-      isEditing={isEditing}
-      services={services}
-    />
+    <PlayerFormComponent playerModel={playerModel} isEditing={isEditing} />
   );
 };
 

@@ -15,7 +15,14 @@ import Breadcrumbs, {
 import { Courses } from '../../../links';
 import useModelValidation from '../../../hooks/useModelValidation';
 
-const CourseFormComponent = (props: any): ReactElement | null => {
+interface CourseFormComponentProps {
+  entityModel: CourseModel;
+  isEditing: boolean;
+}
+
+const CourseFormComponent = (
+  props: CourseFormComponentProps
+): ReactElement | null => {
   const { entityModel, isEditing } = props;
   const services = useRepositoryServices();
   const { model } = useTransaction<CourseModel>(entityModel);
@@ -137,11 +144,7 @@ const CourseForm = (): ReactElement | null => {
   }
 
   return (
-    <CourseFormComponent
-      entityModel={entityModel}
-      isEditing={isEditing}
-      services={services}
-    />
+    <CourseFormComponent entityModel={entityModel} isEditing={isEditing} />
   );
 };
 

@@ -16,7 +16,7 @@ class UsersRepository extends ApiRepository implements Repository<UserModel> {
     return result;
   }
 
-  // eslint-disable-next-line class-methods-use-this
+  // eslint-disable-next-line class-methods-use-this,@typescript-eslint/no-unused-vars
   async create(model: UserModel): Promise<UserModel> {
     throw new Error('UsersRepository.create is not used.');
   }
