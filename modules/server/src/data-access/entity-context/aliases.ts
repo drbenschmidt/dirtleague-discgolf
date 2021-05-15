@@ -65,7 +65,6 @@ class AliasesTable implements EntityTable<DbAlias> {
     return entities;
   }
 
-  // TODO: Update to `getForPlayerId`.
   async getForPlayerId(playerId: number): Promise<DbAlias[]> {
     const entities = await this.db.query(sql`
       SELECT * FROM aliases

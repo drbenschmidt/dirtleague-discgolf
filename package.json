@@ -77,7 +77,8 @@
       "@typescript-eslint/no-unused-vars": [1, { "varsIgnorePattern": "_" }],
       "react/require-default-props": "off",
       "lines-between-class-members": "off",
-      "@typescript-eslint/lines-between-class-members": "off"
+      "@typescript-eslint/lines-between-class-members": "off",
+      "react/static-property-placement": "off"
     }
   },
   "prettier": {
