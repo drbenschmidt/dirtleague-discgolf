@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import { Queryable, sql, SQLQuery } from '@databases/mysql';
+import { Queryable, sql } from '@databases/mysql';
 import { keys } from 'ts-transformer-keys';
 import { EntityTable } from './entity-table';
 import { DbCard } from './cards';
@@ -8,35 +8,7 @@ import { DbCourse } from './courses';
 import { DbPlayerGroup } from './player-groups';
 import { DbPlayerRating } from './player-ratings';
 import { DbRound } from './rounds';
-
-const spliceObject = <TReturn>(obj: any, prefix: string): TReturn => {
-  const newObj = Object.entries(obj)
-    .filter(([key]) => key.startsWith(prefix))
-    .reduce((acc, [key, value]) => {
-      return {
-        ...acc,
-        [key.replace(`${prefix}_`, '')]: value,
-      };
-    }, {});
-
-  return newObj as TReturn;
-};
-
-const buildSelect = (names: string[], prefix: string): SQLQuery => {
-  const fields = names.map(key =>
-    // eslint-disable-next-line no-underscore-dangle
-    sql.__dangerous__rawValue(`${prefix}.${key} as "${prefix}_${key}"`)
-  );
-
-  return sql.join(fields, ', ');
-};
-
-const buildSelects = (kvps: [fields: string[], prefix: string][]): SQLQuery => {
-  return sql.join(
-    kvps.map(([fields, prefix]) => buildSelect(fields, prefix)),
-    ', '
-  );
-};
+import { buildSelects, spliceObject } from '../query-builder/selecting';
 
 interface DbPlayer {
   id?: number;
