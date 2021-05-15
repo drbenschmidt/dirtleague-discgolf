@@ -1,5 +1,5 @@
-import { ConnectionPool, sql } from '@databases/mysql';
-import { Repository } from '../repository';
+import { Queryable, sql } from '@databases/mysql';
+import { EntityTable } from './entity-table';
 
 export interface DbSeason {
   id?: number;
@@ -8,10 +8,10 @@ export interface DbSeason {
   endDate: Date;
 }
 
-class SeasonsRepository implements Repository<DbSeason> {
-  db: ConnectionPool;
+class SeasonsTable implements EntityTable<DbSeason> {
+  db: Queryable;
 
-  constructor(db: ConnectionPool) {
+  constructor(db: Queryable) {
     this.db = db;
   }
 
@@ -66,4 +66,4 @@ class SeasonsRepository implements Repository<DbSeason> {
   }
 }
 
-export default SeasonsRepository;
+export default SeasonsTable;

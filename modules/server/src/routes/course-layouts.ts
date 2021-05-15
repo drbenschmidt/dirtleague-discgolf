@@ -1,11 +1,11 @@
 import { Roles, CourseLayoutModel } from '@dirtleague/common';
 import express, { Router } from 'express';
-import RepositoryServices from '../data-access/repository-services';
+import EntityContext from '../data-access/entity-context';
 import { requireRoles } from '../auth/handler';
 import withTryCatch from '../http/withTryCatch';
-import { DbCourseLayout } from '../data-access/repositories/course-layouts';
+import { DbCourseLayout } from '../data-access/entity-context/course-layouts';
 
-const buildRoute = (services: RepositoryServices): Router => {
+const buildRoute = (services: EntityContext): Router => {
   const router = express.Router();
 
   router.get(

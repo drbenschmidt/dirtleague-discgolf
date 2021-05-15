@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { Roles, UserModel } from '@dirtleague/common';
 import hashPassword from '../crypto/hash';
-import RepositoryServices from '../data-access/repository-services';
+import EntityContext from '../data-access/entity-context';
 import { getDefaultConfigManager } from '../config/manager';
 
 const config = getDefaultConfigManager();
@@ -104,7 +104,7 @@ export const requireRoles = (
 export const authenticate = async (
   email: string,
   password: string,
-  services: RepositoryServices
+  services: EntityContext
 ): Promise<UserModel> => {
   const result = await services.users.getByEmail(email);
 

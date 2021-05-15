@@ -1,4 +1,4 @@
-export interface Repository<TModel> {
+export interface EntityTable<TModel> {
   create(model: TModel): Promise<number>;
   update(model: TModel): Promise<void>;
   delete(id: number): Promise<void>;

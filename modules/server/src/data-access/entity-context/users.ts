@@ -1,4 +1,4 @@
-import { ConnectionPool, sql, SQLQuery } from '@databases/mysql';
+import { Queryable, sql, SQLQuery } from '@databases/mysql';
 import { keys } from 'ts-transformer-keys';
 
 const buildSet = (columnName: string, value: unknown): SQLQuery => {
@@ -31,10 +31,10 @@ export interface DbUser {
   passwordSalt: string;
 }
 
-class UsersRepository {
-  db: ConnectionPool;
+class UsersTable {
+  db: Queryable;
 
-  constructor(db: ConnectionPool) {
+  constructor(db: Queryable) {
     this.db = db;
   }
 
@@ -118,4 +118,4 @@ class UsersRepository {
   };
 }
 
-export default UsersRepository;
+export default UsersTable;

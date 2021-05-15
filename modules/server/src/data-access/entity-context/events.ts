@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
-import { ConnectionPool, sql } from '@databases/mysql';
-import { Repository } from '../repository';
+import { Queryable, sql } from '@databases/mysql';
+import { EntityTable } from './entity-table';
 
 export interface DbEvent {
   id?: number;
@@ -10,10 +10,10 @@ export interface DbEvent {
   startDate: Date;
 }
 
-class EventsRepository implements Repository<DbEvent> {
-  db: ConnectionPool;
+class EventsTable implements EntityTable<DbEvent> {
+  db: Queryable;
 
-  constructor(db: ConnectionPool) {
+  constructor(db: Queryable) {
     this.db = db;
   }
 
@@ -68,4 +68,4 @@ class EventsRepository implements Repository<DbEvent> {
   }
 }
 
-export default EventsRepository;
+export default EventsTable;

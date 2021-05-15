@@ -1,11 +1,11 @@
 import { SeasonModel, Roles } from '@dirtleague/common';
 import express, { Router } from 'express';
-import { DbSeason } from '../data-access/repositories/seasons';
-import RepositoryServices from '../data-access/repository-services';
+import { DbSeason } from '../data-access/entity-context/seasons';
+import EntityContext from '../data-access/entity-context';
 import { requireRoles } from '../auth/handler';
 import withTryCatch from '../http/withTryCatch';
 
-const buildRoute = (services: RepositoryServices): Router => {
+const buildRoute = (services: EntityContext): Router => {
   const router = express.Router();
 
   router.get(

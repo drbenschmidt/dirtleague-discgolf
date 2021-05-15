@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
-import { ConnectionPool, sql } from '@databases/mysql';
-import { Repository } from '../repository';
+import { Queryable, sql } from '@databases/mysql';
+import { EntityTable } from './entity-table';
 
 export interface DbCard {
   id?: number;
@@ -8,10 +8,10 @@ export interface DbCard {
   authorId?: number;
 }
 
-class CardsRepository implements Repository<DbCard> {
-  db: ConnectionPool;
+class CardsTable implements EntityTable<DbCard> {
+  db: Queryable;
 
-  constructor(db: ConnectionPool) {
+  constructor(db: Queryable) {
     this.db = db;
   }
 
@@ -75,4 +75,4 @@ class CardsRepository implements Repository<DbCard> {
   }
 }
 
-export default CardsRepository;
+export default CardsTable;

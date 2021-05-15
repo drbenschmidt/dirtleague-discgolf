@@ -1,8 +1,9 @@
 import { Roles } from '@dirtleague/common';
-import RepositoryServices from './data-access/repository-services';
+import EntityContext from './data-access/entity-context';
+import connectionPool from './data-access/database';
 import hashPassword from './crypto/hash';
 
-const services = new RepositoryServices();
+const services = new EntityContext(connectionPool);
 
 const insertUser = async (email: string, password: string): Promise<void> => {
   const { hash, salt } = await hashPassword(password);

@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
-import { ConnectionPool, sql, SQLQuery } from '@databases/mysql';
+import { Queryable, sql, SQLQuery } from '@databases/mysql';
 import { keys } from 'ts-transformer-keys';
-import { Repository } from '../repository';
+import { EntityTable } from './entity-table';
 import { DbCard } from './cards';
 import { DbCourseLayout } from './course-layouts';
 import { DbCourse } from './courses';
@@ -57,10 +57,10 @@ interface FeedModel {
   courseLayout: DbCourseLayout;
 }
 
-class PlayerRepository implements Repository<DbPlayer> {
-  db: ConnectionPool;
+class PlayersTable implements EntityTable<DbPlayer> {
+  db: Queryable;
 
-  constructor(db: ConnectionPool) {
+  constructor(db: Queryable) {
     this.db = db;
   }
 
@@ -167,4 +167,4 @@ class PlayerRepository implements Repository<DbPlayer> {
   }
 }
 
-export default PlayerRepository;
+export default PlayersTable;

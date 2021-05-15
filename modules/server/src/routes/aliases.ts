@@ -1,11 +1,11 @@
 import { AliasModel, Roles } from '@dirtleague/common';
 import express, { Router } from 'express';
-import { DbAlias } from '../data-access/repositories/aliases';
-import RepositoryServices from '../data-access/repository-services';
+import { DbAlias } from '../data-access/entity-context/aliases';
+import EntityContext from '../data-access/entity-context';
 import { requireRoles } from '../auth/handler';
 import withTryCatch from '../http/withTryCatch';
 
-const buildRoute = (services: RepositoryServices): Router => {
+const buildRoute = (services: EntityContext): Router => {
   const router = express.Router();
 
   router.get(

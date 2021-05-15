@@ -2,12 +2,12 @@ import { asyncForEach, Roles, CourseModel } from '@dirtleague/common';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
-import RepositoryServices from '../data-access/repository-services';
-import { DbCourseLayout } from '../data-access/repositories/course-layouts';
-import { DbCourseHole } from '../data-access/repositories/course-holes';
+import EntityContext from '../data-access/entity-context';
+import { DbCourseLayout } from '../data-access/entity-context/course-layouts';
+import { DbCourseHole } from '../data-access/entity-context/course-holes';
 import getCrud from '../utils/getCrud';
 
-const buildRoute = (services: RepositoryServices): Router => {
+const buildRoute = (services: EntityContext): Router => {
   const router = express.Router();
 
   router.get(

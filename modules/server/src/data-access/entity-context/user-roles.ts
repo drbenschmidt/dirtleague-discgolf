@@ -1,4 +1,4 @@
-import { ConnectionPool, sql } from '@databases/mysql';
+import { Queryable, sql } from '@databases/mysql';
 import { asyncForEach } from '@dirtleague/common';
 import type { Roles } from '@dirtleague/common';
 
@@ -7,10 +7,10 @@ interface DbUserRole {
   roleId: Roles;
 }
 
-class UserRolesRepository {
-  db: ConnectionPool;
+class UserRolesTable {
+  db: Queryable;
 
-  constructor(db: ConnectionPool) {
+  constructor(db: Queryable) {
     this.db = db;
   }
 
@@ -53,4 +53,4 @@ class UserRolesRepository {
   };
 }
 
-export default UserRolesRepository;
+export default UserRolesTable;

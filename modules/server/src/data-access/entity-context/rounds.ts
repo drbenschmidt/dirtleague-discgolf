@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
-import { ConnectionPool, sql } from '@databases/mysql';
-import { Repository } from '../repository';
+import { Queryable, sql } from '@databases/mysql';
+import { EntityTable } from './entity-table';
 
 export interface DbRound {
   id?: number;
@@ -11,10 +11,10 @@ export interface DbRound {
   name?: string;
 }
 
-class RoundsRepository implements Repository<DbRound> {
-  db: ConnectionPool;
+class RoundsTable implements EntityTable<DbRound> {
+  db: Queryable;
 
-  constructor(db: ConnectionPool) {
+  constructor(db: Queryable) {
     this.db = db;
   }
 
@@ -78,4 +78,4 @@ class RoundsRepository implements Repository<DbRound> {
   }
 }
 
-export default RoundsRepository;
+export default RoundsTable;

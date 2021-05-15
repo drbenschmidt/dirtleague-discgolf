@@ -2,11 +2,11 @@ import { PlayerModel, asyncForEach, Roles } from '@dirtleague/common';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { RequestWithToken, requireRoles } from '../auth/handler';
-import { DbAlias } from '../data-access/repositories/aliases';
-import RepositoryServices from '../data-access/repository-services';
+import { DbAlias } from '../data-access/entity-context/aliases';
+import EntityContext from '../data-access/entity-context';
 import getCrud from '../utils/getCrud';
 
-const buildRoute = (services: RepositoryServices): Router => {
+const buildRoute = (services: EntityContext): Router => {
   const router = express.Router();
 
   const isUserEditingOwn = (req: RequestWithToken) => {

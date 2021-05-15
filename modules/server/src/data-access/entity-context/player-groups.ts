@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
-import { ConnectionPool, sql } from '@databases/mysql';
-import { Repository } from '../repository';
+import { Queryable, sql } from '@databases/mysql';
+import { EntityTable } from './entity-table';
 
 export interface DbPlayerGroup {
   id?: number;
@@ -10,10 +10,10 @@ export interface DbPlayerGroup {
   par?: number;
 }
 
-class PlayerGroupsRepository implements Repository<DbPlayerGroup> {
-  db: ConnectionPool;
+class PlayerGroupsTable implements EntityTable<DbPlayerGroup> {
+  db: Queryable;
 
-  constructor(db: ConnectionPool) {
+  constructor(db: Queryable) {
     this.db = db;
   }
 
@@ -77,4 +77,4 @@ class PlayerGroupsRepository implements Repository<DbPlayerGroup> {
   }
 }
 
-export default PlayerGroupsRepository;
+export default PlayerGroupsTable;

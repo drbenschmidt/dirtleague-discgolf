@@ -1,7 +1,7 @@
 /* eslint-disable class-methods-use-this */
-import { ConnectionPool, sql } from '@databases/mysql';
+import { Queryable, sql } from '@databases/mysql';
 import { RatingType } from '@dirtleague/common';
-import { Repository } from '../repository';
+import { EntityTable } from './entity-table';
 
 export interface DbPlayerRating {
   id?: number;
@@ -18,10 +18,10 @@ export type RatingTypeResult = {
   personal: number;
 };
 
-class PlayerRatingRepository implements Repository<DbPlayerRating> {
-  db: ConnectionPool;
+class PlayerRatingTable implements EntityTable<DbPlayerRating> {
+  db: Queryable;
 
-  constructor(db: ConnectionPool) {
+  constructor(db: Queryable) {
     this.db = db;
   }
 
@@ -172,4 +172,4 @@ class PlayerRatingRepository implements Repository<DbPlayerRating> {
   }
 }
 
-export default PlayerRatingRepository;
+export default PlayerRatingTable;

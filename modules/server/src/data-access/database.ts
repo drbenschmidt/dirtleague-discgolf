@@ -6,6 +6,7 @@ const connectionString = config.props.DIRT_API_SQL_STRING;
 
 const debugLoggers = {
   onQueryStart: (_query: any, { text, values }: any) => {
+    // eslint-disable-next-line no-console
     console.log(
       `${new Date().toISOString()} START QUERY ${text} - ${JSON.stringify(
         values
@@ -13,6 +14,7 @@ const debugLoggers = {
     );
   },
   onQueryResults: (_query: any, { text }: any, results: string | any[]) => {
+    // eslint-disable-next-line no-console
     console.log(
       `${new Date().toISOString()} END QUERY   ${text} - ${
         results.length
@@ -20,6 +22,7 @@ const debugLoggers = {
     );
   },
   onQueryError: (_query: any, { text }: any, err: { message: any }) => {
+    // eslint-disable-next-line no-console
     console.log(
       `${new Date().toISOString()} ERROR QUERY ${text} - ${err.message}`
     );

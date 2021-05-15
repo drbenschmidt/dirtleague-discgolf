@@ -6,13 +6,13 @@ import {
   sum,
 } from '@dirtleague/common';
 import express, { Router } from 'express';
-import { DbRound } from '../data-access/repositories/rounds';
-import RepositoryServices from '../data-access/repository-services';
+import { DbRound } from '../data-access/entity-context/rounds';
+import EntityContext from '../data-access/entity-context';
 import { requireRoles } from '../auth/handler';
 import withTryCatch from '../http/withTryCatch';
 import calculateRating from '../utils/calculateRating';
 
-const buildRoute = (services: RepositoryServices): Router => {
+const buildRoute = (services: EntityContext): Router => {
   const router = express.Router();
 
   router.get(

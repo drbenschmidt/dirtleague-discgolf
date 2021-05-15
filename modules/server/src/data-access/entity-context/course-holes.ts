@@ -1,6 +1,6 @@
 /* eslint-disable class-methods-use-this */
-import { ConnectionPool, sql } from '@databases/mysql';
-import { Repository } from '../repository';
+import { Queryable, sql } from '@databases/mysql';
+import { EntityTable } from './entity-table';
 
 export interface DbCourseHole {
   id?: number;
@@ -10,10 +10,10 @@ export interface DbCourseHole {
   courseLayoutId: number;
 }
 
-class CourseHolesRepository implements Repository<DbCourseHole> {
-  db: ConnectionPool;
+class CourseHolesTable implements EntityTable<DbCourseHole> {
+  db: Queryable;
 
-  constructor(db: ConnectionPool) {
+  constructor(db: Queryable) {
     this.db = db;
   }
 
@@ -78,4 +78,4 @@ class CourseHolesRepository implements Repository<DbCourseHole> {
   }
 }
 
-export default CourseHolesRepository;
+export default CourseHolesTable;

@@ -2,11 +2,11 @@ import { PlayerModel, Role, UserModel } from '@dirtleague/common';
 import express, { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import withTryCatch from '../http/withTryCatch';
-import RepositoryServices from '../data-access/repository-services';
+import EntityContext from '../data-access/entity-context';
 import hashPassword from '../crypto/hash';
 import { requireRoles } from '../auth/handler';
 import { getDefaultConfigManager } from '../config/manager';
-import type { DbUser } from '../data-access/repositories/users';
+import type { DbUser } from '../data-access/entity-context/users';
 
 const config = getDefaultConfigManager();
 
@@ -24,7 +24,7 @@ export interface NewUserRequest {
   player: PlayerModel;
 }
 
-const buildRoute = (services: RepositoryServices): Router => {
+const buildRoute = (services: EntityContext): Router => {
   const router = express.Router();
 
   router.get(

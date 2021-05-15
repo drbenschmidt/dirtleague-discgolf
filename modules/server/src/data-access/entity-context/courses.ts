@@ -1,16 +1,16 @@
 /* eslint-disable class-methods-use-this */
-import { ConnectionPool, sql } from '@databases/mysql';
-import { Repository } from '../repository';
+import { Queryable, sql } from '@databases/mysql';
+import { EntityTable } from './entity-table';
 
 export interface DbCourse {
   id?: number;
   name: string;
 }
 
-class CoursesRepository implements Repository<DbCourse> {
-  db: ConnectionPool;
+class CoursesTable implements EntityTable<DbCourse> {
+  db: Queryable;
 
-  constructor(db: ConnectionPool) {
+  constructor(db: Queryable) {
     this.db = db;
   }
 
@@ -65,4 +65,4 @@ class CoursesRepository implements Repository<DbCourse> {
   }
 }
 
-export default CoursesRepository;
+export default CoursesTable;
