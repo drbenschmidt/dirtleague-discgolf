@@ -100,7 +100,7 @@ const CourseFormComponent = (
           list={model.current?.layouts}
           modelFactory={modelFactory}
         />
-        <Form.Button positive content="Submit" />
+        <Form.Button positive content="Submit" style={{ marginTop: '10px' }} />
       </Form>
     </>
   );

@@ -18,6 +18,7 @@ const SelectInput = (props: SelectInputProps): ReactElement => {
     onChange: parentOnChange,
     label,
     dropdownProps,
+    options,
   } = props;
   const [value, setValue] = useState(originalValue);
 
@@ -35,8 +36,9 @@ const SelectInput = (props: SelectInputProps): ReactElement => {
       label,
       value,
       onChange,
+      options,
     }),
-    [dropdownProps, label, onChange, value]
+    [dropdownProps, label, onChange, options, value]
   );
 
   return <Form.Dropdown selection {...controlProps} />;

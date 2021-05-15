@@ -14,6 +14,7 @@ const CourseLengthOptions = [
 
 const Styles = {
   header: { width: '75px' },
+  cell: { width: '75px' },
 };
 
 const CourseLayoutForm = (props: {
@@ -80,7 +81,7 @@ const CourseLayoutForm = (props: {
         >
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell style={Styles.header} key="blank" />
+              <Table.HeaderCell key="blank" style={Styles.cell} />
               {holesArray.map(hole => (
                 <Table.HeaderCell key={hole.cid} style={Styles.header}>
                   {hole.number}
@@ -93,13 +94,23 @@ const CourseLayoutForm = (props: {
             <Table.Row>
               <Table.Cell>Distance</Table.Cell>
               {holesArray.map(hole => (
-                <TableCellInput key={hole.cid} model={hole} name="distance" />
+                <TableCellInput
+                  key={hole.cid}
+                  model={hole}
+                  name="distance"
+                  style={Styles.cell}
+                />
               ))}
             </Table.Row>
             <Table.Row>
               <Table.Cell>Par</Table.Cell>
               {holesArray.map(hole => (
-                <TableCellInput key={hole.cid} model={hole} name="par" />
+                <TableCellInput
+                  key={hole.cid}
+                  model={hole}
+                  name="par"
+                  style={Styles.cell}
+                />
               ))}
             </Table.Row>
           </Table.Body>
