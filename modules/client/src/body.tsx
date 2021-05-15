@@ -1,13 +1,22 @@
-import { ReactElement } from 'react';
-import { Dropdown, Menu, Grid } from 'semantic-ui-react';
+import { PropsWithChildren, ReactElement } from 'react';
+import {
+  Dropdown,
+  Menu,
+  Grid,
+  MenuItemProps,
+  DropdownItemProps,
+} from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
 import AuthButton from './components/auth/button';
 import SignUpButton from './components/sign-up/button';
 import Toaster from './components/notifications/toaster';
 import IfAdmin from './components/auth/if-admin';
 
-export const MenuLink = (props: any): ReactElement => {
+export const MenuLink = (
+  props: PropsWithChildren<MenuItemProps>
+): ReactElement => {
   const { children } = props;
+
   return (
     <Menu.Item as={Link} {...props}>
       {children}
@@ -15,8 +24,11 @@ export const MenuLink = (props: any): ReactElement => {
   );
 };
 
-export const DropdownLink = (props: any): ReactElement => {
+export const DropdownLink = (
+  props: PropsWithChildren<DropdownItemProps>
+): ReactElement => {
   const { children } = props;
+
   return (
     <Dropdown.Item as={Link} {...props}>
       {children}
@@ -36,7 +48,7 @@ export const Footer = (): ReactElement => {
   );
 };
 
-export const Body = (props: any): ReactElement => {
+export const Body = (props: PropsWithChildren<unknown>): ReactElement => {
   const { children } = props;
 
   return (

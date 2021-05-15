@@ -4,21 +4,31 @@ import {
   useCallback,
   useState,
   forwardRef,
+  ForwardedRef,
 } from 'react';
-import { Form, FormFieldProps, Input, Ref } from 'semantic-ui-react';
+import {
+  Form,
+  FormFieldProps,
+  Input,
+  InputOnChangeData,
+  Ref,
+} from 'semantic-ui-react';
 
 export interface TextInputProps extends FormFieldProps {
-  value: any;
-  onChange: (event: any, data: any) => void;
-  control?: any;
+  value: string;
+  onChange: (
+    event: React.ChangeEvent<HTMLInputElement>,
+    data: InputOnChangeData
+  ) => void;
+  control?: unknown;
   type?: string;
   size?: string;
   style?: CSSProperties;
   label?: string;
 }
 
-const TextInput = forwardRef(
-  (props: TextInputProps, ref: any): ReactElement => {
+const TextInput = forwardRef<HTMLElement, TextInputProps>(
+  (props: TextInputProps, ref: ForwardedRef<HTMLElement>): ReactElement => {
     const {
       value: originalValue,
       onChange: parentOnChange,
@@ -28,7 +38,7 @@ const TextInput = forwardRef(
     const [value, setValue] = useState(originalValue);
 
     const onChange = useCallback(
-      (event, data) => {
+      (event: React.ChangeEvent<HTMLInputElement>, data: InputOnChangeData) => {
         const { value: newValue } = data;
         setValue(newValue);
         parentOnChange(event, data);

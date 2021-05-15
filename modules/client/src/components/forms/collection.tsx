@@ -5,7 +5,7 @@ import { LinkedList } from 'linked-list-typescript';
 import DirtLeagueModel from '@dirtleague/common/src/model/dl-model';
 
 interface CollectionProps<TModel> {
-  RowComponent: (props: any) => ReactElement;
+  RowComponent: (props: { model: TModel }) => ReactElement;
   list?: LinkedList<TModel>;
   label: string;
   buttonText: string;

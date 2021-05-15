@@ -1,10 +1,10 @@
 import {
-  BaseSyntheticEvent,
   ReactElement,
   useCallback,
   useState,
   useMemo,
   memo,
+  SyntheticEvent,
 } from 'react';
 import { Form, Segment } from 'semantic-ui-react';
 import { UserModel } from '@dirtleague/common';
@@ -14,8 +14,13 @@ import RepositoryServices from '../../../data-access/repository-services';
 import UserProfileMapper from './user-profile-mapper';
 import SetPassword from './set-password';
 import UserRolesEditor from './user-roles-editor';
+import { EntitySearchValue } from '../../../components/forms/entity-search';
 
-const UserProfileHOC = (props: any): ReactElement | null => {
+interface UserProfileHOCProps {
+  userId: number;
+}
+
+const UserProfileHOC = (props: UserProfileHOCProps): ReactElement | null => {
   const { userId } = props;
   const [userData, setUserData] = useState<UserModel>();
 
@@ -43,8 +48,11 @@ const UserProfileHOC = (props: any): ReactElement | null => {
 const AdminUsers = (): ReactElement => {
   const [userId, setUserId] = useState<number>();
   const onUserSelect = useCallback(
-    (event: BaseSyntheticEvent, selectedUserId: number) => {
-      setUserId(selectedUserId);
+    (
+      event: SyntheticEvent<HTMLElement, Event>,
+      selectedUserId: EntitySearchValue
+    ) => {
+      setUserId(selectedUserId as number);
     },
     []
   );

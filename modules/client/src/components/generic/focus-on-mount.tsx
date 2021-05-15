@@ -1,13 +1,13 @@
-import { useRef, useEffect, ReactElement, MutableRefObject } from 'react';
+import { useRef, useEffect, ReactElement, RefObject } from 'react';
 import { getHtmlInput } from '@dirtleague/common';
 
 export interface FocusOnMountProps {
-  children: (ref: MutableRefObject<HTMLElement | undefined>) => ReactElement;
+  children: (ref: RefObject<HTMLElement>) => ReactElement;
 }
 
 const FocusOnMount = (props: FocusOnMountProps): ReactElement => {
   const { children } = props;
-  const componentRef = useRef<HTMLElement>();
+  const componentRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const element = getHtmlInput(componentRef);

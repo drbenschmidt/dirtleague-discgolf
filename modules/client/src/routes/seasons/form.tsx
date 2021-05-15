@@ -18,8 +18,15 @@ import Breadcrumbs, {
 import { Seasons } from '../../links';
 import useModelValidation from '../../hooks/useModelValidation';
 
-const SeasonFormComponent = (props: any): ReactElement | null => {
-  const { seasonModel, isEditing, services } = props;
+interface SeasonFormComponentProps {
+  seasonModel: SeasonModel;
+  isEditing: boolean;
+}
+
+const SeasonFormComponent = (
+  props: SeasonFormComponentProps
+): ReactElement | null => {
+  const { seasonModel, isEditing } = props;
   const { model } = useTransaction<SeasonModel>(seasonModel);
   const nameBinding = useInputBinding(model, 'name');
   const startDateBinding = useDateBinding(model, 'startDate');
@@ -27,6 +34,7 @@ const SeasonFormComponent = (props: any): ReactElement | null => {
   const [isInFlight, setIsInFlight] = useState(false);
   const history = useHistory();
   const isValid = useModelValidation(model);
+  const services = useRepositoryServices();
 
   const onFormSubmit = useCallback(() => {
     const submit = async () => {
@@ -119,11 +127,7 @@ const SeasonForm = (): ReactElement | null => {
   }
 
   return (
-    <SeasonFormComponent
-      seasonModel={seasonModel}
-      isEditing={isEditing}
-      services={services}
-    />
+    <SeasonFormComponent seasonModel={seasonModel} isEditing={isEditing} />
   );
 };
 

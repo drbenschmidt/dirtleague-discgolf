@@ -46,13 +46,13 @@ const CourseLayoutDetails = (props: {
             <Table.Row>
               <Table.Cell>Distance</Table.Cell>
               {holesArray.map(hole => (
-                <Table.Cell>{hole.distance}</Table.Cell>
+                <Table.Cell key={hole.cid}>{hole.distance}</Table.Cell>
               ))}
             </Table.Row>
             <Table.Row>
               <Table.Cell>Par</Table.Cell>
               {holesArray.map(hole => (
-                <Table.Cell>{hole.par}</Table.Cell>
+                <Table.Cell key={hole.cid}>{hole.par}</Table.Cell>
               ))}
             </Table.Row>
           </Table.Body>

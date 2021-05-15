@@ -4,7 +4,7 @@ import { getConfig } from '../managers/config';
 const buildUrl = (
   baseUrl: string,
   url: string,
-  options?: Record<string, any>
+  options?: string | string[][] | Record<string, string> | URLSearchParams
 ) => {
   const temp = new URL(`api/${url}`, baseUrl);
 
@@ -26,6 +26,7 @@ const defaultRequestOptions = {
   referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const buildRequestOptions = (jwt: string | null, options: any) => {
   const reqOptions = {
     ...defaultRequestOptions,

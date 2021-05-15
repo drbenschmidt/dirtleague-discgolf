@@ -1,19 +1,29 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
-import { memo, useState, useCallback, useMemo } from 'react';
-import { Form } from 'semantic-ui-react';
+import { memo, useState, useCallback, useMemo, SyntheticEvent } from 'react';
+import { DropdownProps, Form } from 'semantic-ui-react';
 
 export interface AsyncSearcherResult {
   text: string;
   value: string | number;
 }
 
+export type EntitySearchValue =
+  | string
+  | number
+  | boolean
+  | undefined
+  | (string | number | boolean)[];
+
 export interface EntitySearchProps {
-  value: any;
+  value: EntitySearchValue;
   searcher: (query: string) => Promise<AsyncSearcherResult[]>;
   label?: string;
-  onChange: (event: any, value: any) => void;
+  onChange: (
+    event: SyntheticEvent<HTMLElement, Event>,
+    data: EntitySearchValue
+  ) => void;
   disabled?: boolean;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const EntitySearch = (props: EntitySearchProps) => {
@@ -40,8 +50,8 @@ const EntitySearch = (props: EntitySearchProps) => {
   );
 
   const onChange = useCallback(
-    (e, data) => {
-      parentOnChange(e, data.value);
+    (event: SyntheticEvent<HTMLElement, Event>, data: DropdownProps) => {
+      parentOnChange(event, data.value);
       setValue(data.value);
     },
     [parentOnChange]
