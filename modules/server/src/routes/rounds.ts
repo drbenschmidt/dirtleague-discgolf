@@ -7,26 +7,31 @@ import {
 } from '@dirtleague/common';
 import express, { Router } from 'express';
 import { DbRound } from '../data-access/entity-context/rounds';
-import EntityContext from '../data-access/entity-context';
 import { requireRoles } from '../auth/handler';
 import withTryCatch from '../http/withTryCatch';
 import calculateRating from '../utils/calculateRating';
+import withRepositoryServices from '../http/withRepositoryServices';
+import toJson from '../utils/toJson';
 
-const buildRoute = (services: EntityContext): Router => {
+const buildRoute = (): Router => {
   const router = express.Router();
 
   router.get(
     '/',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const entities = await services.rounds.getAll();
 
-      res.json(entities);
+      res.json(entities.map(toJson));
     })
   );
 
   router.get(
     '/:id',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
       const entity = await services.rounds.get(parseInt(id, 10));
 
@@ -37,7 +42,9 @@ const buildRoute = (services: EntityContext): Router => {
   router.post(
     '/',
     requireRoles([Roles.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const body = new RoundModel(req.body);
       const newId = await services.rounds.insert(body);
 
@@ -50,7 +57,9 @@ const buildRoute = (services: EntityContext): Router => {
   router.delete(
     '/:id',
     requireRoles([Roles.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
 
       await services.rounds.delete(parseInt(id, 10));
@@ -62,7 +71,9 @@ const buildRoute = (services: EntityContext): Router => {
   router.patch(
     '/:id',
     requireRoles([Roles.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const body = req.body as DbRound;
 
       await services.rounds.update(body);
@@ -75,7 +86,9 @@ const buildRoute = (services: EntityContext): Router => {
   router.get(
     '/:id/complete',
     requireRoles([Roles.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
       const round = await services.rounds.get(parseInt(id, 10));
       const courseLayout = await services.courseLayouts.get(

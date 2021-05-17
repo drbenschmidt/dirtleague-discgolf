@@ -4,7 +4,7 @@ import withTryCatch from '../http/withTryCatch';
 import { DirtLeagueRequest, requireRoles } from '../auth/handler';
 import { DbAlias } from '../data-access/entity-context/aliases';
 import withRepositoryServices from '../http/withRepositoryServices';
-import EntityContext from '../data-access/entity-context';
+import toJson from '../utils/toJson';
 
 const buildRoute = (): Router => {
   const router = express.Router();
@@ -18,18 +18,20 @@ const buildRoute = (): Router => {
 
   router.get(
     '/',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
-      const services = EntityContext.CreateFromPool();
-      const users = await services.profiles.getAll();
+      const { services } = req;
+      const entities = await services.profiles.getAll();
 
-      res.json(users);
+      res.json(entities.map(toJson));
     })
   );
 
   router.get(
     '/:id',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
-      const services = EntityContext.CreateFromPool();
+      const { services } = req;
       const { id } = req.params;
       const { include } = req.query;
       const playerId = parseInt(id, 10);
@@ -65,8 +67,9 @@ const buildRoute = (): Router => {
 
   router.get(
     '/:id/feed',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
-      const services = EntityContext.CreateFromPool();
+      const { services } = req;
       const { id } = req.params;
       const playerId = parseInt(id, 10);
       const entity = await services.profiles.getFeed(playerId);
@@ -82,8 +85,9 @@ const buildRoute = (): Router => {
   router.post(
     '/',
     requireRoles([Roles.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
-      const services = EntityContext.CreateFromPool();
+      const { services } = req;
       const model = new PlayerModel(req.body);
       const newId = await services.profiles.insert(model);
 
@@ -114,8 +118,9 @@ const buildRoute = (): Router => {
   router.delete(
     '/:id',
     requireRoles([Roles.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
-      const services = EntityContext.CreateFromPool();
+      const { services } = req;
       const { id } = req.params;
 
       await services.profiles.delete(parseInt(id, 10));
@@ -135,6 +140,7 @@ const buildRoute = (): Router => {
       await services.tx(async transaction => {
         await transaction.players.update(model);
 
+        // TODO: Move to repository layer.
         if (model.aliases) {
           await transaction.aliases.updateForPlayer(
             model.id,

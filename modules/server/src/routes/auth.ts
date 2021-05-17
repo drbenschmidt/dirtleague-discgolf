@@ -11,10 +11,11 @@ interface RequestWithToken extends Request {
   token: string;
 }
 
-const buildRoute = (services: EntityContext): Router => {
+const buildRoute = (): Router => {
   const router = express.Router();
 
   router.post('/', async (req, res) => {
+    const services = EntityContext.CreateFromPool();
     const { email, password } = req.body;
 
     const user = await authenticate(email, password, services);

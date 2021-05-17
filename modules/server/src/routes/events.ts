@@ -16,6 +16,8 @@ import { DbPlayerGroup } from '../data-access/entity-context/player-groups';
 import { DbPlayerGroupPlayer } from '../data-access/entity-context/player-group-players';
 import getCrud from '../utils/getCrud';
 import parseUDisc from '../utils/parseUdisc';
+import withRepositoryServices from '../http/withRepositoryServices';
+import toJson from '../utils/toJson';
 
 const createRounds = async (
   rounds: RoundModel[],
@@ -66,7 +68,7 @@ const createRounds = async (
   });
 };
 
-const buildRoute = (services: EntityContext): Router => {
+const buildRoute = (): Router => {
   const router = express.Router();
 
   const storage = multer.memoryStorage();
@@ -74,16 +76,20 @@ const buildRoute = (services: EntityContext): Router => {
 
   router.get(
     '/',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const entities = await services.events.getAll();
 
-      res.json(entities);
+      res.json(entities.map(toJson));
     })
   );
 
   router.get(
     '/:id',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
       const { include } = req.query;
       const entity = await services.events.get(parseInt(id, 10));
@@ -159,7 +165,9 @@ const buildRoute = (services: EntityContext): Router => {
   router.post(
     '/',
     requireRoles([Roles.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const model = new EventModel(req.body);
       const newId = await services.events.insert(model);
 
@@ -178,7 +186,9 @@ const buildRoute = (services: EntityContext): Router => {
     '/:id/card/:cardId/upload',
     requireRoles([Roles.Admin]),
     csvUpload.single('csv'),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id, cardId } = req.params;
       const { user } = req;
       const csvData = req.file.buffer.toString('utf8');
@@ -252,7 +262,9 @@ const buildRoute = (services: EntityContext): Router => {
   router.delete(
     '/:id',
     requireRoles([Roles.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
       const entityId = parseInt(id, 10);
 
@@ -265,7 +277,9 @@ const buildRoute = (services: EntityContext): Router => {
   router.patch(
     '/:id',
     requireRoles([Roles.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       // TODO: Technically, this should be a transaction.
       const model = new EventModel(req.body);
 

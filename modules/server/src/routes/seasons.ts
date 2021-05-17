@@ -1,25 +1,30 @@
 import { SeasonModel, Roles } from '@dirtleague/common';
 import express, { Router } from 'express';
 import { DbSeason } from '../data-access/entity-context/seasons';
-import EntityContext from '../data-access/entity-context';
 import { requireRoles } from '../auth/handler';
 import withTryCatch from '../http/withTryCatch';
+import withRepositoryServices from '../http/withRepositoryServices';
+import toJson from '../utils/toJson';
 
-const buildRoute = (services: EntityContext): Router => {
+const buildRoute = (): Router => {
   const router = express.Router();
 
   router.get(
     '/',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
-      const users = await services.seasons.getAll();
+      const { services } = req;
+      const entities = await services.seasons.getAll();
 
-      res.json(users);
+      res.json(entities.map(toJson));
     })
   );
 
   router.get(
     '/:id',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
       const user = await services.seasons.get(parseInt(id, 10));
 
@@ -30,7 +35,9 @@ const buildRoute = (services: EntityContext): Router => {
   router.post(
     '/',
     requireRoles([Roles.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const body = new SeasonModel(req.body);
       const newId = await services.seasons.insert(body);
 
@@ -43,7 +50,9 @@ const buildRoute = (services: EntityContext): Router => {
   router.delete(
     '/:id',
     requireRoles([Roles.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
 
       await services.seasons.delete(parseInt(id, 10));
@@ -55,7 +64,9 @@ const buildRoute = (services: EntityContext): Router => {
   router.patch(
     '/:id',
     requireRoles([Roles.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const body = req.body as DbSeason;
 
       await services.seasons.update(body);

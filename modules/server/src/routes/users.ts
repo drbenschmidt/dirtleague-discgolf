@@ -2,11 +2,12 @@ import { PlayerModel, Role, UserModel } from '@dirtleague/common';
 import express, { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import withTryCatch from '../http/withTryCatch';
-import EntityContext from '../data-access/entity-context';
 import hashPassword from '../crypto/hash';
 import { requireRoles } from '../auth/handler';
 import { getDefaultConfigManager } from '../config/manager';
 import type { DbUser } from '../data-access/entity-context/users';
+import withRepositoryServices from '../http/withRepositoryServices';
+import toJson from '../utils/toJson';
 
 const config = getDefaultConfigManager();
 
@@ -24,22 +25,25 @@ export interface NewUserRequest {
   player: PlayerModel;
 }
 
-const buildRoute = (services: EntityContext): Router => {
+const buildRoute = (): Router => {
   const router = express.Router();
 
   router.get(
     '/',
     requireRoles([Role.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const users = await services.users.getAll();
 
-      res.json(users.map(cleanUser));
+      res.json(users.map(toJson).map(cleanUser));
     })
   );
 
   router.get(
     '/:id',
     requireRoles([Role.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const user = await services.users.get(parseInt(id, 10));
@@ -63,6 +67,7 @@ const buildRoute = (services: EntityContext): Router => {
   // New User Request comes from anonymous.
   router.post(
     '/',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
       const newUserRequest = req.body as NewUserRequest;
 
@@ -121,6 +126,7 @@ const buildRoute = (services: EntityContext): Router => {
   router.delete(
     '/:id',
     requireRoles([Role.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const userId = parseInt(id, 10);
@@ -136,6 +142,7 @@ const buildRoute = (services: EntityContext): Router => {
   router.post(
     '/:id/addRole',
     requireRoles([Role.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const { roleId } = req.body;
@@ -150,6 +157,7 @@ const buildRoute = (services: EntityContext): Router => {
   router.post(
     '/:id/removeRole',
     requireRoles([Role.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const { roleId } = req.body;
@@ -164,6 +172,7 @@ const buildRoute = (services: EntityContext): Router => {
   router.post(
     '/:id/updatePassword',
     requireRoles([Role.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const { password } = req.body;
@@ -185,6 +194,7 @@ const buildRoute = (services: EntityContext): Router => {
   router.patch(
     '/:id',
     requireRoles([Role.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const userId = parseInt(id, 10);
