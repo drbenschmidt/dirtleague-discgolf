@@ -28,6 +28,7 @@ export default class CourseLayoutModel
   implements Cloneable<CourseLayoutModel>, Validatable {
   static defaults = {
     name: 'Default Layout',
+    dgcrSse: 0,
     holes: filledArray(1, 18).map(val => ({
       number: val,
     })) as CourseHoleAttributes[],

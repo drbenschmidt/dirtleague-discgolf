@@ -3,6 +3,7 @@ import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
 import withRepositoryServices from '../http/withRepositoryServices';
+import toJson from '../utils/toJson';
 
 const buildRoute = (): Router => {
   const router = express.Router();
@@ -14,7 +15,7 @@ const buildRoute = (): Router => {
       const { services } = req;
       const users = await services.courses.getAll();
 
-      res.json(users);
+      res.json(users.map(toJson));
     })
   );
 
@@ -31,13 +32,11 @@ const buildRoute = (): Router => {
         res.status(404).json({ error: 'Entity Not Found' });
       }
 
-      // TODO: parse it and check for entity types.
+      // TODO: Move this logic to the repository when it's generalized.
       if (include && entity) {
         const courseLayouts = await services.courseLayouts.getAllForCourse(
           parseInt(id, 10)
         );
-
-        (entity as any).layouts = courseLayouts;
 
         await asyncForEach(courseLayouts, async courseLayout => {
           const holes = await services.courseHoles.getAllForCourseLayout(
@@ -45,11 +44,13 @@ const buildRoute = (): Router => {
           );
 
           // eslint-disable-next-line no-param-reassign
-          (courseLayout as any).holes = holes;
+          (courseLayout as any).attributes.holes = holes.map(toJson);
         });
+
+        (entity as any).attributes.layouts = courseLayouts.map(toJson);
       }
 
-      res.json(entity);
+      res.json(entity.toJson());
     })
   );
 
@@ -69,7 +70,7 @@ const buildRoute = (): Router => {
         parseInt(id, 10)
       );
 
-      res.json(courseLayouts);
+      res.json(courseLayouts.map(toJson));
     })
   );
 
@@ -80,6 +81,8 @@ const buildRoute = (): Router => {
     withTryCatch(async (req, res) => {
       const { services } = req;
       const model = new CourseModel(req.body);
+
+      console.log(model.toJson());
 
       await services.tx(async tx => {
         await tx.courses.insert(model);
