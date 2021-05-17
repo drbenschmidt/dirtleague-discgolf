@@ -30,11 +30,12 @@ export default abstract class Repository<
     await this.entityTable.delete(id);
   };
 
-  get = async (id: number): Promise<TModel> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async get(id: number, includes?: string[]): Promise<TModel> {
     const dbRow = await this.entityTable.get(id);
 
     return this.factory(dbRow);
-  };
+  }
 
   getAll = async (): Promise<TModel[]> => {
     const dbRows = await this.entityTable.getAll();

@@ -1,7 +1,9 @@
 import { CourseLayoutModel, set } from '@dirtleague/common';
+import toJson from '../../utils/toJson';
 import { DbCourseLayout } from '../entity-context/course-layouts';
 import { Table } from '../entity-context/entity-table';
 import Repository from './repository';
+import { getIncludes } from './utils';
 
 class CourseLayoutRepository extends Repository<
   CourseLayoutModel,
@@ -40,6 +42,21 @@ class CourseLayoutRepository extends Repository<
       entity => set(entity, 'courseLayoutId', model.id),
       this.servicesInstance.courseHoles
     );
+  }
+
+  async get(id: number, includes?: string[]): Promise<CourseLayoutModel> {
+    const [myIncludes, nextIncludes] = getIncludes('courseLayout', includes);
+    const model = await super.get(id);
+
+    if (myIncludes.includes('holes')) {
+      const holes = await this.servicesInstance.courseHoles.getAllForCourseLayout(
+        id
+      );
+
+      set(model.attributes, 'holes', holes.map(toJson));
+    }
+
+    return model;
   }
 
   getAllForCourse = async (id: number): Promise<CourseLayoutModel[]> => {

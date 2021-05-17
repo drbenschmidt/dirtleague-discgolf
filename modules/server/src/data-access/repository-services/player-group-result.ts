@@ -15,7 +15,10 @@ class PlayerGroupResultRepository extends JoinRepository<
     return new PlayerGroupResultModel(row);
   }
 
-  async getAllForGroup(id: number): Promise<PlayerGroupResultModel[]> {
+  async getAllForGroup(
+    id: number,
+    includes?: string[]
+  ): Promise<PlayerGroupResultModel[]> {
     const rows = await this.context.playerGroupResults.getAllForGroup(id);
 
     return rows.map(this.factory);

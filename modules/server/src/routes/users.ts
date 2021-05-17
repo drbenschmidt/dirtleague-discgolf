@@ -46,6 +46,7 @@ const buildRoute = (): Router => {
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
+      const { services } = req;
       const user = await services.users.get(parseInt(id, 10));
 
       // TODO: Check to see if we're requesting the player as well.
@@ -69,6 +70,7 @@ const buildRoute = (): Router => {
     '/',
     withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const newUserRequest = req.body as NewUserRequest;
 
       const { hash, salt } = await hashPassword(newUserRequest.user.password);

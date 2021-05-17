@@ -19,6 +19,21 @@ import parseUDisc from '../utils/parseUdisc';
 import withRepositoryServices from '../http/withRepositoryServices';
 import toJson from '../utils/toJson';
 
+const includesMap = {
+  details: [
+    'event.rounds',
+    'round.course',
+    'round.courseLayout',
+    'round.courseLayout.holes',
+    'round.cards',
+    'round.card.playerGroups',
+    'round.card.playerGroup.playerGroupPlayers',
+    'round.card.playerGroup.playerGroupPlayer.profile',
+    'round.card.playerGroup.playerGroupPlayer.ratings',
+    'round.card.playerGroup.playerGroupResults',
+  ],
+};
+
 const createRounds = async (
   rounds: RoundModel[],
   newEventId: number,
@@ -92,70 +107,13 @@ const buildRoute = (): Router => {
       const { services } = req;
       const { id } = req.params;
       const { include } = req.query;
-      const entity = await services.events.get(parseInt(id, 10));
+      const entity = await services.events.get(
+        parseInt(id, 10),
+        includesMap.details
+      );
 
       if (!entity) {
         res.status(404).json({ error: 'Entity Not Found' });
-      }
-
-      // TODO: parse it and check for entity types.
-      if (include && entity) {
-        const rounds = await services.rounds.getAllForEvent(parseInt(id, 10));
-
-        (entity as any).rounds = rounds;
-
-        await asyncForEach(rounds, async round => {
-          // TODO: Check for including course and layout info.
-          const course = await services.courses.get(round.courseId);
-          const layout = await services.courseLayouts.get(round.courseLayoutId);
-          const layoutHoles = await services.courseHoles.getAllForCourseLayout(
-            round.courseLayoutId
-          );
-          const cards = await services.cards.getForRound(round.id);
-
-          (round as any).cards = cards;
-          (round as any).course = course;
-          (round as any).courseLayout = layout;
-          (round as any).courseLayout.holes = layoutHoles;
-
-          await asyncForEach(cards, async card => {
-            const playerGroups = await services.playerGroups.getForCard(
-              card.id
-            );
-
-            (card as any).playerGroups = playerGroups;
-
-            await asyncForEach(playerGroups, async playerGroup => {
-              const playerGroupPlayers = await services.playerGroupPlayers.getForPlayerGroup(
-                playerGroup.id
-              );
-
-              // TODO: Check for includes and get player info.
-              await asyncForEach(playerGroupPlayers, async player => {
-                const dbPlayer = await services.profiles.get(player.playerId);
-                const dbRating = await services.playerRatings.getForPlayerCardId(
-                  player.playerId,
-                  card.id
-                );
-
-                (player as any).player = dbPlayer;
-
-                if (dbPlayer && dbRating) {
-                  (player as any).rating = dbRating.rating;
-                }
-              });
-
-              (playerGroup as any).players = playerGroupPlayers;
-
-              // TODO: Check for results and include.
-              const results = await services.playerGroupResults.getAllForGroup(
-                playerGroup.id
-              );
-
-              (playerGroup as any).results = results;
-            });
-          });
-        });
       }
 
       res.json(entity.toJson());
@@ -169,13 +127,12 @@ const buildRoute = (): Router => {
     withTryCatch(async (req, res) => {
       const { services } = req;
       const model = new EventModel(req.body);
-      const newId = await services.events.insert(model);
 
-      model.id = newId;
+      await services.events.insert(model);
 
       if (model.rounds) {
         // Create each round if included.
-        await createRounds(model.rounds.toArray(), newId, services);
+        // await createRounds(model.rounds.toArray(), newId, services);
       }
 
       res.json(model.toJson());
@@ -214,7 +171,8 @@ const buildRoute = (): Router => {
         }
 
         const dbPlayers = await services.playerGroupPlayers.getForPlayerGroup(
-          playerGroup.id
+          playerGroup.id,
+          card.id
         );
 
         // Each player group has players, and those have aliases.
@@ -242,17 +200,17 @@ const buildRoute = (): Router => {
 
           // Loop through the uDisc scores and add them to the db!
           await asyncForEach(match.scores, async uDiscScore => {
-            await services.playerGroupResults.insert({
+            /* await services.playerGroupResults.insert({
               playerGroupId: playerGroup.id,
               courseHoleId: getHole(uDiscScore.number).id,
               score: uDiscScore.score,
-            });
+            }); */
           });
         }
       });
 
       // Update the card with the userId of who just uploaded this card.
-      card.authorId = user.id;
+      // card.authorId = user.id;
       await services.cards.update(card);
 
       res.json({ success: true, scores });
@@ -294,7 +252,7 @@ const buildRoute = (): Router => {
           dbRounds
         );
 
-        await createRounds(roundsToCreate, model.id, services);
+        // await createRounds(roundsToCreate, model.id, services);
 
         await asyncForEach(roundsToUpdate, async round => {
           await services.rounds.update(round);
@@ -314,7 +272,7 @@ const buildRoute = (): Router => {
             await asyncForEach(
               card.playerGroups.toArray(),
               async playerGroup => {
-                playerGroup.cardId = newCardId;
+                // playerGroup.cardId = newCardId;
 
                 const newPlayerGroupId = await services.playerGroups.insert(
                   playerGroup
@@ -323,7 +281,7 @@ const buildRoute = (): Router => {
                 await asyncForEach(
                   playerGroup.players.toArray(),
                   async player => {
-                    player.playerGroupId = newPlayerGroupId;
+                    // player.playerGroupId = newPlayerGroupId;
 
                     await services.playerGroupPlayers.insert(player);
                   }
