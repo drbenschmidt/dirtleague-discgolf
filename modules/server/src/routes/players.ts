@@ -85,7 +85,7 @@ const buildRoute = (): Router => {
     withTryCatch(async (req, res) => {
       const services = EntityContext.CreateFromPool();
       const model = new PlayerModel(req.body);
-      const newId = await services.profiles.create(model);
+      const newId = await services.profiles.insert(model);
 
       model.id = newId;
 
@@ -98,7 +98,7 @@ const buildRoute = (): Router => {
 
           const aliasJson = alias.toJson();
 
-          const newAliasId = await services.aliases.create(
+          const newAliasId = await services.aliases.insert(
             aliasJson as DbAlias
           );
 

@@ -32,7 +32,7 @@ const buildRoute = (services: EntityContext): Router => {
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const entity = new CourseLayoutModel(req.body);
-      const newId = await services.courseLayouts.create(entity);
+      const newId = await services.courseLayouts.insert(entity);
 
       entity.id = newId;
 

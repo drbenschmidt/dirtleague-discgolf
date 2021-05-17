@@ -9,7 +9,7 @@ import { DbPlayerRating } from './player-ratings';
 import { DbRound } from './rounds';
 import { buildSelects, spliceObject } from '../query-builder/selecting';
 
-interface DbPlayer {
+export interface DbPlayer {
   id?: number;
   firstName: string;
   lastName: string;

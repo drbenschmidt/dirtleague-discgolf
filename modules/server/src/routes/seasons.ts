@@ -32,7 +32,7 @@ const buildRoute = (services: EntityContext): Router => {
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const body = new SeasonModel(req.body);
-      const newId = await services.seasons.create(body);
+      const newId = await services.seasons.insert(body);
 
       body.id = newId;
 

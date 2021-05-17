@@ -27,7 +27,7 @@ const createRounds = async (
     round.eventId = newEventId;
 
     const roundJson = round.toJson();
-    const newRoundId = await services.rounds.create(roundJson as DbRound);
+    const newRoundId = await services.rounds.insert(roundJson as DbRound);
 
     round.id = newRoundId;
     roundJson.id = newRoundId;
@@ -36,7 +36,7 @@ const createRounds = async (
       card.roundId = newRoundId;
 
       const cardJson = card.toJson();
-      const newCardId = await services.cards.create(cardJson as DbCard);
+      const newCardId = await services.cards.insert(cardJson as DbCard);
 
       card.id = newCardId;
       cardJson.id = newCardId;
@@ -45,7 +45,7 @@ const createRounds = async (
         playerGroup.cardId = newCardId;
 
         const playerGroupJson = playerGroup.toJson();
-        const newPlayerGroupId = await services.playerGroups.create(
+        const newPlayerGroupId = await services.playerGroups.insert(
           playerGroupJson as DbPlayerGroup
         );
 
@@ -57,7 +57,7 @@ const createRounds = async (
 
           const playerJson = player.toJson();
 
-          await services.playerGroupPlayers.create(
+          await services.playerGroupPlayers.insert(
             playerJson as DbPlayerGroupPlayer
           );
         });
@@ -161,7 +161,7 @@ const buildRoute = (services: EntityContext): Router => {
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const model = new EventModel(req.body);
-      const newId = await services.events.create(model);
+      const newId = await services.events.insert(model);
 
       model.id = newId;
 
@@ -232,7 +232,7 @@ const buildRoute = (services: EntityContext): Router => {
 
           // Loop through the uDisc scores and add them to the db!
           await asyncForEach(match.scores, async uDiscScore => {
-            await services.playerGroupResults.create({
+            await services.playerGroupResults.insert({
               playerGroupId: playerGroup.id,
               courseHoleId: getHole(uDiscScore.number).id,
               score: uDiscScore.score,
@@ -295,14 +295,14 @@ const buildRoute = (services: EntityContext): Router => {
           await asyncForEach(cardsToCreate, async card => {
             card.roundId = round.id;
 
-            const newCardId = await services.cards.create(card);
+            const newCardId = await services.cards.insert(card);
 
             await asyncForEach(
               card.playerGroups.toArray(),
               async playerGroup => {
                 playerGroup.cardId = newCardId;
 
-                const newPlayerGroupId = await services.playerGroups.create(
+                const newPlayerGroupId = await services.playerGroups.insert(
                   playerGroup
                 );
 
@@ -311,7 +311,7 @@ const buildRoute = (services: EntityContext): Router => {
                   async player => {
                     player.playerGroupId = newPlayerGroupId;
 
-                    await services.playerGroupPlayers.create(player);
+                    await services.playerGroupPlayers.insert(player);
                   }
                 );
               }
@@ -337,7 +337,7 @@ const buildRoute = (services: EntityContext): Router => {
                   async player => {
                     player.playerGroupId = playerGroup.id;
 
-                    await services.playerGroupPlayers.create(player);
+                    await services.playerGroupPlayers.insert(player);
                   }
                 );
               }

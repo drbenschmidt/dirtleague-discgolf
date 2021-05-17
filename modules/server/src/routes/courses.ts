@@ -2,17 +2,16 @@ import { asyncForEach, Roles, CourseModel } from '@dirtleague/common';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
-import EntityContext from '../data-access/entity-context';
-import { DbCourseLayout } from '../data-access/entity-context/course-layouts';
-import { DbCourseHole } from '../data-access/entity-context/course-holes';
-import getCrud from '../utils/getCrud';
+import withRepositoryServices from '../http/withRepositoryServices';
 
-const buildRoute = (services: EntityContext): Router => {
+const buildRoute = (): Router => {
   const router = express.Router();
 
   router.get(
     '/',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const users = await services.courses.getAll();
 
       res.json(users);
@@ -21,9 +20,11 @@ const buildRoute = (services: EntityContext): Router => {
 
   router.get(
     '/:id',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
       const { include } = req.query;
+      const { services } = req;
       const entity = await services.courses.get(parseInt(id, 10));
 
       if (!entity) {
@@ -54,8 +55,10 @@ const buildRoute = (services: EntityContext): Router => {
 
   router.get(
     '/:id/layouts',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
+      const { services } = req;
       const entity = await services.courses.get(parseInt(id, 10));
 
       if (!entity) {
@@ -73,39 +76,14 @@ const buildRoute = (services: EntityContext): Router => {
   router.post(
     '/',
     requireRoles([Roles.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const model = new CourseModel(req.body);
-      const newId = await services.courses.create(model);
 
-      model.id = newId;
-
-      if (model.layouts) {
-        // Create each alias if included.
-        await asyncForEach(model.layouts.toArray(), async layout => {
-          // Make sure the aliases relate to this player.
-          // eslint-disable-next-line no-param-reassign
-          layout.courseId = newId;
-
-          const layoutJson = layout.toJson();
-
-          const newLayoutId = await services.courseLayouts.create(
-            layoutJson as DbCourseLayout
-          );
-
-          // eslint-disable-next-line no-param-reassign
-          layout.id = newLayoutId;
-          layoutJson.id = newLayoutId;
-
-          await asyncForEach(layout.holes.toArray(), async hole => {
-            // eslint-disable-next-line no-param-reassign
-            hole.courseLayoutId = newLayoutId;
-
-            const holeJson = hole.toJson();
-
-            await services.courseHoles.create(holeJson as DbCourseHole);
-          });
-        });
-      }
+      await services.tx(async tx => {
+        await tx.courses.insert(model);
+      });
 
       res.json(model.toJson());
     })
@@ -114,8 +92,10 @@ const buildRoute = (services: EntityContext): Router => {
   router.delete(
     '/:id',
     requireRoles([Roles.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
+      const { services } = req;
       const entityId = parseInt(id, 10);
 
       await services.courses.delete(entityId);
@@ -127,78 +107,14 @@ const buildRoute = (services: EntityContext): Router => {
   router.patch(
     '/:id',
     requireRoles([Roles.Admin]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
-      // TODO: Technically, this should be a transaction.
+      const { services } = req;
       const model = new CourseModel(req.body);
 
-      await services.courses.update(model);
-
-      if (model.layouts) {
-        const requestLayouts = Array.from(model.layouts);
-        const dbLayouts = await services.courseLayouts.getAllForCourse(
-          model.id
-        );
-
-        const [layoutsToCreate, layoutsToUpdate, layoutsToDelete] = getCrud(
-          requestLayouts,
-          dbLayouts
-        );
-
-        await asyncForEach(layoutsToCreate, async entity => {
-          // eslint-disable-next-line no-param-reassign
-          entity.courseId = model.id;
-          const layoutJson = entity.toJson();
-
-          const newLayoutId = await services.courseLayouts.create(
-            layoutJson as DbCourseLayout
-          );
-
-          // eslint-disable-next-line no-param-reassign
-          entity.id = newLayoutId;
-          layoutJson.id = newLayoutId;
-
-          await asyncForEach(entity.holes.toArray(), async hole => {
-            // eslint-disable-next-line no-param-reassign
-            hole.courseLayoutId = newLayoutId;
-
-            const holeJson = hole.toJson();
-
-            await services.courseHoles.create(holeJson as DbCourseHole);
-          });
-        });
-
-        await asyncForEach(layoutsToUpdate, async entity => {
-          await services.courseLayouts.update(entity);
-
-          const dbHoles = await services.courseHoles.getAllForCourseLayout(
-            entity.id
-          );
-
-          const [holesToCreate, holesToUpdate, holesToDelete] = getCrud(
-            Array.from(entity.holes),
-            dbHoles
-          );
-
-          await asyncForEach(holesToCreate, async hole => {
-            // eslint-disable-next-line no-param-reassign
-            hole.courseLayoutId = entity.id;
-
-            await services.courseHoles.create(hole);
-          });
-
-          await asyncForEach(holesToUpdate, async hole => {
-            await services.courseHoles.update(hole);
-          });
-
-          await asyncForEach(holesToDelete, async hole => {
-            await services.courseHoles.delete(hole.id);
-          });
-        });
-
-        await asyncForEach(layoutsToDelete, async entity => {
-          await services.courseLayouts.delete(entity.id);
-        });
-      }
+      await services.tx(async tx => {
+        await tx.courses.update(model);
+      });
 
       res.json(null);
     })

@@ -68,7 +68,7 @@ const buildRoute = (services: EntityContext): Router => {
 
       const { hash, salt } = await hashPassword(newUserRequest.user.password);
 
-      const playerId = await services.profiles.create({
+      const playerId = await services.profiles.insert({
         firstName: newUserRequest.player.firstName,
         lastName: newUserRequest.player.lastName,
         yearJoined: new Date().getFullYear(),

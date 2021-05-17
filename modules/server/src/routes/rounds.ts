@@ -39,7 +39,7 @@ const buildRoute = (services: EntityContext): Router => {
     requireRoles([Roles.Admin]),
     withTryCatch(async (req, res) => {
       const body = new RoundModel(req.body);
-      const newId = await services.rounds.create(body);
+      const newId = await services.rounds.insert(body);
 
       body.id = newId;
 
@@ -117,7 +117,7 @@ const buildRoute = (services: EntityContext): Router => {
           const playerIds = players.map(p => p.playerId);
 
           await asyncForEach(playerIds, async playerId => {
-            await services.playerRatings.create({
+            await services.playerRatings.insert({
               playerId,
               cardId: card.id,
               date: new Date(), // TODO: Get from round?

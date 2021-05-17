@@ -60,7 +60,7 @@ app.use('/api/users', buildUsersRoute(services));
 app.use('/api/auth', buildAuthRoute(services));
 app.use('/api/players', buildProfilesRoute());
 app.use('/api/aliases', buildAliasesRoute(services));
-app.use('/api/courses', buildCoursesRoute(services));
+app.use('/api/courses', buildCoursesRoute());
 app.use('/api/seasons', buildSeasonsRoute(services));
 app.use('/api/courseLayouts', buildCourseLayoutsRoute(services));
 app.use('/api/events', buildEventsRoute(services));
