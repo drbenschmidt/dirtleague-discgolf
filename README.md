@@ -20,3 +20,5 @@ yarn start
 which will start the backend service and frontend react dev server.
 
 A docker compose file would be nice to have to have a mysql server and two node containers started up.
+
+Container is built and available at https://hub.docker.com/r/dirtleague/dirtleague
