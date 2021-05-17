@@ -56,15 +56,15 @@ app.get(['/', ...allUrls], (req, res) => {
 app.use(morgan('dev'));
 
 // Add the routers for each area.
-app.use('/api/users', buildUsersRoute(services));
+app.use('/api/users', buildUsersRoute());
 app.use('/api/auth', buildAuthRoute(services));
 app.use('/api/players', buildProfilesRoute());
-app.use('/api/aliases', buildAliasesRoute(services));
+app.use('/api/aliases', buildAliasesRoute());
 app.use('/api/courses', buildCoursesRoute());
-app.use('/api/seasons', buildSeasonsRoute(services));
-app.use('/api/courseLayouts', buildCourseLayoutsRoute(services));
-app.use('/api/events', buildEventsRoute(services));
-app.use('/api/rounds', buildRoundsRoute(services));
+app.use('/api/seasons', buildSeasonsRoute());
+app.use('/api/courseLayouts', buildCourseLayoutsRoute());
+app.use('/api/events', buildEventsRoute());
+app.use('/api/rounds', buildRoundsRoute());
 
 app.listen(port, async () => {
   console.log(`DirtLeague API listening at http://localhost:${port}`);

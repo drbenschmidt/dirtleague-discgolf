@@ -158,7 +158,7 @@ const buildRoute = (): Router => {
         });
       }
 
-      res.json(entity);
+      res.json(entity.toJson());
     })
   );
 

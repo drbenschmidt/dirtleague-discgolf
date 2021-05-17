@@ -6,6 +6,14 @@ import PlayerRepository from './player';
 import CourseRepository from './course';
 import CourseLayoutRepository from './course-layout';
 import CourseHoleRepository from './course-hole';
+import EventRepository from './event';
+import RoundRepository from './round';
+import CardRepository from './card';
+import PlayerGroupRepository from './player-group';
+import PlayerGroupPlayerRepository from './player-group-player';
+import ProfileRepository from './profile';
+import PlayerRatingRepository from './player-rating';
+import PlayerGroupResultRepository from './player-group-result';
 
 // TODO: Memoize getters
 export default class RepositoryServices {
@@ -30,6 +38,38 @@ export default class RepositoryServices {
 
   get courseHoles(): CourseHoleRepository {
     return new CourseHoleRepository(this, this.user, this.context);
+  }
+
+  get events(): EventRepository {
+    return new EventRepository(this, this.user, this.context);
+  }
+
+  get rounds(): RoundRepository {
+    return new RoundRepository(this, this.user, this.context);
+  }
+
+  get cards(): CardRepository {
+    return new CardRepository(this, this.user, this.context);
+  }
+
+  get playerGroups(): PlayerGroupRepository {
+    return new PlayerGroupRepository(this, this.user, this.context);
+  }
+
+  get playerGroupPlayers(): PlayerGroupPlayerRepository {
+    return new PlayerGroupPlayerRepository(this, this.user, this.context);
+  }
+
+  get profiles(): ProfileRepository {
+    return new ProfileRepository(this, this.user, this.context);
+  }
+
+  get playerRatings(): PlayerRatingRepository {
+    return new PlayerRatingRepository(this, this.user, this.context);
+  }
+
+  get playerGroupResults(): PlayerGroupResultRepository {
+    return new PlayerGroupResultRepository(this, this.user, this.context);
   }
 
   constructor(user: UserModel, context: EntityContext) {

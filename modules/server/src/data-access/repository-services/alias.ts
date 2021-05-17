@@ -41,6 +41,12 @@ class AliasRepository extends Repository<AliasModel, DbAlias> {
       });
     });
   };
+
+  async getForPlayerId(id: number): Promise<AliasModel[]> {
+    const rows = await this.context.aliases.getForPlayerId(id);
+
+    return rows.map(row => new AliasModel(row));
+  }
 }
 
 export default AliasRepository;

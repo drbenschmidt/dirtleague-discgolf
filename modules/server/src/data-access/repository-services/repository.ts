@@ -1,7 +1,8 @@
+/* eslint-disable max-classes-per-file */
 import { asyncForEach, set, UserModel } from '@dirtleague/common';
 import getCrud from '../../utils/getCrud';
 import EntityContext from '../entity-context';
-import { Table } from '../entity-context/entity-table';
+import { Table, JoinTable } from '../entity-context/entity-table';
 import type RepositoryServices from './index';
 
 export default abstract class Repository<
@@ -80,4 +81,36 @@ export default abstract class Repository<
       await repository.delete(model.id);
     });
   };
+}
+
+export abstract class JoinRepository<
+  TModel extends { toJson: () => any },
+  TDbRow
+> {
+  protected user: UserModel = null;
+  protected context: EntityContext = null;
+  protected servicesInstance: RepositoryServices = null;
+
+  abstract get entityTable(): JoinTable<TDbRow>;
+  abstract factory(row: TDbRow): TModel;
+
+  constructor(
+    servicesInstance: RepositoryServices,
+    user: UserModel,
+    context: EntityContext
+  ) {
+    this.servicesInstance = servicesInstance;
+    this.user = user;
+    this.context = context;
+  }
+
+  async delete(model: TModel): Promise<void> {
+    await this.entityTable.delete(model.toJson() as TDbRow);
+  }
+
+  async insert(model: TModel): Promise<void> {
+    const id = await this.entityTable.insert(model.toJson() as TDbRow);
+
+    set(model, 'id', id);
+  }
 }
