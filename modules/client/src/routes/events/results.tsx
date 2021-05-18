@@ -53,7 +53,7 @@ const CombinedCardResults = (props: CombinedCardResultsProps): ReactElement => {
             <div>{player.player?.fullName}</div>
           ))}
         </div>
-        <div>{rating}</div>
+        <div>{rating?.rating}</div>
       </div>
     );
   };
