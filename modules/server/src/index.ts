@@ -58,10 +58,10 @@ app.use('/api/auth', buildAuthRoute());
 // app.use('/api/players', buildProfilesRoute());
 app.use('/api/aliases', buildAliasesRoute());
 app.use('/api/courses', buildCoursesRoute());
-// app.use('/api/seasons', buildSeasonsRoute());
+app.use('/api/seasons', buildSeasonsRoute());
 app.use('/api/courseLayouts', buildCourseLayoutsRoute());
 app.use('/api/events', buildEventsRoute());
-// app.use('/api/rounds', buildRoundsRoute());
+app.use('/api/rounds', buildRoundsRoute());
 
 app.listen(port, async () => {
   console.log(`DirtLeague API listening at http://localhost:${port}`);

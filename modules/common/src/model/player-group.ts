@@ -58,8 +58,16 @@ export default class PlayerGroupModel
     this.setInt('cardId', value);
   }
 
+  set par(value: number) {
+    this.setInt('par', value);
+  }
+
   get par(): number {
     return this.attributes.par;
+  }
+
+  set score(value: number) {
+    this.setInt('score', value);
   }
 
   get score(): number {

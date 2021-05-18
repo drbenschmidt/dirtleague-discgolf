@@ -1,6 +1,5 @@
 import { SeasonModel, Roles } from '@dirtleague/common';
 import express, { Router } from 'express';
-import { DbSeason } from '../data-access/entity-context/seasons';
 import { requireRoles } from '../auth/handler';
 import withTryCatch from '../http/withTryCatch';
 import withRepositoryServices from '../http/withRepositoryServices';
@@ -39,9 +38,8 @@ const buildRoute = (): Router => {
     withTryCatch(async (req, res) => {
       const { services } = req;
       const body = new SeasonModel(req.body);
-      const newId = await services.seasons.insert(body);
 
-      body.id = newId;
+      await services.seasons.insert(body);
 
       res.json(body.toJson());
     })
@@ -67,7 +65,7 @@ const buildRoute = (): Router => {
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
-      const body = req.body as DbSeason;
+      const body = new SeasonModel(req.body);
 
       await services.seasons.update(body);
 

@@ -46,9 +46,8 @@ const buildRoute = (): Router => {
     withTryCatch(async (req, res) => {
       const { services } = req;
       const body = new RoundModel(req.body);
-      const newId = await services.rounds.insert(body);
 
-      body.id = newId;
+      await services.rounds.insert(body);
 
       res.json(body.toJson());
     })
@@ -74,7 +73,7 @@ const buildRoute = (): Router => {
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
-      const body = req.body as DbRound;
+      const body = new RoundModel(req.body);
 
       await services.rounds.update(body);
 
@@ -91,54 +90,12 @@ const buildRoute = (): Router => {
       const { services } = req;
       const { id } = req.params;
       const round = await services.rounds.get(parseInt(id, 10));
-      const courseLayout = await services.courseLayouts.get(
-        round.courseLayoutId
-      );
 
       round.isComplete = true;
 
-      await services.rounds.update(round);
-
-      // Go through each player card for this round
-      const cards = await services.cards.getForRound(round.id);
-      await asyncForEach(cards, async card => {
-        // and get each player group on each card.
-        const playerGroups = await services.playerGroups.getForCard(card.id);
-        // and then each player(s) for the groups.
-        await asyncForEach(playerGroups, async playerGroup => {
-          const results = await services.playerGroupResults.getAllForGroup(
-            playerGroup.id
-          );
-
-          const totalScore = sum(results.map(r => r.score));
-          const { dgcrSse } = courseLayout;
-          const rating = calculateRating(totalScore, dgcrSse);
-
-          // Update the player group with the score and par of the card so we can
-          // do other calculations in downstream flows.
-
-          // eslint-disable-next-line no-param-reassign
-          playerGroup.score = totalScore;
-          // eslint-disable-next-line no-param-reassign
-          playerGroup.par = courseLayout.par;
-
-          await services.playerGroups.update(playerGroup);
-
-          const players = await services.playerGroupPlayers.getForPlayerGroup(
-            playerGroup.id
-          );
-          const playerIds = players.map(p => p.playerId);
-
-          await asyncForEach(playerIds, async playerId => {
-            await services.playerRatings.insert({
-              playerId,
-              cardId: card.id,
-              date: new Date(), // TODO: Get from round?
-              rating,
-              type: RatingType.Event, // TODO: Allow client to specify type
-            });
-          });
-        });
+      await services.tx(async tx => {
+        await tx.rounds.update(round);
+        await tx.cards.onRoundComplete(round);
       });
 
       res.json({ success: true });
