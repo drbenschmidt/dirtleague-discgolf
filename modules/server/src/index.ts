@@ -55,7 +55,7 @@ app.use(morgan('dev'));
 // Add the routers for each area.
 app.use('/api/users', buildUsersRoute());
 app.use('/api/auth', buildAuthRoute());
-// app.use('/api/players', buildProfilesRoute());
+app.use('/api/players', buildProfilesRoute());
 app.use('/api/aliases', buildAliasesRoute());
 app.use('/api/courses', buildCoursesRoute());
 app.use('/api/seasons', buildSeasonsRoute());

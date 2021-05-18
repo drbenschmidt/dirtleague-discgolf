@@ -36,11 +36,12 @@ class EventRepository extends Repository<EventModel, DbEvent> {
     set(model, 'id', id);
 
     if (model.rounds) {
-      await this.servicesInstance.tx(async tx => {
-        await asyncForEach(model.rounds.toArray(), async round => {
-          tx.rounds.insert(round);
-        });
-      });
+      await this.syncCollection(
+        model.rounds.toArray(),
+        [],
+        entity => set(entity, 'eventId', model.id),
+        this.servicesInstance.rounds
+      );
     }
   }
 

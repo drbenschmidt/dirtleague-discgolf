@@ -1,8 +1,7 @@
-import { PlayerModel, asyncForEach, Roles } from '@dirtleague/common';
+import { PlayerModel, Roles } from '@dirtleague/common';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { DirtLeagueRequest, requireRoles } from '../auth/handler';
-import { DbAlias } from '../data-access/entity-context/aliases';
 import withRepositoryServices from '../http/withRepositoryServices';
 import toJson from '../utils/toJson';
 
@@ -45,7 +44,7 @@ const buildRoute = (): Router => {
       if (include && entity) {
         const aliases = await services.aliases.getForPlayerId(playerId);
 
-        (entity as any).aliases = aliases;
+        (entity as any).attributes.aliases = aliases.map(a => a.toJson());
 
         const ratings = await services.playerRatings.getRunningAverages(
           playerId
@@ -55,13 +54,13 @@ const buildRoute = (): Router => {
           playerId
         );
 
-        (entity as any).stats = {
+        (entity as any).attributes.stats = {
           roundCounts,
           ratings,
         };
       }
 
-      res.json(entity);
+      res.json(entity.toJson());
     })
   );
 
@@ -89,27 +88,10 @@ const buildRoute = (): Router => {
     withTryCatch(async (req, res) => {
       const { services } = req;
       const model = new PlayerModel(req.body);
-      const newId = await services.profiles.insert(model);
 
-      model.id = newId;
-
-      if (model.aliases) {
-        // Create each alias if included.
-        await asyncForEach(model.aliases.toArray(), async alias => {
-          // Make sure the aliases relate to this player.
-          // eslint-disable-next-line no-param-reassign
-          alias.playerId = newId;
-
-          const aliasJson = alias.toJson();
-
-          const newAliasId = await services.aliases.insert(
-            aliasJson as DbAlias
-          );
-
-          // eslint-disable-next-line no-param-reassign
-          alias.id = newAliasId;
-        });
-      }
+      await services.tx(async tx => {
+        await tx.profiles.insert(model);
+      });
 
       res.json(model.toJson());
     })
@@ -138,15 +120,7 @@ const buildRoute = (): Router => {
       const model = new PlayerModel(body);
 
       await services.tx(async transaction => {
-        await transaction.players.update(model);
-
-        // TODO: Move to repository layer.
-        if (model.aliases) {
-          await transaction.aliases.updateForPlayer(
-            model.id,
-            model.aliases.toArray()
-          );
-        }
+        await transaction.profiles.update(model);
       });
 
       res.json(null);

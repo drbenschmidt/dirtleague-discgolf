@@ -57,10 +57,9 @@ class PlayerGroupRepository extends Repository<
     set(model, 'id', id);
 
     if (model.players) {
-      await this.servicesInstance.tx(async tx => {
-        await asyncForEach(model.players.toArray(), async player => {
-          tx.playerGroupPlayers.insert(player);
-        });
+      await asyncForEach(model.players.toArray(), async player => {
+        set(player.attributes, 'playerGroupId', model.id);
+        await this.servicesInstance.playerGroupPlayers.insert(player);
       });
     }
   }
@@ -72,9 +71,8 @@ class PlayerGroupRepository extends Repository<
       await this.context.playerGroupPlayers.deleteForPlayerGroup(model.id);
 
       await asyncForEach(model.players.toArray(), async player => {
-        set(player, 'playerGroupId', model.id);
-
-        await this.context.playerGroupPlayers.insert(player);
+        set(player.attributes, 'playerGroupId', model.id);
+        await this.servicesInstance.playerGroupPlayers.insert(player);
       });
     }
   }

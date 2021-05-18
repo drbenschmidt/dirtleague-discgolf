@@ -18,7 +18,7 @@ export interface DbPlayer {
   currentRating?: number;
 }
 
-interface FeedModel {
+export interface FeedModel {
   rating: DbPlayerRating;
   card: DbCard;
   group: DbPlayerGroup;

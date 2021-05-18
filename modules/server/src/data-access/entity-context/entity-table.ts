@@ -118,6 +118,11 @@ export abstract class JoinTable<TRow> {
       model
     );
 
+    // eslint-disable-next-line no-underscore-dangle
+    if ((insertClause as any)._items.length === 5) {
+      throw new Error('Found it!');
+    }
+
     const [result] = await this.db.query(sql`
       ${insertClause};
 

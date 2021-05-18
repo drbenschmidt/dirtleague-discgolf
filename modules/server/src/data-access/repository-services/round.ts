@@ -57,11 +57,12 @@ class RoundRepository extends Repository<RoundModel, DbRound> {
     set(model, 'id', id);
 
     if (model.cards) {
-      await this.servicesInstance.tx(async tx => {
-        await asyncForEach(model.cards.toArray(), async card => {
-          tx.cards.insert(card);
-        });
-      });
+      await this.syncCollection(
+        model.cards.toArray(),
+        [],
+        entity => set(entity, 'roundId', model.id),
+        this.servicesInstance.cards
+      );
     }
   }
 

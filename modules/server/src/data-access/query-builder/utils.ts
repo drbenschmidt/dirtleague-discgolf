@@ -11,6 +11,7 @@ const validTableNames = [
   'courseLayouts',
   'courses',
   'events',
+  'playerGroups',
   'playerGroupPlayers',
   'playerGroupResults',
   'playerRatings',
@@ -23,7 +24,7 @@ const validTableNames = [
 
 export const getTableName = (tableName: string): SQLQuery => {
   if (!validTableNames.includes(tableName)) {
-    throw new Error(`Table name ${tableName} is not valid.`);
+    throw new Error(`Table name ${tableName} is not a safe table name.`);
   }
 
   // eslint-disable-next-line no-underscore-dangle

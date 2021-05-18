@@ -48,11 +48,12 @@ class CardRepository extends Repository<CardModel, DbCard> {
     set(model, 'id', id);
 
     if (model.playerGroups) {
-      await this.servicesInstance.tx(async tx => {
-        await asyncForEach(model.playerGroups.toArray(), async playerGroup => {
-          tx.playerGroups.insert(playerGroup);
-        });
-      });
+      await this.syncCollection(
+        model.playerGroups.toArray(),
+        [],
+        entity => set(entity, 'cardId', model.id),
+        this.servicesInstance.playerGroups
+      );
     }
   }
 
