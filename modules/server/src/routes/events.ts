@@ -5,6 +5,7 @@ import {
   EventModel,
   RoundModel,
 } from '@dirtleague/common';
+import type { ParsedQs } from 'qs';
 import multer from 'multer';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
@@ -32,6 +33,26 @@ const includesMap = {
     'round.card.playerGroup.playerGroupPlayer.ratings',
     'round.card.playerGroup.playerGroupResults',
   ],
+};
+
+const getInclude = (
+  query: ParsedQs,
+  map: Record<string, string[]>,
+  defaultValue: string
+) => {
+  const { include } = query;
+
+  if (!include) {
+    return map[defaultValue];
+  }
+
+  const includes = (include as string).split(',');
+
+  if (includes.length === 1 && map[includes[0]] !== undefined) {
+    return map[includes[0]];
+  }
+
+  return includes;
 };
 
 const createRounds = async (
@@ -106,11 +127,8 @@ const buildRoute = (): Router => {
     withTryCatch(async (req, res) => {
       const { services } = req;
       const { id } = req.params;
-      const { include } = req.query;
-      const entity = await services.events.get(
-        parseInt(id, 10),
-        includesMap.details
-      );
+      const include = getInclude(req.query, includesMap, 'details');
+      const entity = await services.events.get(parseInt(id, 10), include);
 
       if (!entity) {
         res.status(404).json({ error: 'Entity Not Found' });

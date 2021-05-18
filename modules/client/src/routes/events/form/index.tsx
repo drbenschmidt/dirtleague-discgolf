@@ -169,7 +169,7 @@ const EventForm = (): ReactElement | null => {
     if (isEditing) {
       const getEntity = async () => {
         const response = await services?.events.get(parseInt(id, 10), {
-          include: ['rounds'],
+          include: ['details'],
         });
 
         if (response) {
