@@ -146,12 +146,9 @@ const buildRoute = (): Router => {
       const { services } = req;
       const model = new EventModel(req.body);
 
-      await services.events.insert(model);
-
-      if (model.rounds) {
-        // Create each round if included.
-        // await createRounds(model.rounds.toArray(), newId, services);
-      }
+      await services.tx(async tx => {
+        await tx.events.insert(model);
+      });
 
       res.json(model.toJson());
     })
@@ -256,10 +253,11 @@ const buildRoute = (): Router => {
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
-      // TODO: Technically, this should be a transaction.
       const model = new EventModel(req.body);
 
-      await services.events.update(model);
+      await services.tx(async tx => {
+        await services.events.update(model);
+      });
 
       if (model.rounds) {
         const requestRounds = model.rounds.toArray();

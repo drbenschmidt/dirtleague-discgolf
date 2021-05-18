@@ -32,6 +32,20 @@ class CardRepository extends Repository<CardModel, DbCard> {
 
     return models;
   }
+
+  async insert(model: CardModel): Promise<void> {
+    const id = await this.entityTable.insert(model.toJson() as DbCard);
+
+    set(model, 'id', id);
+
+    if (model.playerGroups) {
+      await this.servicesInstance.tx(async tx => {
+        await asyncForEach(model.playerGroups.toArray(), async playerGroup => {
+          tx.playerGroups.insert(playerGroup);
+        });
+      });
+    }
+  }
 }
 
 export default CardRepository;

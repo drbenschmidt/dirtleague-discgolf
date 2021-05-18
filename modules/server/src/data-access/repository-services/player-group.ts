@@ -50,6 +50,20 @@ class PlayerGroupRepository extends Repository<
 
     return models;
   }
+
+  async insert(model: PlayerGroupModel): Promise<void> {
+    const id = await this.entityTable.insert(model.toJson() as DbPlayerGroup);
+
+    set(model, 'id', id);
+
+    if (model.players) {
+      await this.servicesInstance.tx(async tx => {
+        await asyncForEach(model.players.toArray(), async player => {
+          tx.playerGroupPlayers.insert(player);
+        });
+      });
+    }
+  }
 }
 
 export default PlayerGroupRepository;

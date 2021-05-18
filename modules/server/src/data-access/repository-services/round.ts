@@ -50,6 +50,20 @@ class RoundRepository extends Repository<RoundModel, DbRound> {
 
     return models;
   }
+
+  async insert(model: RoundModel): Promise<void> {
+    const id = await this.entityTable.insert(model.toJson() as DbRound);
+
+    set(model, 'id', id);
+
+    if (model.cards) {
+      await this.servicesInstance.tx(async tx => {
+        await asyncForEach(model.cards.toArray(), async card => {
+          tx.cards.insert(card);
+        });
+      });
+    }
+  }
 }
 
 export default RoundRepository;

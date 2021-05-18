@@ -1,4 +1,4 @@
-import { EventModel, set } from '@dirtleague/common';
+import { asyncForEach, EventModel, set } from '@dirtleague/common';
 import { DbEvent } from '../entity-context/events';
 import { Table } from '../entity-context/entity-table';
 import Repository from './repository';
@@ -28,6 +28,20 @@ class EventRepository extends Repository<EventModel, DbEvent> {
     }
 
     return model;
+  }
+
+  async insert(model: EventModel): Promise<void> {
+    const id = await this.entityTable.insert(model.toJson() as DbEvent);
+
+    set(model, 'id', id);
+
+    if (model.rounds) {
+      await this.servicesInstance.tx(async tx => {
+        await asyncForEach(model.rounds.toArray(), async round => {
+          tx.rounds.insert(round);
+        });
+      });
+    }
   }
 }
 
