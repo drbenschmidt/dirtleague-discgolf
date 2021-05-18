@@ -64,6 +64,20 @@ class PlayerGroupRepository extends Repository<
       });
     }
   }
+
+  async update(model: PlayerGroupModel): Promise<void> {
+    await this.entityTable.update(model.toJson() as DbPlayerGroup);
+
+    if (model.players) {
+      await this.context.playerGroupPlayers.deleteForPlayerGroup(model.id);
+
+      await asyncForEach(model.players.toArray(), async player => {
+        set(player, 'playerGroupId', model.id);
+
+        await this.context.playerGroupPlayers.insert(player);
+      });
+    }
+  }
 }
 
 export default PlayerGroupRepository;

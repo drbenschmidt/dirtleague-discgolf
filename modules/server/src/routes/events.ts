@@ -256,10 +256,10 @@ const buildRoute = (): Router => {
       const model = new EventModel(req.body);
 
       await services.tx(async tx => {
-        await services.events.update(model);
+        await tx.events.update(model);
       });
 
-      if (model.rounds) {
+      if (model.rounds && false) {
         const requestRounds = model.rounds.toArray();
         const dbRounds = await services.rounds.getAllForEvent(model.id);
 

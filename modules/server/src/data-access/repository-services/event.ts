@@ -43,6 +43,21 @@ class EventRepository extends Repository<EventModel, DbEvent> {
       });
     }
   }
+
+  async update(model: EventModel): Promise<void> {
+    await this.entityTable.update(model.toJson() as DbEvent);
+
+    if (model.rounds) {
+      const dbRounds = await this.context.rounds.getAllForEvent(model.id);
+
+      await this.syncCollection(
+        model.rounds.toArray(),
+        dbRounds,
+        entity => set(entity, 'eventId', model.id),
+        this.servicesInstance.rounds
+      );
+    }
+  }
 }
 
 export default EventRepository;

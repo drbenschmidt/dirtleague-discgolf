@@ -64,6 +64,21 @@ class RoundRepository extends Repository<RoundModel, DbRound> {
       });
     }
   }
+
+  async update(model: RoundModel): Promise<void> {
+    await this.entityTable.update(model.toJson() as DbRound);
+
+    if (model.cards) {
+      const dbCards = await this.context.cards.getForRound(model.id);
+
+      await this.syncCollection(
+        model.cards.toArray(),
+        dbCards,
+        entity => set(entity, 'roundId', model.id),
+        this.servicesInstance.cards
+      );
+    }
+  }
 }
 
 export default RoundRepository;

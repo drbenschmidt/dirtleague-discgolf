@@ -46,6 +46,23 @@ class CardRepository extends Repository<CardModel, DbCard> {
       });
     }
   }
+
+  async update(model: CardModel): Promise<void> {
+    await this.entityTable.update(model.toJson() as DbCard);
+
+    if (model.playerGroups) {
+      const dbPlayerGroups = await this.context.playerGroups.getForCard(
+        model.id
+      );
+
+      await this.syncCollection(
+        model.playerGroups.toArray(),
+        dbPlayerGroups,
+        entity => set(entity, 'cardId', model.id),
+        this.servicesInstance.playerGroups
+      );
+    }
+  }
 }
 
 export default CardRepository;
