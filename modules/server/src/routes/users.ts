@@ -8,9 +8,11 @@ import { getDefaultConfigManager } from '../config/manager';
 import type { DbUser } from '../data-access/entity-context/users';
 import withRepositoryServices from '../http/withRepositoryServices';
 import toJson from '../utils/toJson';
+import { UserRoleModel } from '../data-access/repository-services/user-role';
 
 const config = getDefaultConfigManager();
 
+// TODO: Move cleaning to repository.
 const cleanUser = (user: DbUser) => {
   // eslint-disable-next-line no-param-reassign
   delete user.passwordHash;
@@ -61,7 +63,7 @@ const buildRoute = (): Router => {
 
       (user as any).roles = roles;
 
-      res.json(cleanUser(user));
+      res.json(cleanUser(user.toJson() as DbUser));
     })
   );
 
@@ -72,40 +74,42 @@ const buildRoute = (): Router => {
     withTryCatch(async (req, res) => {
       const { services } = req;
       const newUserRequest = req.body as NewUserRequest;
+      let userModel: UserModel = null;
 
-      const { hash, salt } = await hashPassword(newUserRequest.user.password);
+      await services.tx(async tx => {
+        const { hash, salt } = await hashPassword(newUserRequest.user.password);
 
-      const playerId = await services.profiles.insert({
-        firstName: newUserRequest.player.firstName,
-        lastName: newUserRequest.player.lastName,
-        yearJoined: new Date().getFullYear(),
-        bio: '',
+        const playerModel = new PlayerModel({
+          firstName: newUserRequest.player.firstName,
+          lastName: newUserRequest.player.lastName,
+          yearJoined: new Date().getFullYear(),
+          bio: '',
+        });
+
+        await tx.profiles.insert(playerModel);
+
+        userModel = new UserModel({
+          email: newUserRequest.user.email,
+          passwordHash: hash,
+          passwordSalt: salt,
+          playerId: playerModel.id,
+        });
+
+        await tx.users.insert(userModel);
+
+        userModel.roles = await services.userRoles.getByUserId(userModel.id);
       });
 
-      const userId = await services.users.insert({
-        email: newUserRequest.user.email,
-        passwordHash: hash,
-        passwordSalt: salt,
-        playerId,
-      });
-
-      // TODO: Another spot where the routes should be calling a single repository function
-      // to get a user and it's roles. This logic is duplicated in the auth route.
-      const result = await services.users.get(userId);
-
-      const {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        passwordSalt: password_salt,
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        passwordHash: password_hash,
-        ...user
-      } = result;
-
-      (user as UserModel).roles = await services.userRoles.getByUserId(userId);
+      if (!userModel) {
+        res.status(500).json({
+          success: false,
+          error: 'Error creating user or profile',
+        });
+      }
 
       // TODO: Make secret key configurable or use certificate.
       jwt.sign(
-        { user },
+        { user: userModel },
         config.props.DIRT_API_SESSION_SECRET,
         (error: Error | null, token: string | null) => {
           if (error) {
@@ -117,7 +121,7 @@ const buildRoute = (): Router => {
 
           res.json({
             success: true,
-            user,
+            user: userModel,
             token,
           });
         }
@@ -130,6 +134,7 @@ const buildRoute = (): Router => {
     requireRoles([Role.Admin]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
       const userId = parseInt(id, 10);
 
@@ -146,11 +151,12 @@ const buildRoute = (): Router => {
     requireRoles([Role.Admin]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
       const { roleId } = req.body;
       const userId = parseInt(id, 10);
 
-      await services.userRoles.insert({ userId, roleId });
+      await services.userRoles.insert(new UserRoleModel({ userId, roleId }));
 
       res.json({ success: true });
     })
@@ -161,11 +167,12 @@ const buildRoute = (): Router => {
     requireRoles([Role.Admin]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
       const { roleId } = req.body;
       const userId = parseInt(id, 10);
 
-      await services.userRoles.delete({ userId, roleId });
+      await services.userRoles.delete(new UserRoleModel({ userId, roleId }));
 
       res.json({ success: true });
     })
@@ -176,18 +183,12 @@ const buildRoute = (): Router => {
     requireRoles([Role.Admin]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
       const { password } = req.body;
       const userId = parseInt(id, 10);
 
-      const dbUser = await services.users.get(userId);
-
-      const { hash, salt } = await hashPassword(password);
-
-      dbUser.passwordHash = hash;
-      dbUser.passwordSalt = salt;
-
-      await services.users.update(dbUser);
+      services.users.updatePassword(userId, password);
 
       res.json({ success: true });
     })
@@ -198,6 +199,7 @@ const buildRoute = (): Router => {
     requireRoles([Role.Admin]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
       const userId = parseInt(id, 10);
 

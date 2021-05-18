@@ -53,7 +53,7 @@ app.get(['/', ...allUrls], (req, res) => {
 app.use(morgan('dev'));
 
 // Add the routers for each area.
-// app.use('/api/users', buildUsersRoute());
+app.use('/api/users', buildUsersRoute());
 app.use('/api/auth', buildAuthRoute());
 // app.use('/api/players', buildProfilesRoute());
 app.use('/api/aliases', buildAliasesRoute());

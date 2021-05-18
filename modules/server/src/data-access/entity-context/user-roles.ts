@@ -1,12 +1,12 @@
 import { keys } from 'ts-transformer-keys';
 import { sql } from '@databases/mysql';
 import { asyncForEach } from '@dirtleague/common';
-import type { Roles } from '@dirtleague/common';
+import type { Role } from '@dirtleague/common';
 import { JoinTable } from './entity-table';
 
-interface DbUserRole {
+export interface DbUserRole {
   userId: number;
-  roleId: Roles;
+  roleId: Role;
 }
 
 class UserRolesTable extends JoinTable<DbUserRole> {
@@ -18,7 +18,7 @@ class UserRolesTable extends JoinTable<DbUserRole> {
     return 'userRoles';
   }
 
-  getByUserId = async (userId: number): Promise<Roles[]> => {
+  getByUserId = async (userId: number): Promise<Role[]> => {
     const roles = await this.db.query(sql`
       SELECT roleId FROM userRoles
       WHERE userId=${userId}
@@ -34,7 +34,7 @@ class UserRolesTable extends JoinTable<DbUserRole> {
     `);
   };
 
-  updateForUserId = async (userId: number, roles: Roles[]): Promise<void> => {
+  updateForUserId = async (userId: number, roles: Role[]): Promise<void> => {
     await this.deleteForUserId(userId);
 
     asyncForEach(roles, async (roleId: number) => {

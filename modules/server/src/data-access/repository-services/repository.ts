@@ -53,6 +53,10 @@ export default abstract class Repository<
     await this.entityTable.update(model.toJson() as TDbRow);
   }
 
+  async patch(id: number, props: Record<string, unknown>): Promise<void> {
+    await this.entityTable.patch(id, props);
+  }
+
   updateMany = async (models: TModel[]): Promise<void> => {
     await asyncForEach(models, this.update);
   };

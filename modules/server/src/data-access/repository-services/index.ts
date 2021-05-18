@@ -15,6 +15,8 @@ import ProfileRepository from './profile';
 import PlayerRatingRepository from './player-rating';
 import PlayerGroupResultRepository from './player-group-result';
 import SeasonRepository from './season';
+import UserRepository from './user';
+import UserRoleRepository from './user-role';
 
 // TODO: Memoize getters
 export default class RepositoryServices {
@@ -75,6 +77,14 @@ export default class RepositoryServices {
 
   get seasons(): SeasonRepository {
     return new SeasonRepository(this, this.user, this.context);
+  }
+
+  get users(): UserRepository {
+    return new UserRepository(this, this.user, this.context);
+  }
+
+  get userRoles(): UserRoleRepository {
+    return new UserRoleRepository(this, this.user, this.context);
   }
 
   constructor(user: UserModel, context: EntityContext) {
