@@ -55,55 +55,6 @@ const getInclude = (
   return includes;
 };
 
-const createRounds = async (
-  rounds: RoundModel[],
-  newEventId: number,
-  services: EntityContext
-) => {
-  await asyncForEach(rounds, async round => {
-    // Each round has to be tied into this event.
-    round.eventId = newEventId;
-
-    const roundJson = round.toJson();
-    const newRoundId = await services.rounds.insert(roundJson as DbRound);
-
-    round.id = newRoundId;
-    roundJson.id = newRoundId;
-
-    await asyncForEach(round.cards.toArray(), async card => {
-      card.roundId = newRoundId;
-
-      const cardJson = card.toJson();
-      const newCardId = await services.cards.insert(cardJson as DbCard);
-
-      card.id = newCardId;
-      cardJson.id = newCardId;
-
-      await asyncForEach(card.playerGroups.toArray(), async playerGroup => {
-        playerGroup.cardId = newCardId;
-
-        const playerGroupJson = playerGroup.toJson();
-        const newPlayerGroupId = await services.playerGroups.insert(
-          playerGroupJson as DbPlayerGroup
-        );
-
-        playerGroup.id = newPlayerGroupId;
-        playerGroupJson.id = newPlayerGroupId;
-
-        await asyncForEach(playerGroup.players.toArray(), async player => {
-          player.playerGroupId = newPlayerGroupId;
-
-          const playerJson = player.toJson();
-
-          await services.playerGroupPlayers.insert(
-            playerJson as DbPlayerGroupPlayer
-          );
-        });
-      });
-    });
-  });
-};
-
 const buildRoute = (): Router => {
   const router = express.Router();
 
@@ -161,72 +112,13 @@ const buildRoute = (): Router => {
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
-      const { id, cardId } = req.params;
-      const { user } = req;
+      const { cardId } = req.params;
       const csvData = req.file.buffer.toString('utf8');
       const scores = parseUDisc(csvData);
-      const playerGroups = await services.playerGroups.getForCard(
-        parseInt(cardId, 10)
-      );
-      const card = await services.cards.get(parseInt(cardId, 10));
-      const round = await services.rounds.get(card.roundId);
-      const holes = await services.courseHoles.getAllForCourseLayout(
-        round.courseLayoutId
-      );
 
-      const getHole = (n: number) => holes.find(h => h.number === n);
-
-      // Look through each player group...
-      await asyncForEach(playerGroups, async playerGroup => {
-        const possibleNames = new Array<string>();
-
-        // For possible names that could be on the uploaded card.
-        if (playerGroup.teamName) {
-          possibleNames.push(playerGroup.teamName.toLowerCase());
-        }
-
-        const dbPlayers = await services.playerGroupPlayers.getForPlayerGroup(
-          playerGroup.id,
-          card.id
-        );
-
-        // Each player group has players, and those have aliases.
-        await asyncForEach(dbPlayers, async dbPlayer => {
-          const player = await services.profiles.get(dbPlayer.playerId);
-
-          // eslint-disable-next-line prettier/prettier
-          possibleNames.push(
-            `${player.firstName.toLowerCase()} ${player.lastName.toLowerCase()}`
-          );
-
-          const aliases = await services.aliases.getForPlayerId(player.id);
-
-          possibleNames.push(...aliases.map(a => a.value.toLowerCase()));
-        });
-
-        // And with that array, we can look through the scores to find a match.
-        const match = scores.find(f =>
-          possibleNames.includes(f.name.toLowerCase())
-        );
-
-        if (match) {
-          // Remove any results that we may already have, in the event someone fixes a card.
-          await services.playerGroupResults.deleteAllForGroup(playerGroup.id);
-
-          // Loop through the uDisc scores and add them to the db!
-          await asyncForEach(match.scores, async uDiscScore => {
-            /* await services.playerGroupResults.insert({
-              playerGroupId: playerGroup.id,
-              courseHoleId: getHole(uDiscScore.number).id,
-              score: uDiscScore.score,
-            }); */
-          });
-        }
+      await services.tx(async tx => {
+        await tx.cards.applyScoreCard(parseInt(cardId, 10), scores);
       });
-
-      // Update the card with the userId of who just uploaded this card.
-      // card.authorId = user.id;
-      await services.cards.update(card);
 
       res.json({ success: true, scores });
     })

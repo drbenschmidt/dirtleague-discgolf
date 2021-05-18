@@ -1,12 +1,14 @@
 import {
   asyncForEach,
   CardModel,
+  PlayerGroupResultModel,
   PlayerRatingModel,
   RatingType,
   RoundModel,
   set,
   sum,
 } from '@dirtleague/common';
+import { UDiscPlayer } from '../../utils/parseUdisc';
 import calculateRating from '../../utils/calculateRating';
 import toJson from '../../utils/toJson';
 import { DbCard } from '../entity-context/cards';
@@ -82,47 +84,120 @@ class CardRepository extends Repository<CardModel, DbCard> {
       round.courseLayoutId
     );
 
-    this.servicesInstance.tx(async tx => {
-      await asyncForEach(cards, async card => {
-        // and get each player group on each card.
-        const playerGroups = await tx.playerGroups.getForCard(card.id);
-        // and then each player(s) for the groups.
-        await asyncForEach(playerGroups, async playerGroup => {
-          const results = await tx.playerGroupResults.getAllForGroup(
-            playerGroup.id
+    await asyncForEach(cards, async card => {
+      // and get each player group on each card.
+      const playerGroups = await this.servicesInstance.playerGroups.getForCard(
+        card.id
+      );
+      // and then each player(s) for the groups.
+      await asyncForEach(playerGroups, async playerGroup => {
+        const results = await this.servicesInstance.playerGroupResults.getAllForGroup(
+          playerGroup.id
+        );
+
+        const totalScore = sum(results.map(r => r.score));
+        const { dgcrSse } = courseLayout;
+        const rating = calculateRating(totalScore, dgcrSse);
+
+        // Update the player group with the score and par of the card so we can
+        // do other calculations in downstream flows.
+        await this.servicesInstance.playerGroups.patch(playerGroup.id, {
+          score: totalScore,
+          par: courseLayout.par,
+        });
+
+        const players = await this.servicesInstance.playerGroupPlayers.getForPlayerGroup(
+          playerGroup.id,
+          card.id
+        );
+        const playerIds = players.map(p => p.playerId);
+
+        await asyncForEach(playerIds, async playerId => {
+          await this.servicesInstance.playerRatings.insert(
+            new PlayerRatingModel({
+              playerId,
+              cardId: card.id,
+              date: new Date(), // TODO: Get from round?
+              rating,
+              type: RatingType.Event, // TODO: Allow client to specify type
+            })
           );
-
-          const totalScore = sum(results.map(r => r.score));
-          const { dgcrSse } = courseLayout;
-          const rating = calculateRating(totalScore, dgcrSse);
-
-          // Update the player group with the score and par of the card so we can
-          // do other calculations in downstream flows.
-
-          set(playerGroup, 'score', totalScore);
-          set(playerGroup, 'par', courseLayout.par);
-
-          await this.servicesInstance.playerGroups.update(playerGroup);
-
-          const players = await this.servicesInstance.playerGroupPlayers.getForPlayerGroup(
-            playerGroup.id,
-            card.id
-          );
-          const playerIds = players.map(p => p.playerId);
-
-          await asyncForEach(playerIds, async playerId => {
-            await this.servicesInstance.playerRatings.insert(
-              new PlayerRatingModel({
-                playerId,
-                cardId: card.id,
-                date: new Date(), // TODO: Get from round?
-                rating,
-                type: RatingType.Event, // TODO: Allow client to specify type
-              })
-            );
-          });
         });
       });
+    });
+  }
+
+  async applyScoreCard(id: number, scoreCard: UDiscPlayer[]): Promise<void> {
+    const playerGroups = await this.servicesInstance.playerGroups.getForCard(
+      id
+    );
+    const card = await this.get(id);
+    const round = await this.servicesInstance.rounds.get(card.roundId);
+    const holes = await this.servicesInstance.courseHoles.getAllForCourseLayout(
+      round.courseLayoutId
+    );
+
+    const getHole = (n: number) => holes.find(h => h.number === n);
+
+    // Look through each player group...
+    await asyncForEach(playerGroups, async playerGroup => {
+      const possibleNames = new Array<string>();
+
+      // For possible names that could be on the uploaded card.
+      if (playerGroup.teamName) {
+        possibleNames.push(playerGroup.teamName.toLowerCase());
+      }
+
+      const dbPlayers = await this.servicesInstance.playerGroupPlayers.getForPlayerGroup(
+        playerGroup.id,
+        card.id
+      );
+
+      // Each player group has players, and those have aliases.
+      await asyncForEach(dbPlayers, async dbPlayer => {
+        const player = await this.servicesInstance.profiles.get(
+          dbPlayer.playerId
+        );
+
+        // eslint-disable-next-line prettier/prettier
+        possibleNames.push(
+          `${player.firstName.toLowerCase()} ${player.lastName.toLowerCase()}`
+        );
+
+        const aliases = await this.servicesInstance.aliases.getForPlayerId(
+          player.id
+        );
+
+        possibleNames.push(...aliases.map(a => a.value.toLowerCase()));
+      });
+
+      // And with that array, we can look through the scores to find a match.
+      const match = scoreCard.find(f =>
+        possibleNames.includes(f.name.toLowerCase())
+      );
+
+      if (match) {
+        // Remove any results that we may already have, in the event someone fixes a card.
+        await this.servicesInstance.playerGroupResults.deleteAllForGroup(
+          playerGroup.id
+        );
+
+        // Loop through the uDisc scores and add them to the db!
+        await asyncForEach(match.scores, async uDiscScore => {
+          await this.servicesInstance.playerGroupResults.insert(
+            new PlayerGroupResultModel({
+              playerGroupId: playerGroup.id,
+              courseHoleId: getHole(uDiscScore.number).id,
+              score: uDiscScore.score,
+            })
+          );
+        });
+      }
+    });
+
+    // Update the card with the playerId of who just uploaded this card.
+    await this.servicesInstance.cards.patch(card.id, {
+      authorId: this.user.playerId,
     });
   }
 }

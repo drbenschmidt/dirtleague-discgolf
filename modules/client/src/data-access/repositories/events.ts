@@ -30,7 +30,7 @@ class EventRepository extends ApiRepository implements Repository<EventModel> {
 
   // TODO: Put this on a round repository.
   async markRoundComplete(roundId: number): Promise<void> {
-    await this.api.get(`rounds/${roundId}/complete`);
+    await this.api.post(`rounds/${roundId}/complete`, {});
   }
 
   async putCard(

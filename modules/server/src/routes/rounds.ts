@@ -81,8 +81,7 @@ const buildRoute = (): Router => {
     })
   );
 
-  // TODO: Why is this a get? Should be POST.
-  router.get(
+  router.post(
     '/:id/complete',
     requireRoles([Roles.Admin]),
     withRepositoryServices,
@@ -91,10 +90,8 @@ const buildRoute = (): Router => {
       const { id } = req.params;
       const round = await services.rounds.get(parseInt(id, 10));
 
-      round.isComplete = true;
-
       await services.tx(async tx => {
-        await tx.rounds.update(round);
+        await tx.rounds.patch(round.id, { isComplete: true });
         await tx.cards.onRoundComplete(round);
       });
 
