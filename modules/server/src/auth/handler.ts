@@ -95,6 +95,7 @@ export const requireRoles = (
     if (!isAuthorized) {
       // Forbidden
       res.status(403).json({ error: 'Unauthorized' });
+      return;
     }
 
     next();

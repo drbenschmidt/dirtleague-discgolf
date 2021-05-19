@@ -8,8 +8,8 @@ const services = new EntityContext(connectionPool);
 const insertUser = async (email: string, password: string): Promise<void> => {
   const { hash, salt } = await hashPassword(password);
 
-  const playerId = await services.profiles.create({
-    firstName: 'New',
+  const playerId = await services.profiles.insert({
+    firstName: 'System',
     lastName: 'User',
     yearJoined: new Date().getFullYear(),
     bio: '',

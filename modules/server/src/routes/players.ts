@@ -12,7 +12,7 @@ const buildRoute = (): Router => {
     const { id } = req.params;
     const { user } = req;
 
-    return user.id === parseInt(id, 10);
+    return user.playerId === parseInt(id, 10);
   };
 
   router.get(
