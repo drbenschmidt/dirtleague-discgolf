@@ -1,4 +1,3 @@
-/* eslint-disable class-methods-use-this */
 import { sql } from '@databases/mysql';
 import { keys } from 'ts-transformer-keys';
 import { JoinTable } from './entity-table';
