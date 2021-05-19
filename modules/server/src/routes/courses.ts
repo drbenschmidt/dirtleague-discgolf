@@ -105,7 +105,7 @@ const buildRoute = (): Router => {
     })
   );
 
-  router.patch(
+  router.put(
     '/:id',
     requireRoles([Role.CourseManagement]),
     withRepositoryServices,

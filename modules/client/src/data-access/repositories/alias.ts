@@ -9,7 +9,7 @@ class AliasRepository extends ApiRepository implements Repository<AliasModel> {
   }
 
   async update(model: AliasModel): Promise<void> {
-    await this.api.patch<AliasAttributes>(`aliases/${model.id}`, model);
+    await this.api.put<AliasAttributes>(`aliases/${model.id}`, model);
   }
 
   async delete(id: number): Promise<void> {

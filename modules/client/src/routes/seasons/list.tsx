@@ -1,8 +1,8 @@
-import { SeasonModel } from '@dirtleague/common';
+import { Role, SeasonModel } from '@dirtleague/common';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { Link, useRouteMatch } from 'react-router-dom';
 import { Table, Button, Menu, Icon, Modal } from 'semantic-ui-react';
-import IfAdmin from '../../components/auth/if-admin';
+import IfAuthorized from '../../components/auth/if-admin';
 import RepositoryServices from '../../data-access/repository-services';
 import { useRepositoryServices } from '../../data-access/context';
 import Breadcrumbs from '../../components/generic/breadcrumbs';
@@ -114,7 +114,7 @@ const SeasonList = (): ReactElement => {
               <Table.Cell>{season.startDate.toDateString()}</Table.Cell>
               <Table.Cell>{season.endDate.toDateString()}</Table.Cell>
               <Table.Cell textAlign="right">
-                <IfAdmin>
+                <IfAuthorized roles={[Role.SeasonManagement]}>
                   <Button as={Link} to={`${url}/${season.id}/edit`} size="mini">
                     <Icon name="edit" />
                     Edit
@@ -124,7 +124,7 @@ const SeasonList = (): ReactElement => {
                     services={services}
                     onDelete={onDelete}
                   />
-                </IfAdmin>
+                </IfAuthorized>
               </Table.Cell>
             </Table.Row>
           ))}
@@ -133,13 +133,13 @@ const SeasonList = (): ReactElement => {
         <Table.Footer>
           <Table.Row>
             <Table.HeaderCell colSpan="4">
-              <Menu floated="right">
-                <IfAdmin>
+              <IfAuthorized roles={[Role.SeasonManagement]}>
+                <Menu floated="right">
                   <Menu.Item as={Link} to={`${url}/new`}>
                     <Icon name="add circle" /> New Season
                   </Menu.Item>
-                </IfAdmin>
-              </Menu>
+                </Menu>
+              </IfAuthorized>
             </Table.HeaderCell>
           </Table.Row>
         </Table.Footer>

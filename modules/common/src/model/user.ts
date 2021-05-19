@@ -2,7 +2,7 @@ import { Memoize } from 'typescript-memoize';
 import Cloneable from '../interfaces/cloneable';
 import type Role from '../security/roles';
 import DirtLeagueModel from './dl-model';
-import PlayerModel from './player';
+import PlayerModel, { PlayerAttributes } from './player';
 
 export interface UserAttributes {
   id: number;
@@ -53,8 +53,14 @@ export default class UserModel
   }
 
   @Memoize()
-  get player(): PlayerModel {
-    return new PlayerModel(this.get('player'));
+  get player(): PlayerModel | undefined {
+    const model = this.getAttribute<PlayerAttributes>('player');
+
+    if (model) {
+      return new PlayerModel(model);
+    }
+
+    return undefined;
   }
 
   clone(): UserModel {

@@ -55,13 +55,13 @@ const buildRoute = (): Router => {
       if (user.playerId) {
         const player = await services.profiles.get(user.playerId);
 
-        (user as any).player = player;
+        (user as any).attributes.player = player;
       }
 
       // TODO: Check to see if we're requesting the roles as well.
       const roles = await services.userRoles.getByUserId(user.id);
 
-      (user as any).roles = roles;
+      (user as any).attributes.roles = roles;
 
       res.json(cleanUser(user.toJson() as DbUser));
     })
@@ -88,15 +88,14 @@ const buildRoute = (): Router => {
 
         await tx.profiles.insert(playerModel);
 
-        userModel = new UserModel({
+        const newUserId = await tx.users.newUser({
           email: newUserRequest.user.email,
           passwordHash: hash,
           passwordSalt: salt,
           playerId: playerModel.id,
         });
 
-        await tx.users.insert(userModel);
-
+        userModel = await services.users.get(newUserId);
         userModel.roles = await services.userRoles.getByUserId(userModel.id);
       });
 

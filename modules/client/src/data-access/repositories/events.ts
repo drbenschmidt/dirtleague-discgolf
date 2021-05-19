@@ -9,7 +9,7 @@ class EventRepository extends ApiRepository implements Repository<EventModel> {
   }
 
   async update(model: EventModel): Promise<void> {
-    await this.api.patch<EventAttributes>(`events/${model.id}`, model);
+    await this.api.put<EventAttributes>(`events/${model.id}`, model);
   }
 
   async delete(id: number): Promise<void> {

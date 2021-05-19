@@ -4,6 +4,13 @@ import { Table } from '../entity-context/entity-table';
 import Repository from './repository';
 import hashPassword from '../../crypto/hash';
 
+export interface NewUserProps {
+  email: string;
+  passwordHash: string;
+  passwordSalt: string;
+  playerId: number;
+}
+
 class UserRepository extends Repository<UserModel, DbUser> {
   get entityTable(): Table<DbUser> {
     return this.context.users;
@@ -11,6 +18,10 @@ class UserRepository extends Repository<UserModel, DbUser> {
 
   factory(row: DbUser): UserModel {
     return new UserModel(row);
+  }
+
+  async newUser(props: NewUserProps): Promise<number> {
+    return this.entityTable.insert(props);
   }
 
   async updatePassword(id: number, password: string): Promise<void> {

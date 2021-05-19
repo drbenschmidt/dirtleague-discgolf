@@ -1,8 +1,8 @@
-import { PlayerModel } from '@dirtleague/common';
+import { PlayerModel, Role } from '@dirtleague/common';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { Link, useRouteMatch } from 'react-router-dom';
 import { Table, Button, Menu, Icon, Modal } from 'semantic-ui-react';
-import IfAdmin from '../../components/auth/if-admin';
+import IfAuthorized from '../../components/auth/if-admin';
 import RepositoryServices from '../../data-access/repository-services';
 import { useRepositoryServices } from '../../data-access/context';
 import Breadcrumbs from '../../components/generic/breadcrumbs';
@@ -120,19 +120,22 @@ const PlayerList = (): ReactElement => {
                   <Icon name="address book" />
                   View
                 </Button>
-                <IfAdmin or={() => player.id === authManager?.user?.id}>
+                <IfAuthorized
+                  roles={[Role.PlayerManagement]}
+                  or={() => player.id === authManager?.user?.id}
+                >
                   <Button as={Link} to={`${url}/${player.id}/edit`} size="mini">
                     <Icon name="edit" />
                     Edit
                   </Button>
-                </IfAdmin>
-                <IfAdmin>
+                </IfAuthorized>
+                <IfAuthorized roles={[Role.PlayerManagement]}>
                   <DeletePlayerButton
                     player={player}
                     services={services}
                     onDelete={onDelete}
                   />
-                </IfAdmin>
+                </IfAuthorized>
               </Table.Cell>
             </Table.Row>
           ))}
@@ -141,13 +144,13 @@ const PlayerList = (): ReactElement => {
         <Table.Footer>
           <Table.Row>
             <Table.HeaderCell colSpan="4">
-              <Menu floated="right">
-                <IfAdmin>
+              <IfAuthorized roles={[Role.PlayerManagement]}>
+                <Menu floated="right">
                   <Menu.Item as={Link} to={`${url}/new`}>
                     <Icon name="add circle" /> New Player
                   </Menu.Item>
-                </IfAdmin>
-              </Menu>
+                </Menu>
+              </IfAuthorized>
             </Table.HeaderCell>
           </Table.Row>
         </Table.Footer>

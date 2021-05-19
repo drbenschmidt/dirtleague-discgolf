@@ -127,7 +127,7 @@ const buildRoute = (): Router => {
     })
   );
 
-  router.patch(
+  router.put(
     '/:id',
     requireRoles([Role.EventManagement]),
     withRepositoryServices,

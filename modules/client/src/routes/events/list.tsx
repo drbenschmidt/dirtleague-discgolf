@@ -1,8 +1,8 @@
-import { EventModel } from '@dirtleague/common';
+import { EventModel, Role } from '@dirtleague/common';
 import { ReactElement, useCallback, useEffect, useState, memo } from 'react';
 import { Link, useRouteMatch } from 'react-router-dom';
 import { Table, Button, Menu, Icon } from 'semantic-ui-react';
-import IfAdmin from '../../components/auth/if-admin';
+import IfAuthorized from '../../components/auth/if-admin';
 import { useRepositoryServices } from '../../data-access/context';
 import DeleteEntityButton from '../../components/generic/delete-entity-button';
 import Breadcrumbs from '../../components/generic/breadcrumbs';
@@ -70,7 +70,7 @@ const EventList = (): ReactElement => {
                   <Icon name="chart bar" />
                   Results
                 </Button>
-                <IfAdmin>
+                <IfAuthorized roles={[Role.EventManagement]}>
                   <Button as={Link} to={`${url}/${entity.id}/edit`} size="mini">
                     <Icon name="edit" />
                     Edit
@@ -80,7 +80,7 @@ const EventList = (): ReactElement => {
                     id={entity.id}
                     onDelete={onDelete}
                   />
-                </IfAdmin>
+                </IfAuthorized>
               </Table.Cell>
             </Table.Row>
           ))}
@@ -89,13 +89,13 @@ const EventList = (): ReactElement => {
         <Table.Footer>
           <Table.Row>
             <Table.HeaderCell colSpan="4">
-              <Menu floated="right">
-                <IfAdmin>
+              <IfAuthorized roles={[Role.EventManagement]}>
+                <Menu floated="right">
                   <Menu.Item as={Link} to={`${url}/new`}>
                     <Icon name="add circle" /> New Event
                   </Menu.Item>
-                </IfAdmin>
-              </Menu>
+                </Menu>
+              </IfAuthorized>
             </Table.HeaderCell>
           </Table.Row>
         </Table.Footer>

@@ -59,7 +59,7 @@ const buildRoute = (): Router => {
     })
   );
 
-  router.patch(
+  router.put(
     '/:id',
     requireRoles([Roles.SeasonManagement]),
     withRepositoryServices,
