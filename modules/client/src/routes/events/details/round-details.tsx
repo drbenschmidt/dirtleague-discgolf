@@ -1,6 +1,7 @@
-import { CardModel, RoundModel } from '@dirtleague/common';
+import { CardModel, Role, RoundModel } from '@dirtleague/common';
 import { ReactElement, useCallback } from 'react';
 import { Button, Grid, Icon } from 'semantic-ui-react';
+import IfAuthorized from '../../../components/auth/if-admin';
 import { useRepositoryServices } from '../../../data-access/context';
 import useModelState from '../../../hooks/useModelState';
 import CardDetails from './card-details';
@@ -28,15 +29,17 @@ const RoundDetails = (props: RoundDetailsProps): ReactElement => {
             <div>Layout: {model.courseLayout?.name}</div>
           </Grid.Column>
           <Grid.Column width="8" floated="right" textAlign="right">
-            <Button
-              as="a"
-              disabled={isComplete}
-              positive
-              onClick={onCompleteClick}
-            >
-              <Icon name="checkmark" />
-              Complete
-            </Button>
+            <IfAuthorized roles={[Role.EventManagement]}>
+              <Button
+                as="a"
+                disabled={isComplete}
+                positive
+                onClick={onCompleteClick}
+              >
+                <Icon name="checkmark" />
+                Complete
+              </Button>
+            </IfAuthorized>
           </Grid.Column>
         </Grid.Row>
       </Grid>

@@ -4,10 +4,12 @@ import {
   PlayerGroupModel,
   clamper,
   RatingType,
+  Role,
 } from '@dirtleague/common';
 import { ReactElement, useRef, useCallback } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Grid, Label, Table, SemanticCOLORS } from 'semantic-ui-react';
+import IfAuthorized from '../../../components/auth/if-admin';
 import { useRepositoryServices } from '../../../data-access/context';
 import UploadButton from './upload-button';
 
@@ -136,12 +138,14 @@ const CardDetails = (props: CardDetailsProps): ReactElement => {
       </Table>
       <Grid>
         <Grid.Column width="16" floated="right" textAlign="right">
-          <UploadButton
-            disabled={isComplete}
-            onUpload={onUpload}
-            formData={formDataRef.current}
-            formPropName="csv"
-          />
+          <IfAuthorized roles={[Role.EventManagement]}>
+            <UploadButton
+              disabled={isComplete}
+              onUpload={onUpload}
+              formData={formDataRef.current}
+              formPropName="csv"
+            />
+          </IfAuthorized>
         </Grid.Column>
       </Grid>
     </>
