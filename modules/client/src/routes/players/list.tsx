@@ -95,6 +95,10 @@ const PlayerList = (): ReactElement => {
     };
   }, [services?.players, dummy]);
 
+  const isCurrentUser = (profileId: number) => {
+    return profileId === authManager.user?.playerId;
+  };
+
   return (
     <>
       <Breadcrumbs path={[Players.List]} />
@@ -104,7 +108,6 @@ const PlayerList = (): ReactElement => {
           <Table.Row>
             <Table.HeaderCell>First</Table.HeaderCell>
             <Table.HeaderCell>Last</Table.HeaderCell>
-            <Table.HeaderCell>Current Rating</Table.HeaderCell>
             <Table.HeaderCell textAlign="right">Actions</Table.HeaderCell>
           </Table.Row>
         </Table.Header>
@@ -114,7 +117,6 @@ const PlayerList = (): ReactElement => {
             <Table.Row key={player.id}>
               <Table.Cell>{player.firstName}</Table.Cell>
               <Table.Cell>{player.lastName}</Table.Cell>
-              <Table.Cell>{player.currentRating}</Table.Cell>
               <Table.Cell textAlign="right">
                 <Button as={Link} to={`${url}/${player.id}`} size="mini">
                   <Icon name="address book" />
@@ -122,7 +124,7 @@ const PlayerList = (): ReactElement => {
                 </Button>
                 <IfAuthorized
                   roles={[Role.PlayerManagement]}
-                  or={() => player.id === authManager?.user?.id}
+                  or={() => isCurrentUser(player.id)}
                 >
                   <Button as={Link} to={`${url}/${player.id}/edit`} size="mini">
                     <Icon name="edit" />

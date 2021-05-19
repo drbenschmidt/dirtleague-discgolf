@@ -74,7 +74,7 @@ const buildRoute = (): Router => {
     withTryCatch(async (req, res) => {
       const { services } = req;
       const newUserRequest = req.body as NewUserRequest;
-      let userModel: UserModel = null;
+      let newUserId: number = null;
 
       await services.tx(async tx => {
         const { hash, salt } = await hashPassword(newUserRequest.user.password);
@@ -88,27 +88,29 @@ const buildRoute = (): Router => {
 
         await tx.profiles.insert(playerModel);
 
-        const newUserId = await tx.users.newUser({
+        newUserId = await tx.users.newUser({
           email: newUserRequest.user.email,
           passwordHash: hash,
           passwordSalt: salt,
           playerId: playerModel.id,
         });
-
-        userModel = await services.users.get(newUserId);
-        userModel.roles = await services.userRoles.getByUserId(userModel.id);
       });
 
-      if (!userModel) {
+      if (!newUserId) {
         res.status(500).json({
           success: false,
           error: 'Error creating user or profile',
         });
       }
 
+      const userModel = await services.users.get(newUserId);
+      userModel.attributes.roles = await services.userRoles.getByUserId(
+        userModel.id
+      );
+
       // TODO: Make secret key configurable or use certificate.
       jwt.sign(
-        { user: userModel },
+        { user: userModel.toJson() },
         config.props.DIRT_API_SESSION_SECRET,
         (error: Error | null, token: string | null) => {
           if (error) {
@@ -120,7 +122,7 @@ const buildRoute = (): Router => {
 
           res.json({
             success: true,
-            user: userModel,
+            user: userModel.toJson(),
             token,
           });
         }
