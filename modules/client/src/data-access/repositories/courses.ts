@@ -16,7 +16,7 @@ class CourseRepository
   }
 
   async update(model: CourseModel): Promise<void> {
-    await this.api.patch<CourseAttributes>(`courses/${model.id}`, model);
+    await this.api.put<CourseAttributes>(`courses/${model.id}`, model);
   }
 
   async delete(id: number): Promise<void> {

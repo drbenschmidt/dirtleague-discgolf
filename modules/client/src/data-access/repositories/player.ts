@@ -16,7 +16,7 @@ class PlayerRepository
   }
 
   async update(model: PlayerModel): Promise<void> {
-    await this.api.patch<PlayerAttributes>(`players/${model.id}`, model);
+    await this.api.put<PlayerAttributes>(`players/${model.id}`, model);
   }
 
   async delete(id: number): Promise<void> {

@@ -22,7 +22,7 @@ class UsersRepository extends ApiRepository implements Repository<UserModel> {
   }
 
   async update(model: UserModel): Promise<void> {
-    await this.api.patch<UserAttributes>(`users/${model.id}`, model);
+    await this.api.put<UserAttributes>(`users/${model.id}`, model);
   }
 
   async delete(id: number): Promise<void> {

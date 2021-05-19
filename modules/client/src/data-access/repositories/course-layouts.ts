@@ -11,7 +11,7 @@ class EventRepository
   }
 
   async update(model: CourseLayoutModel): Promise<void> {
-    await this.api.patch<EventAttributes>(`courseLayouts/${model.id}`, model);
+    await this.api.put<EventAttributes>(`courseLayouts/${model.id}`, model);
   }
 
   async delete(id: number): Promise<void> {

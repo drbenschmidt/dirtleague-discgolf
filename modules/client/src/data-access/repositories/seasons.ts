@@ -11,7 +11,7 @@ class SeasonRepository
   }
 
   async update(model: SeasonModel): Promise<void> {
-    await this.api.patch<SeasonAttributes>(`seasons/${model.id}`, model);
+    await this.api.put<SeasonAttributes>(`seasons/${model.id}`, model);
   }
 
   async delete(id: number): Promise<void> {

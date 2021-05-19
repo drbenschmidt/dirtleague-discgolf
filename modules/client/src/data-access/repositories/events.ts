@@ -9,7 +9,7 @@ class EventRepository extends ApiRepository implements Repository<EventModel> {
   }
 
   async update(model: EventModel): Promise<void> {
-    await this.api.patch<EventAttributes>(`events/${model.id}`, model);
+    await this.api.put<EventAttributes>(`events/${model.id}`, model);
   }
 
   async delete(id: number): Promise<void> {
@@ -30,7 +30,7 @@ class EventRepository extends ApiRepository implements Repository<EventModel> {
 
   // TODO: Put this on a round repository.
   async markRoundComplete(roundId: number): Promise<void> {
-    await this.api.get(`rounds/${roundId}/complete`);
+    await this.api.post(`rounds/${roundId}/complete`, {});
   }
 
   async putCard(

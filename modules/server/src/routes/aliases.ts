@@ -1,40 +1,45 @@
 import { AliasModel, Roles } from '@dirtleague/common';
 import express, { Router } from 'express';
-import { DbAlias } from '../data-access/repositories/aliases';
-import RepositoryServices from '../data-access/repository-services';
 import { requireRoles } from '../auth/handler';
 import withTryCatch from '../http/withTryCatch';
+import withRepositoryServices from '../http/withRepositoryServices';
+import toJson from '../utils/toJson';
 
-const buildRoute = (services: RepositoryServices): Router => {
+const buildRoute = (): Router => {
   const router = express.Router();
 
   router.get(
     '/',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const users = await services.aliases.getAll();
 
-      res.json(users);
+      res.json(users.map(toJson));
     })
   );
 
   router.get(
     '/:id',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
       const user = await services.aliases.get(parseInt(id, 10));
 
-      res.json(user);
+      res.json(user.toJson());
     })
   );
 
   router.post(
     '/',
-    requireRoles([Roles.Admin]),
+    requireRoles([Roles.PlayerManagement]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const body = new AliasModel(req.body);
-      const newId = await services.aliases.create(body);
 
-      body.id = newId;
+      await services.aliases.insert(body);
 
       res.json(body.toJson());
     })
@@ -42,8 +47,10 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.delete(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Roles.PlayerManagement]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
 
       await services.aliases.delete(parseInt(id, 10));
@@ -52,11 +59,13 @@ const buildRoute = (services: RepositoryServices): Router => {
     })
   );
 
-  router.patch(
+  router.put(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Roles.PlayerManagement]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
-      const body = req.body as DbAlias;
+      const { services } = req;
+      const body = new AliasModel(req.body);
 
       await services.aliases.update(body);
 

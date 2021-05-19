@@ -1,8 +1,8 @@
-import { CourseModel } from '@dirtleague/common';
+import { CourseModel, Role } from '@dirtleague/common';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { Link, useRouteMatch } from 'react-router-dom';
 import { Table, Button, Menu, Icon } from 'semantic-ui-react';
-import IfAdmin from '../../components/auth/if-admin';
+import IfAuthorized from '../../components/auth/if-admin';
 import { useRepositoryServices } from '../../data-access/context';
 import DeleteEntityButton from '../../components/generic/delete-entity-button';
 import Breadcrumbs from '../../components/generic/breadcrumbs';
@@ -62,7 +62,7 @@ const CourseList = (): ReactElement => {
                   <Icon name="address book" />
                   View
                 </Button>
-                <IfAdmin>
+                <IfAuthorized roles={[Role.CourseManagement]}>
                   <Button as={Link} to={`${url}/${course.id}/edit`} size="mini">
                     <Icon name="edit" />
                     Edit
@@ -72,7 +72,7 @@ const CourseList = (): ReactElement => {
                     modelName="Course"
                     onDelete={onDelete}
                   />
-                </IfAdmin>
+                </IfAuthorized>
               </Table.Cell>
             </Table.Row>
           ))}
@@ -81,13 +81,13 @@ const CourseList = (): ReactElement => {
         <Table.Footer>
           <Table.Row>
             <Table.HeaderCell colSpan="4">
-              <Menu floated="right">
-                <IfAdmin>
+              <IfAuthorized roles={[Role.CourseManagement]}>
+                <Menu floated="right">
                   <Menu.Item as={Link} to={`${url}/new`}>
                     <Icon name="add circle" /> New Course
                   </Menu.Item>
-                </IfAdmin>
-              </Menu>
+                </Menu>
+              </IfAuthorized>
             </Table.HeaderCell>
           </Table.Row>
         </Table.Footer>

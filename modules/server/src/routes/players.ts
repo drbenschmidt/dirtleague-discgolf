@@ -1,15 +1,14 @@
-import { PlayerModel, asyncForEach, Roles } from '@dirtleague/common';
+import { PlayerModel, Role } from '@dirtleague/common';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
-import { RequestWithToken, requireRoles } from '../auth/handler';
-import { DbAlias } from '../data-access/repositories/aliases';
-import RepositoryServices from '../data-access/repository-services';
-import getCrud from '../utils/getCrud';
+import { DirtLeagueRequest, requireRoles } from '../auth/handler';
+import withRepositoryServices from '../http/withRepositoryServices';
+import toJson from '../utils/toJson';
 
-const buildRoute = (services: RepositoryServices): Router => {
+const buildRoute = (): Router => {
   const router = express.Router();
 
-  const isUserEditingOwn = (req: RequestWithToken) => {
+  const isUserEditingOwn = (req: DirtLeagueRequest) => {
     const { id } = req.params;
     const { user } = req;
 
@@ -18,16 +17,20 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.get(
     '/',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
-      const users = await services.profiles.getAll();
+      const { services } = req;
+      const entities = await services.profiles.getAll();
 
-      res.json(users);
+      res.json(entities.map(toJson));
     })
   );
 
   router.get(
     '/:id',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
       const { include } = req.query;
       const playerId = parseInt(id, 10);
@@ -39,9 +42,9 @@ const buildRoute = (services: RepositoryServices): Router => {
 
       // TODO: parse it and check for entity types.
       if (include && entity) {
-        const aliases = await services.aliases.getForUserId(playerId);
+        const aliases = await services.aliases.getForPlayerId(playerId);
 
-        (entity as any).aliases = aliases;
+        (entity as any).attributes.aliases = aliases.map(a => a.toJson());
 
         const ratings = await services.playerRatings.getRunningAverages(
           playerId
@@ -51,19 +54,21 @@ const buildRoute = (services: RepositoryServices): Router => {
           playerId
         );
 
-        (entity as any).stats = {
+        (entity as any).attributes.stats = {
           roundCounts,
           ratings,
         };
       }
 
-      res.json(entity);
+      res.json(entity.toJson());
     })
   );
 
   router.get(
     '/:id/feed',
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
       const playerId = parseInt(id, 10);
       const entity = await services.profiles.getFeed(playerId);
@@ -78,30 +83,15 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.post(
     '/',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.PlayerManagement]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const model = new PlayerModel(req.body);
-      const newId = await services.profiles.create(model);
 
-      model.id = newId;
-
-      if (model.aliases) {
-        // Create each alias if included.
-        await asyncForEach(model.aliases.toArray(), async alias => {
-          // Make sure the aliases relate to this player.
-          // eslint-disable-next-line no-param-reassign
-          alias.playerId = newId;
-
-          const aliasJson = alias.toJson();
-
-          const newAliasId = await services.aliases.create(
-            aliasJson as DbAlias
-          );
-
-          // eslint-disable-next-line no-param-reassign
-          alias.id = newAliasId;
-        });
-      }
+      await services.tx(async tx => {
+        await tx.profiles.insert(model);
+      });
 
       res.json(model.toJson());
     })
@@ -109,8 +99,10 @@ const buildRoute = (services: RepositoryServices): Router => {
 
   router.delete(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.PlayerManagement]),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
+      const { services } = req;
       const { id } = req.params;
 
       await services.profiles.delete(parseInt(id, 10));
@@ -119,39 +111,17 @@ const buildRoute = (services: RepositoryServices): Router => {
     })
   );
 
-  router.patch(
+  router.put(
     '/:id',
-    requireRoles([Roles.Admin], isUserEditingOwn),
+    requireRoles([Role.PlayerManagement], isUserEditingOwn),
+    withRepositoryServices,
     withTryCatch(async (req, res) => {
-      // TODO: Technically, this should be a transaction.
-      const body = req.body as PlayerModel;
+      const { services, body } = req;
+      const model = new PlayerModel(body);
 
-      await services.profiles.update(body);
-
-      if (body.aliases) {
-        const requestAliases = Array.from(body.aliases);
-        const dbAliases = await services.aliases.getForUserId(body.id);
-
-        const [aliasesToCreate, aliasesToUpdate, aliasesToDelete] = getCrud(
-          requestAliases,
-          dbAliases
-        );
-
-        await asyncForEach(aliasesToCreate, async alias => {
-          // eslint-disable-next-line no-param-reassign
-          alias.playerId = body.id;
-
-          await services.aliases.create(alias);
-        });
-
-        await asyncForEach(aliasesToUpdate, async alias => {
-          await services.aliases.update(alias);
-        });
-
-        await asyncForEach(aliasesToDelete, async alias => {
-          await services.aliases.delete(alias.id);
-        });
-      }
+      await services.tx(async transaction => {
+        await transaction.profiles.update(model);
+      });
 
       res.json(null);
     })

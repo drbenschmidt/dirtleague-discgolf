@@ -1,12 +1,16 @@
 import { NextFunction, Response, Request } from 'express';
-import { RequestWithToken } from '../auth/handler';
+import { DirtLeagueRequest } from '../auth/handler';
 
 const withTryCatch = (
-  callback: (req: RequestWithToken, res: Response, next: NextFunction) => void
+  callback: (req: DirtLeagueRequest, res: Response, next: NextFunction) => void
 ) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
     try {
-      await callback(req as RequestWithToken, res, next);
+      await callback(req as DirtLeagueRequest, res, next);
     } catch (e) {
       // TODO: Only return errors in dev mode.
       console.error(e.message, e);

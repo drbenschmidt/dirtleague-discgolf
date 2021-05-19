@@ -48,7 +48,7 @@ const SeasonFormComponent = (
           if (isEditing) {
             await services?.seasons.update(model.current);
 
-            history.push(`/seasons/${model.current.id}`);
+            history.push(`/seasons`);
           } else {
             await services?.seasons.create(model.current);
 

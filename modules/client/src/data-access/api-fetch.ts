@@ -125,6 +125,36 @@ class ApiFetch {
     return response.json();
   };
 
+  put = async <TResponse>(
+    url = '',
+    data: DirtLeagueModel<unknown> | Record<string, unknown>,
+    queryParams = {}
+  ): Promise<TResponse | null> => {
+    let body = {};
+
+    if (data instanceof DirtLeagueModel) {
+      body = data.toJson();
+    } else {
+      body = data;
+    }
+
+    const response = await fetch(
+      buildUrl(ApiFetch.getBaseUrl(), url, queryParams),
+      buildRequestOptions(this.jwt, {
+        method: 'PUT',
+        body: JSON.stringify(body || {}),
+      })
+    );
+
+    const length = response.headers.get('Content-Length');
+
+    if (length && parseInt(length, 10) > 0) {
+      return response.json();
+    }
+
+    return null;
+  };
+
   patch = async <TResponse>(
     url = '',
     data: DirtLeagueModel<unknown> | Record<string, unknown>,

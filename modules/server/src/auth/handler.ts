@@ -2,14 +2,17 @@ import jwt from 'jsonwebtoken';
 import { Request, Response, NextFunction } from 'express';
 import { Roles, UserModel } from '@dirtleague/common';
 import hashPassword from '../crypto/hash';
-import RepositoryServices from '../data-access/repository-services';
+import EntityContext from '../data-access/entity-context';
 import { getDefaultConfigManager } from '../config/manager';
+import RepositoryServices from '../data-access/repository-services';
 
 const config = getDefaultConfigManager();
 
-export interface RequestWithToken extends Request {
+// TODO: Move to own type file
+export interface DirtLeagueRequest extends Request {
   token: string;
   user: UserModel;
+  services: RepositoryServices;
 }
 
 interface JsonWebToken {
@@ -31,7 +34,7 @@ export const extractToken = (req: Request): string => {
 };
 
 export const applyToken = (
-  req: RequestWithToken,
+  req: DirtLeagueRequest,
   res: Response,
   next: NextFunction
 ): void => {
@@ -49,7 +52,7 @@ export const applyToken = (
 };
 
 export const requireToken = (
-  req: RequestWithToken,
+  req: DirtLeagueRequest,
   res: Response,
   next: NextFunction
 ): void => {
@@ -77,8 +80,8 @@ export const applyRoles = (user: UserModel, roles: Roles[]): void => {
 
 export const requireRoles = (
   roles: Roles[],
-  or?: (req: RequestWithToken) => boolean
-) => (req: RequestWithToken, res: Response, next: NextFunction): void => {
+  or?: (req: DirtLeagueRequest) => boolean
+) => (req: DirtLeagueRequest, res: Response, next: NextFunction): void => {
   if (req.token) {
     const { user } = jwt.decode(req.token, { json: true }) as JsonWebToken;
     const isAdmin = user.roles.includes(Roles.Admin);
@@ -104,7 +107,7 @@ export const requireRoles = (
 export const authenticate = async (
   email: string,
   password: string,
-  services: RepositoryServices
+  services: EntityContext
 ): Promise<UserModel> => {
   const result = await services.users.getByEmail(email);
 

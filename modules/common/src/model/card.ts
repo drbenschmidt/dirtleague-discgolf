@@ -15,6 +15,7 @@ export interface CardAttributes {
   id?: number;
   roundId?: number;
   playerGroups?: PlayerGroupAttributes[];
+  authorId?: number;
 }
 
 export default class CardModel
@@ -46,6 +47,14 @@ export default class CardModel
 
   set roundId(value: number) {
     this.setInt('roundId', value);
+  }
+
+  get authorId(): number {
+    return this.attributes.authorId;
+  }
+
+  set authorId(value: number) {
+    this.setInt('authorId', value);
   }
 
   @Memoize()

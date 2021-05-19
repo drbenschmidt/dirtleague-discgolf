@@ -2,7 +2,7 @@ import Cloneable from '../interfaces/cloneable';
 import DirtLeagueModel from './dl-model';
 
 export interface PlayerGroupResultAttributes {
-  cardThrowerId?: number;
+  playerGroupId?: number;
   courseHoleId?: number;
   score?: number;
 }
@@ -19,12 +19,12 @@ export default class PlayerGroupResultModel
     });
   }
 
-  get cardThrowerId(): number {
-    return this.attributes.cardThrowerId;
+  get playerGroupId(): number {
+    return this.attributes.playerGroupId;
   }
 
-  set cardThrowerId(value: number) {
-    this.setInt('cardThrowerId', value);
+  set playerGroupId(value: number) {
+    this.setInt('playerGroupId', value);
   }
 
   get courseHoleId(): number {

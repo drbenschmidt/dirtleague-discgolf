@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import AuthButton from './components/auth/button';
 import SignUpButton from './components/sign-up/button';
 import Toaster from './components/notifications/toaster';
-import IfAdmin from './components/auth/if-admin';
+import IfAuthorized from './components/auth/if-admin';
 
 export const MenuLink = (
   props: PropsWithChildren<MenuItemProps>
@@ -61,9 +61,9 @@ export const Body = (props: PropsWithChildren<unknown>): ReactElement => {
             <MenuLink to="/courses">Courses</MenuLink>
             <MenuLink to="/events">Events</MenuLink>
             <MenuLink to="/seasons">Seasons</MenuLink>
-            <IfAdmin>
+            <IfAuthorized>
               <MenuLink to="/admin">Admin</MenuLink>
-            </IfAdmin>
+            </IfAuthorized>
             <Menu.Item position="right">
               <SignUpButton fixed={false} />
               <AuthButton fixed={false} />
@@ -77,9 +77,9 @@ export const Body = (props: PropsWithChildren<unknown>): ReactElement => {
                 <DropdownLink to="/courses">Courses</DropdownLink>
                 <DropdownLink to="/events">Events</DropdownLink>
                 <DropdownLink to="/seasons">Seasons</DropdownLink>
-                <IfAdmin>
+                <IfAuthorized>
                   <DropdownLink to="/admin">Admin</DropdownLink>
-                </IfAdmin>
+                </IfAuthorized>
               </Dropdown.Menu>
             </Dropdown>
             <Menu.Item position="right">

@@ -13,6 +13,7 @@ export { default as filledArray } from './utils/filledArray';
 export { default as sum } from './utils/sum';
 export { default as get } from './utils/get';
 export { default as set } from './utils/set';
+export { default as includesAny } from './utils/includesAny';
 
 export { default as Roles } from './security/roles';
 export { default as Role } from './security/roles';
@@ -33,6 +34,7 @@ export { default as PlayerGroupResultModel } from './model/player-group-result';
 export { default as CardHoleResultModel } from './model/player-group-result';
 export { default as FeedModel } from './model/feed';
 export { default as UserModel } from './model/user';
+export { default as PlayerRatingModel } from './model/player-rating';
 export type { AliasAttributes } from './model/alias';
 export type { CourseAttributes } from './model/course';
 export type { CourseHoleAttributes } from './model/course-hole';
@@ -47,6 +49,7 @@ export type { PlayerGroupPlayerAttributes } from './model/player-group-player';
 export type { PlayerGroupResultAttributes } from './model/player-group-result';
 export type { FeedAttributes } from './model/feed';
 export type { UserAttributes } from './model/user';
+export type { PlayerRatingAttributes } from './model/player-rating';
 
 export { RatingType } from './model/player-rating';
 

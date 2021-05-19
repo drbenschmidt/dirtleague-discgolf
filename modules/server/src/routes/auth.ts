@@ -2,7 +2,7 @@ import express, { Request, Response, Router } from 'express';
 import jwt from 'jsonwebtoken';
 import { randomInt, sleep } from '@dirtleague/common';
 import { authenticate } from '../auth/handler';
-import RepositoryServices from '../data-access/repository-services';
+import EntityContext from '../data-access/entity-context';
 import { getDefaultConfigManager } from '../config/manager';
 
 const config = getDefaultConfigManager();
@@ -11,10 +11,11 @@ interface RequestWithToken extends Request {
   token: string;
 }
 
-const buildRoute = (services: RepositoryServices): Router => {
+const buildRoute = (): Router => {
   const router = express.Router();
 
   router.post('/', async (req, res) => {
+    const services = EntityContext.CreateFromPool();
     const { email, password } = req.body;
 
     const user = await authenticate(email, password, services);

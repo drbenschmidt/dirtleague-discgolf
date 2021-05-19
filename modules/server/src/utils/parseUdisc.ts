@@ -5,12 +5,12 @@ Par,Capital Springs,Short Teepads to White Baskets,2020-08-13 11:39,63,,4,3,4,4,
 Actionjakson,Capital Springs,Short Teepads to White Baskets,2020-08-13 11:39,48,-15,3,2,3,3,2,3,3,2,2,3,3,4,2,3,2,3,3,2
  */
 
-interface UDiscScore {
+export interface UDiscScore {
   number: number;
   score: number;
 }
 
-interface UDiscPlayer {
+export interface UDiscPlayer {
   name: string;
   scores: UDiscScore[];
 }

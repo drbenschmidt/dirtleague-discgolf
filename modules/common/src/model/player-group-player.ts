@@ -4,6 +4,7 @@ import Cloneable from '../interfaces/cloneable';
 import DirtLeagueModel from './dl-model';
 import PlayerModel, { PlayerAttributes } from './player';
 import Validatable, { onlyClient } from '../interfaces/validatable';
+import PlayerRatingModel, { PlayerRatingAttributes } from './player-rating';
 
 export interface PlayerGroupPlayerAttributes {
   playerGroupId?: number;
@@ -51,11 +52,11 @@ export default class PlayerGroupPlayerModel
   }
 
   @Memoize()
-  get rating(): number | undefined {
-    const rating = this.getAttribute<number>('rating');
+  get rating(): PlayerRatingModel | undefined {
+    const rating = this.getAttribute<PlayerRatingAttributes>('rating');
 
     if (rating) {
-      return rating;
+      return new PlayerRatingModel(rating);
     }
 
     return undefined;

@@ -17,7 +17,7 @@ const EventDetails = (): ReactElement | null => {
   useEffect(() => {
     const doWork = async () => {
       const event = await services?.events.get(parseInt(id, 10), {
-        include: ['rounds'],
+        include: ['details'],
       });
 
       setResult(event);

@@ -53,7 +53,7 @@ const CombinedCardResults = (props: CombinedCardResultsProps): ReactElement => {
             <div>{player.player?.fullName}</div>
           ))}
         </div>
-        <div>{rating}</div>
+        <div>{rating?.rating}</div>
       </div>
     );
   };
@@ -182,7 +182,7 @@ const EventResults = (): ReactElement | null => {
   useEffect(() => {
     const doWork = async () => {
       const event = await services?.events.get(parseInt(id, 10), {
-        include: ['rounds'],
+        include: ['details'],
       });
 
       setResult(event);
