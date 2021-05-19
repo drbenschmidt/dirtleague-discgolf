@@ -1,15 +1,7 @@
-import {
-  RoundModel,
-  Roles,
-  asyncForEach,
-  RatingType,
-  sum,
-} from '@dirtleague/common';
+import { RoundModel, Role } from '@dirtleague/common';
 import express, { Router } from 'express';
-import { DbRound } from '../data-access/entity-context/rounds';
 import { requireRoles } from '../auth/handler';
 import withTryCatch from '../http/withTryCatch';
-import calculateRating from '../utils/calculateRating';
 import withRepositoryServices from '../http/withRepositoryServices';
 import toJson from '../utils/toJson';
 
@@ -41,7 +33,7 @@ const buildRoute = (): Router => {
 
   router.post(
     '/',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.RoundManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
@@ -55,7 +47,7 @@ const buildRoute = (): Router => {
 
   router.delete(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.RoundManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
@@ -69,7 +61,7 @@ const buildRoute = (): Router => {
 
   router.patch(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.RoundManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
@@ -83,7 +75,7 @@ const buildRoute = (): Router => {
 
   router.post(
     '/:id/complete',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.RoundManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;

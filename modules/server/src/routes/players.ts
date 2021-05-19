@@ -1,4 +1,4 @@
-import { PlayerModel, Roles } from '@dirtleague/common';
+import { PlayerModel, Role } from '@dirtleague/common';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { DirtLeagueRequest, requireRoles } from '../auth/handler';
@@ -83,7 +83,7 @@ const buildRoute = (): Router => {
 
   router.post(
     '/',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.PlayerManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
@@ -99,7 +99,7 @@ const buildRoute = (): Router => {
 
   router.delete(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.PlayerManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
@@ -113,7 +113,7 @@ const buildRoute = (): Router => {
 
   router.patch(
     '/:id',
-    requireRoles([Roles.Admin], isUserEditingOwn),
+    requireRoles([Role.PlayerManagement], isUserEditingOwn),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services, body } = req;

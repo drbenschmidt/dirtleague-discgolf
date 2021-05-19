@@ -1,8 +1,7 @@
-import { Roles, CourseLayoutModel } from '@dirtleague/common';
+import { Role, CourseLayoutModel } from '@dirtleague/common';
 import express, { Router } from 'express';
 import { requireRoles } from '../auth/handler';
 import withTryCatch from '../http/withTryCatch';
-import { DbCourseLayout } from '../data-access/entity-context/course-layouts';
 import withRepositoryServices from '../http/withRepositoryServices';
 import toJson from '../utils/toJson';
 
@@ -34,7 +33,7 @@ const buildRoute = (): Router => {
 
   router.post(
     '/',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.CourseManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
@@ -48,7 +47,7 @@ const buildRoute = (): Router => {
 
   router.delete(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.CourseManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
@@ -62,7 +61,7 @@ const buildRoute = (): Router => {
 
   router.patch(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.CourseManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;

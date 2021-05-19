@@ -33,7 +33,7 @@ const buildRoute = (): Router => {
 
   router.post(
     '/',
-    requireRoles([Roles.Admin]),
+    requireRoles([Roles.PlayerManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
@@ -47,7 +47,7 @@ const buildRoute = (): Router => {
 
   router.delete(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Roles.PlayerManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
@@ -61,7 +61,7 @@ const buildRoute = (): Router => {
 
   router.patch(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Roles.PlayerManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;

@@ -25,15 +25,15 @@ const buildRoute = (): Router => {
     withTryCatch(async (req, res) => {
       const { services } = req;
       const { id } = req.params;
-      const user = await services.seasons.get(parseInt(id, 10));
+      const entity = await services.seasons.get(parseInt(id, 10));
 
-      res.json(user);
+      res.json(entity.toJson());
     })
   );
 
   router.post(
     '/',
-    requireRoles([Roles.Admin]),
+    requireRoles([Roles.SeasonManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
@@ -47,7 +47,7 @@ const buildRoute = (): Router => {
 
   router.delete(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Roles.SeasonManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
@@ -61,7 +61,7 @@ const buildRoute = (): Router => {
 
   router.patch(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Roles.SeasonManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;

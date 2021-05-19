@@ -1,21 +1,9 @@
-/* eslint-disable no-param-reassign */
-import {
-  asyncForEach,
-  Roles,
-  EventModel,
-  RoundModel,
-} from '@dirtleague/common';
+import { Role, EventModel } from '@dirtleague/common';
 import type { ParsedQs } from 'qs';
 import multer from 'multer';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
-import EntityContext from '../data-access/entity-context';
-import { DbRound } from '../data-access/entity-context/rounds';
-import { DbCard } from '../data-access/entity-context/cards';
-import { DbPlayerGroup } from '../data-access/entity-context/player-groups';
-import { DbPlayerGroupPlayer } from '../data-access/entity-context/player-group-players';
-import getCrud from '../utils/getCrud';
 import parseUDisc from '../utils/parseUdisc';
 import withRepositoryServices from '../http/withRepositoryServices';
 import toJson from '../utils/toJson';
@@ -91,7 +79,7 @@ const buildRoute = (): Router => {
 
   router.post(
     '/',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.EventManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
@@ -107,7 +95,7 @@ const buildRoute = (): Router => {
 
   router.put(
     '/:id/card/:cardId/upload',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.EventManagement]),
     csvUpload.single('csv'),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
@@ -126,7 +114,7 @@ const buildRoute = (): Router => {
 
   router.delete(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.EventManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
@@ -141,7 +129,7 @@ const buildRoute = (): Router => {
 
   router.patch(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.EventManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;

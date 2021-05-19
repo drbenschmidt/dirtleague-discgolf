@@ -1,4 +1,4 @@
-import { asyncForEach, Roles, CourseModel } from '@dirtleague/common';
+import { asyncForEach, Role, CourseModel } from '@dirtleague/common';
 import express, { Router } from 'express';
 import withTryCatch from '../http/withTryCatch';
 import { requireRoles } from '../auth/handler';
@@ -76,13 +76,11 @@ const buildRoute = (): Router => {
 
   router.post(
     '/',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.CourseManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;
       const model = new CourseModel(req.body);
-
-      console.log(model.toJson());
 
       await services.tx(async tx => {
         await tx.courses.insert(model);
@@ -94,7 +92,7 @@ const buildRoute = (): Router => {
 
   router.delete(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.CourseManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { id } = req.params;
@@ -109,7 +107,7 @@ const buildRoute = (): Router => {
 
   router.patch(
     '/:id',
-    requireRoles([Roles.Admin]),
+    requireRoles([Role.CourseManagement]),
     withRepositoryServices,
     withTryCatch(async (req, res) => {
       const { services } = req;

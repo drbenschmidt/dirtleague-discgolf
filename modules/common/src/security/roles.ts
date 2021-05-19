@@ -6,6 +6,7 @@ enum Role {
   CourseManagement = 3,
   EventManagement = 4,
   SeasonManagement = 5,
+  RoundManagement = 6,
 }
 
 export default Role;
