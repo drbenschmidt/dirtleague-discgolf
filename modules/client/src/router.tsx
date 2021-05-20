@@ -1,6 +1,13 @@
-import { ReactElement, Suspense, lazy } from 'react';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import React, { ReactElement, Suspense, lazy, useCallback } from 'react';
+import {
+  BrowserRouter,
+  Switch,
+  Route,
+  Redirect,
+  RouteProps,
+} from 'react-router-dom';
 import { Body } from './body';
+import { useAuthContext } from './components/auth/context';
 
 const Home = lazy(() => import('./routes/home/index'));
 const PlayerForm = lazy(() => import('./routes/players/form'));
@@ -16,6 +23,36 @@ const EventResults = lazy(() => import('./routes/events/results'));
 const SeasonList = lazy(() => import('./routes/seasons/list'));
 const SeasonForm = lazy(() => import('./routes/seasons/form'));
 const AdminArea = lazy(() => import('./routes/admin'));
+const UnauthorizedPage = lazy(() => import('./routes/unauthorized'));
+
+const PrivateRoute = (
+  props: React.PropsWithChildren<RouteProps>
+): ReactElement => {
+  const { children, ...rest } = props;
+  const auth = useAuthContext();
+
+  const render = useCallback(
+    (props2: RouteProps) => {
+      const { location } = props2;
+
+      if (auth.isAuthenticated) {
+        return children;
+      }
+
+      return (
+        <Redirect
+          to={{
+            pathname: '/unauthorized',
+            state: { from: location },
+          }}
+        />
+      );
+    },
+    [auth.isAuthenticated, children]
+  );
+
+  return <Route {...rest} render={render} />;
+};
 
 const Router = (): ReactElement => {
   return (
@@ -40,7 +77,10 @@ const Router = (): ReactElement => {
             <Route exact path="/seasons" component={SeasonList} />
             <Route exact path="/seasons/new" component={SeasonForm} />
             <Route exact path="/seasons/:id/edit" component={SeasonForm} />
-            <Route path="/admin" component={AdminArea} />
+            <Route exact path="/unauthorized" component={UnauthorizedPage} />
+            <PrivateRoute path="/admin">
+              <AdminArea />
+            </PrivateRoute>
           </Switch>
         </Suspense>
       </Body>

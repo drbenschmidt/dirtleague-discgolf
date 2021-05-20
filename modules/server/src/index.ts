@@ -38,7 +38,14 @@ app.use('/static', express.static('../client/build/static'));
 app.set('views', path.join(__dirname, '../../client/build'));
 app.engine('html', renderFile);
 
-const rootUrls = ['/players', '/courses', '/events', '/seasons', '/admin'];
+const rootUrls = [
+  '/players',
+  '/courses',
+  '/events',
+  '/seasons',
+  '/admin',
+  '/unauthorized',
+];
 
 const allUrls = rootUrls.reduce((acc, cur) => {
   acc.push(cur);
