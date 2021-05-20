@@ -95,7 +95,12 @@ const AuthButton = (props: AuthButtonProps) => {
       <Button as="a" inverted={!fixed} onClick={loginOnClick}>
         Log in
       </Button>
-      <Modal open={isModalOpen} onClose={onModalClose} size="small">
+      <Modal
+        open={isModalOpen}
+        onClose={onModalClose}
+        closeOnDimmerClick={false}
+        size="small"
+      >
         <Modal.Header>Login</Modal.Header>
         <Modal.Content>
           <Form size="large">

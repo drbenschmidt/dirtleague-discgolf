@@ -1,6 +1,7 @@
 import path from 'path';
 import express from 'express';
 import morgan from 'morgan';
+import compression from 'compression';
 import { renderFile } from 'ejs';
 import { getDefaultConfigManager } from './config/manager';
 import { applyToken } from './auth/handler';
@@ -22,6 +23,9 @@ const port = config.props.DIRT_API_PORT;
 
 // CORS handling needs to come first.
 app.use(corsHandler);
+
+// TODO: Check for prod/if enabled.
+app.use(compression());
 
 // Setup our handlers/middlewares.
 app.use(express.json()); // for parsing application/json

@@ -27,6 +27,7 @@ const SignUpButton = (props: AuthButtonProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [shouldShowMessage, setShouldShowMessage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string>();
   const { model, revertModel } = useTransaction(defaultModel);
   const services = useRepositoryServices();
 
@@ -51,6 +52,8 @@ const SignUpButton = (props: AuthButtonProps) => {
     if (result?.success) {
       context?.setUser(result.user, result.token);
       history.go(0);
+    } else {
+      setErrorMessage(result.error);
     }
   }, [model, services.users, context, history]);
 
@@ -73,7 +76,7 @@ const SignUpButton = (props: AuthButtonProps) => {
   const message = !showMessage ? null : (
     <Message warning>
       <Icon name="warning" />
-      Invalid email or password. Please try again.
+      {errorMessage}
     </Message>
   );
 
@@ -88,7 +91,12 @@ const SignUpButton = (props: AuthButtonProps) => {
       >
         Sign Up
       </Button>
-      <Modal open={isModalOpen} onClose={onModalClose} size="small">
+      <Modal
+        open={isModalOpen}
+        onClose={onModalClose}
+        closeOnDimmerClick={false}
+        size="small"
+      >
         <Modal.Header>Sign Up</Modal.Header>
         <Modal.Content>
           <Form size="large">

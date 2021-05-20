@@ -22,8 +22,14 @@ const cleanUser = (user: DbUser) => {
   return user;
 };
 
+interface UserProps {
+  email: string;
+  password: string;
+  password2: string;
+}
+
 export interface NewUserRequest {
-  user: UserModel;
+  user: UserProps;
   player: PlayerModel;
 }
 
@@ -76,6 +82,14 @@ const buildRoute = (): Router => {
       const newUserRequest = req.body as NewUserRequest;
       let newUserId: number = null;
 
+      if (newUserRequest.user.password !== newUserRequest.user.password2) {
+        res.status(500).json({
+          success: false,
+          error: 'Passwords do not match.',
+        });
+        return;
+      }
+
       await services.tx(async tx => {
         const { hash, salt } = await hashPassword(newUserRequest.user.password);
 
@@ -101,6 +115,7 @@ const buildRoute = (): Router => {
           success: false,
           error: 'Error creating user or profile',
         });
+        return;
       }
 
       const userModel = await services.users.get(newUserId);
