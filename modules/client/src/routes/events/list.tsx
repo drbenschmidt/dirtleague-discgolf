@@ -45,7 +45,7 @@ const EventList = (): ReactElement => {
     <>
       <Breadcrumbs path={[Events.List]} />
       <h1>Events</h1>
-      <Table celled>
+      <Table celled unstackable>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>Name</Table.HeaderCell>

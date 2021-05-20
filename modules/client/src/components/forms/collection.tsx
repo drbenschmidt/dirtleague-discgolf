@@ -74,12 +74,10 @@ function CollectionComponent<TModel extends DirtLeagueModel<void>>(
         </Table.Body>
         <Table.Footer>
           <Table.Row>
-            <Table.HeaderCell colSpan="4">
-              <Menu floated="right">
-                <Menu.Item as="a" onClick={onAddClick} type="Button">
-                  <Icon name="add circle" /> {buttonText}
-                </Menu.Item>
-              </Menu>
+            <Table.HeaderCell colSpan="4" textAlign="right">
+              <Button basic as="a" onClick={onAddClick}>
+                <Icon name="add circle" /> {buttonText}
+              </Button>
             </Table.HeaderCell>
           </Table.Row>
         </Table.Footer>

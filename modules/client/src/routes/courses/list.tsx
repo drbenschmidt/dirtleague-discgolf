@@ -45,7 +45,7 @@ const CourseList = (): ReactElement => {
     <>
       <Breadcrumbs path={[Courses.List]} />
       <h1>Courses</h1>
-      <Table celled>
+      <Table celled unstackable>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>Name</Table.HeaderCell>

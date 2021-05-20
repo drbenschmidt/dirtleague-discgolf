@@ -28,7 +28,7 @@ const AdminMenu = (): ReactElement => {
   const { path } = useRouteMatch();
 
   return (
-    <Menu vertical size="small">
+    <Menu fluid vertical>
       <AdminMenuLink to={`${path}`} text="Dashboard" />
       <AdminMenuLink to={`${path}/users`} text="Users" />
     </Menu>

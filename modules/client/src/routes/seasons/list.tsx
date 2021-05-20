@@ -97,7 +97,7 @@ const SeasonList = (): ReactElement => {
     <>
       <Breadcrumbs path={[Seasons.List]} />
       <h1>Seasons</h1>
-      <Table celled>
+      <Table celled unstackable>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>Name</Table.HeaderCell>

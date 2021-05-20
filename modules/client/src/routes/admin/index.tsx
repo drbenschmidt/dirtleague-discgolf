@@ -12,10 +12,10 @@ const Admin = (): ReactElement => {
   return (
     <Grid>
       <Grid.Row>
-        <Grid.Column width="3">
+        <Grid.Column computer="3" mobile="16">
           <AdminMenu />
         </Grid.Column>
-        <Grid.Column width="13">
+        <Grid.Column computer="13" mobile="16">
           <Switch>
             <Route exact path={`${path}/`} component={Dashboard} />
             <Route exact path={`${path}/users`} component={Users} />

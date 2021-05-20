@@ -1,4 +1,4 @@
-import { PropsWithChildren, ReactElement } from 'react';
+import { PropsWithChildren, ReactElement, useCallback, useState } from 'react';
 import {
   Dropdown,
   Menu,
@@ -71,7 +71,7 @@ export const Body = (props: PropsWithChildren<unknown>): ReactElement => {
           </Grid.Row>
           <Grid.Row only="tablet mobile">
             <MenuLink to="/">Home</MenuLink>
-            <Dropdown item simple icon="ellipsis horizontal">
+            <Dropdown item icon="ellipsis horizontal">
               <Dropdown.Menu>
                 <DropdownLink to="/players">Players</DropdownLink>
                 <DropdownLink to="/courses">Courses</DropdownLink>
