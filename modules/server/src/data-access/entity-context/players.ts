@@ -77,6 +77,16 @@ class PlayersTable extends Table<DbPlayer> {
 
     return results.map(row => row as FeedModel);
   }
+
+  async getAllUnclaimed(): Promise<DbPlayer[]> {
+    const results = await this.db.query(sql`
+      SELECT p.* FROM players AS p
+      LEFT JOIN users AS u ON p.id = u.playerId
+      WHERE u.id is null 
+    `);
+
+    return results as DbPlayer[];
+  }
 }
 
 export default PlayersTable;

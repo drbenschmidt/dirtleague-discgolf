@@ -25,15 +25,20 @@ const UserProfileMapper = (
     }
   }, [model.id, services.users]);
 
+  const searcher = useCallback(() => {
+    return services.players.getAllFiltered({ filter: 'profileId=null' });
+  }, [services]);
+
   return (
     <Form onSubmit={() => {}}>
       <Form.Group>
         <PlayerSelect
+          searcher={searcher}
           value={model.playerId}
-          label="Player Profile"
+          label="Orphaned Player Profiles"
           onChange={onChange}
         />
-        <Button onClick={onClick}>Update</Button>
+        <Button onClick={onClick}>Set</Button>
       </Form.Group>
     </Form>
   );

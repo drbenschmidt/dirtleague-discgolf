@@ -6,6 +6,10 @@ import {
 } from '@dirtleague/common';
 import { ApiOptions, ApiRepository, Repository } from '../repository';
 
+interface QueryProps {
+  filter: string;
+}
+
 class PlayerRepository
   extends ApiRepository
   implements Repository<PlayerModel> {
@@ -43,6 +47,16 @@ class PlayerRepository
     const result = await this.api.get<FeedAttributes[]>(`players/${id}/feed`);
 
     return result.map(obj => new FeedModel(obj));
+  }
+
+  // TODO: Make `getAll` generic and allow filter/limit/orderBy commands.
+  async getAllFiltered(props: QueryProps): Promise<PlayerModel[]> {
+    const { filter } = props;
+    const result = await this.api.get<PlayerAttributes[]>('players', {
+      filter,
+    });
+
+    return result.map(obj => new PlayerModel(obj));
   }
 }
 
