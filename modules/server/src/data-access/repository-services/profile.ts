@@ -43,6 +43,12 @@ class ProfileRepository extends Repository<PlayerModel, DbPlayer> {
       );
     }
   }
+
+  async getAllUnclaimed(): Promise<PlayerModel[]> {
+    const results = await this.context.profiles.getAllUnclaimed();
+
+    return results.map(this.factory);
+  }
 }
 
 export default ProfileRepository;

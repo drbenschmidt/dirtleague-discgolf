@@ -1,7 +1,7 @@
 import { CourseModel, Role } from '@dirtleague/common';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { Link, useRouteMatch } from 'react-router-dom';
-import { Table, Button, Menu, Icon } from 'semantic-ui-react';
+import { Table, Button, Menu, Icon, Grid, Dropdown } from 'semantic-ui-react';
 import IfAuthorized from '../../components/auth/if-admin';
 import { useRepositoryServices } from '../../data-access/context';
 import DeleteEntityButton from '../../components/generic/delete-entity-button';
@@ -45,7 +45,7 @@ const CourseList = (): ReactElement => {
     <>
       <Breadcrumbs path={[Courses.List]} />
       <h1>Courses</h1>
-      <Table celled>
+      <Table celled unstackable>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>Name</Table.HeaderCell>
@@ -58,21 +58,66 @@ const CourseList = (): ReactElement => {
             <Table.Row key={course.id}>
               <Table.Cell>{course.name}</Table.Cell>
               <Table.Cell textAlign="right">
-                <Button as={Link} to={`${url}/${course.id}`} size="mini">
-                  <Icon name="address book" />
-                  View
-                </Button>
-                <IfAuthorized roles={[Role.CourseManagement]}>
-                  <Button as={Link} to={`${url}/${course.id}/edit`} size="mini">
-                    <Icon name="edit" />
-                    Edit
-                  </Button>
-                  <DeleteEntityButton
-                    id={course.id}
-                    modelName="Course"
-                    onDelete={onDelete}
-                  />
-                </IfAuthorized>
+                <Grid>
+                  <Grid.Row
+                    only="computer"
+                    style={{
+                      justifyContent: 'flex-end',
+                      marginRight: '0.7rem',
+                    }}
+                  >
+                    <Button as={Link} to={`${url}/${course.id}`} size="mini">
+                      <Icon name="address book" />
+                      View
+                    </Button>
+                    <IfAuthorized roles={[Role.CourseManagement]}>
+                      <Button
+                        as={Link}
+                        to={`${url}/${course.id}/edit`}
+                        size="mini"
+                      >
+                        <Icon name="edit" />
+                        Edit
+                      </Button>
+                      <DeleteEntityButton
+                        id={course.id}
+                        modelName="Course"
+                        onDelete={onDelete}
+                      />
+                    </IfAuthorized>
+                  </Grid.Row>
+                  <Grid.Row only="mobile tablet" centered>
+                    <Dropdown
+                      direction="left"
+                      floating
+                      button
+                      className="mini icon"
+                    >
+                      <Dropdown.Menu>
+                        <Dropdown.Item as={Link} to={`${url}/${course.id}`}>
+                          View
+                        </Dropdown.Item>
+                        <IfAuthorized roles={[Role.CourseManagement]}>
+                          <Dropdown.Item
+                            as={Link}
+                            to={`${url}/${course.id}/edit`}
+                          >
+                            Edit
+                          </Dropdown.Item>
+                          <IfAuthorized roles={[Role.CourseManagement]}>
+                            <Dropdown.Item as={Link}>
+                              <DeleteEntityButton
+                                id={course.id}
+                                modelName="Course"
+                                onDelete={onDelete}
+                              />
+                            </Dropdown.Item>
+                          </IfAuthorized>
+                        </IfAuthorized>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </Grid.Row>
+                </Grid>
               </Table.Cell>
             </Table.Row>
           ))}

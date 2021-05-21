@@ -19,7 +19,16 @@ const buildRoute = (): Router => {
     '/',
     withRepositoryServices,
     withTryCatch(async (req, res) => {
-      const { services } = req;
+      const { services, query } = req;
+      const { filter } = query;
+
+      if (filter === 'profileId=null') {
+        const entities = await services.profiles.getAllUnclaimed();
+
+        res.json(entities.map(toJson));
+        return;
+      }
+
       const entities = await services.profiles.getAll();
 
       res.json(entities.map(toJson));

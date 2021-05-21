@@ -37,7 +37,7 @@ const UserRolesEditor = (props: UserRolesEditorProps): ReactElement | null => {
   );
 
   return (
-    <Table celled padded>
+    <Table celled padded unstackable>
       <Table.Header>
         <Table.Row>
           <Table.HeaderCell>Role Name</Table.HeaderCell>

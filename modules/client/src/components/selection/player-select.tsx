@@ -9,16 +9,22 @@ export interface PlayerSelectProps {
     data: EntitySearchValue
   ) => void;
   value: EntitySearchValue;
+  searcher?: () => Promise<PlayerModel[]>;
   [key: string]: unknown;
 }
 
 const PlayerSelect = (props: PlayerSelectProps): ReactElement => {
-  const { onChange, value, ...rest } = props;
   const services = useRepositoryServices();
+  const {
+    onChange,
+    value,
+    searcher = services?.players.getAll.bind(services),
+    ...rest
+  } = props;
 
   const playerSearch = useCallback(
     async (query: string) => {
-      const players = await services?.players.getAll();
+      const players = await searcher();
       const mapper = (entity: PlayerModel) => ({
         text: entity.fullName,
         value: entity.id,
@@ -38,7 +44,7 @@ const PlayerSelect = (props: PlayerSelectProps): ReactElement => {
         )
         .map(mapper);
     },
-    [services?.players]
+    [searcher]
   );
 
   return (

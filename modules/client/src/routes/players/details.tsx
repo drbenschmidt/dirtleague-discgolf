@@ -60,10 +60,10 @@ const PlayerDetails = (): ReactElement | null => {
           [Players.Details, { name: result.fullName, id: result.id }],
         ]}
       />
-      <Grid style={{ marginTop: '1rem' }}>
+      <Grid stackable style={{ marginTop: '1rem' }}>
         <Grid.Row>
-          <Grid.Column width="4">
-            <Card>
+          <Grid.Column computer="4" mobile="16">
+            <Card centered>
               <Image src="http://placekitten.com/300/300" wrapped ui={false} />
               <Card.Content>
                 <Card.Header>{result.fullName}</Card.Header>
@@ -81,7 +81,7 @@ const PlayerDetails = (): ReactElement | null => {
               </Card.Content>
             </Card>
           </Grid.Column>
-          <Grid.Column width="12">
+          <Grid.Column computer="12" mobile="16">
             <Statistic.Group style={{ justifyContent: 'center' }}>
               <Statistic>
                 <Statistic.Value>
@@ -120,9 +120,11 @@ const PlayerDetails = (): ReactElement | null => {
                 <Statistic.Label>Personal Rounds</Statistic.Label>
               </Statistic>
             </Statistic.Group>
-            <Suspense fallback={<div>Loading...</div>}>
-              <PlayerFeed id={playerId} />
-            </Suspense>
+            <div style={{ marginTop: '3rem' }}>
+              <Suspense fallback={<div>Loading...</div>}>
+                <PlayerFeed id={playerId} />
+              </Suspense>
+            </div>
           </Grid.Column>
         </Grid.Row>
       </Grid>

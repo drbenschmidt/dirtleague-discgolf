@@ -6,6 +6,7 @@ type SignUpResponse = {
   success: boolean;
   user: UserModel;
   token: string;
+  error: string;
 };
 
 class UsersRepository extends ApiRepository implements Repository<UserModel> {

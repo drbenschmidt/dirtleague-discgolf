@@ -123,6 +123,7 @@ const PlayerFormComponent = (
           label="Player Aliases"
           buttonText="Add Alias"
           modelFactory={() => new AliasModel()}
+          helpText="Aliases are used to help match uDisc score cards to this player."
         />
         <Form.Button positive content="Submit" />
       </Form>

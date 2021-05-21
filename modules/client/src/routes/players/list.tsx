@@ -1,7 +1,15 @@
 import { PlayerModel, Role } from '@dirtleague/common';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { Link, useRouteMatch } from 'react-router-dom';
-import { Table, Button, Menu, Icon, Modal } from 'semantic-ui-react';
+import {
+  Table,
+  Button,
+  Menu,
+  Icon,
+  Modal,
+  Grid,
+  Dropdown,
+} from 'semantic-ui-react';
 import IfAuthorized from '../../components/auth/if-admin';
 import RepositoryServices from '../../data-access/repository-services';
 import { useRepositoryServices } from '../../data-access/context';
@@ -103,7 +111,7 @@ const PlayerList = (): ReactElement => {
     <>
       <Breadcrumbs path={[Players.List]} />
       <h1>Players</h1>
-      <Table celled>
+      <Table celled unstackable>
         <Table.Header>
           <Table.Row>
             <Table.HeaderCell>First</Table.HeaderCell>
@@ -118,26 +126,74 @@ const PlayerList = (): ReactElement => {
               <Table.Cell>{player.firstName}</Table.Cell>
               <Table.Cell>{player.lastName}</Table.Cell>
               <Table.Cell textAlign="right">
-                <Button as={Link} to={`${url}/${player.id}`} size="mini">
-                  <Icon name="address book" />
-                  View
-                </Button>
-                <IfAuthorized
-                  roles={[Role.PlayerManagement]}
-                  or={() => isCurrentUser(player.id)}
-                >
-                  <Button as={Link} to={`${url}/${player.id}/edit`} size="mini">
-                    <Icon name="edit" />
-                    Edit
-                  </Button>
-                </IfAuthorized>
-                <IfAuthorized roles={[Role.PlayerManagement]}>
-                  <DeletePlayerButton
-                    player={player}
-                    services={services}
-                    onDelete={onDelete}
-                  />
-                </IfAuthorized>
+                <Grid>
+                  <Grid.Row
+                    only="computer"
+                    style={{
+                      justifyContent: 'flex-end',
+                      marginRight: '0.7rem',
+                    }}
+                  >
+                    <Button as={Link} to={`${url}/${player.id}`} size="mini">
+                      <Icon name="address book" />
+                      View
+                    </Button>
+                    <IfAuthorized
+                      roles={[Role.PlayerManagement]}
+                      or={() => isCurrentUser(player.id)}
+                    >
+                      <Button
+                        as={Link}
+                        to={`${url}/${player.id}/edit`}
+                        size="mini"
+                      >
+                        <Icon name="edit" />
+                        Edit
+                      </Button>
+                    </IfAuthorized>
+                    <IfAuthorized roles={[Role.PlayerManagement]}>
+                      <DeletePlayerButton
+                        player={player}
+                        services={services}
+                        onDelete={onDelete}
+                      />
+                    </IfAuthorized>
+                  </Grid.Row>
+                  <Grid.Row only="mobile tablet" centered>
+                    <Dropdown
+                      direction="left"
+                      floating
+                      button
+                      className="mini icon"
+                    >
+                      <Dropdown.Menu>
+                        <Dropdown.Item as={Link} to={`${url}/${player.id}`}>
+                          View
+                        </Dropdown.Item>
+                        <IfAuthorized
+                          roles={[Role.PlayerManagement]}
+                          or={() => isCurrentUser(player.id)}
+                        >
+                          <Dropdown.Item
+                            as={Link}
+                            to={`${url}/${player.id}/edit`}
+                          >
+                            Edit
+                          </Dropdown.Item>
+                          <IfAuthorized roles={[Role.PlayerManagement]}>
+                            <Dropdown.Item as={Link}>
+                              <DeletePlayerButton
+                                player={player}
+                                services={services}
+                                onDelete={onDelete}
+                              />
+                            </Dropdown.Item>
+                          </IfAuthorized>
+                        </IfAuthorized>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </Grid.Row>
+                </Grid>
               </Table.Cell>
             </Table.Row>
           ))}
