@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import { ReactElement, useCallback, useState } from 'react';
-import { Table, Menu, Button, Icon, SemanticCOLORS } from 'semantic-ui-react';
+import { Table, Button, Icon, Popup, SemanticCOLORS } from 'semantic-ui-react';
 import { LinkedList } from 'linked-list-typescript';
 import DirtLeagueModel from '@dirtleague/common/src/model/dl-model';
 
@@ -11,6 +11,7 @@ interface CollectionProps<TModel> {
   buttonText: string;
   tableColor?: SemanticCOLORS;
   modelFactory: () => TModel;
+  helpText?: string;
 }
 
 function CollectionComponent<TModel extends DirtLeagueModel<void>>(
@@ -23,6 +24,7 @@ function CollectionComponent<TModel extends DirtLeagueModel<void>>(
     buttonText,
     tableColor,
     modelFactory,
+    helpText,
   } = props;
   const [, setDummy] = useState(false);
 
@@ -48,7 +50,22 @@ function CollectionComponent<TModel extends DirtLeagueModel<void>>(
   return (
     <>
       <div className="field">
-        <label>{label}</label>
+        <label>
+          {label}
+          {helpText && (
+            <Popup
+              trigger={
+                <Icon
+                  style={{ boxShadow: 'none' }}
+                  circular
+                  name="question circle"
+                />
+              }
+              content={helpText}
+              size="small"
+            />
+          )}
+        </label>
       </div>
       <Table color={tableColor}>
         <Table.Body>
