@@ -3,7 +3,6 @@ import express from 'express';
 import morgan from 'morgan';
 import compression from 'compression';
 import https from 'https';
-import http from 'http';
 import fs from 'fs';
 import { renderFile } from 'ejs';
 import { getDefaultConfigManager } from './config/manager';
@@ -42,7 +41,7 @@ app.use(applyToken);
 app.use(genericErrorHandler);
 
 // For prod builds, we want to serve the static files of the frontend app.
-app.use('/static', express.static('../client/build/static'));
+app.use('/', express.static('../client/build'));
 app.set('views', path.join(__dirname, '../../client/build'));
 app.engine('html', renderFile);
 
