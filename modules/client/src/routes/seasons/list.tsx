@@ -1,7 +1,15 @@
 import { Role, SeasonModel } from '@dirtleague/common';
 import { ReactElement, useCallback, useEffect, useState } from 'react';
 import { Link, useRouteMatch } from 'react-router-dom';
-import { Table, Button, Menu, Icon, Modal } from 'semantic-ui-react';
+import {
+  Table,
+  Button,
+  Menu,
+  Icon,
+  Modal,
+  Grid,
+  Dropdown,
+} from 'semantic-ui-react';
 import IfAuthorized from '../../components/auth/if-admin';
 import RepositoryServices from '../../data-access/repository-services';
 import { useRepositoryServices } from '../../data-access/context';
@@ -50,7 +58,7 @@ const DeleteSeasonButton = (props: DeleteSeasonButtonProps): ReactElement => {
     >
       <Modal.Header>{`Delete ${season.name}`}</Modal.Header>
       <Modal.Content>
-        <p>Are you sure you want to delete this course?</p>
+        <p>Are you sure you want to delete this Season?</p>
       </Modal.Content>
       <Modal.Actions>
         <Button disabled={isInFlight} onClick={() => setIsOpen(false)} negative>
@@ -114,17 +122,53 @@ const SeasonList = (): ReactElement => {
               <Table.Cell>{season.startDate.toDateString()}</Table.Cell>
               <Table.Cell>{season.endDate.toDateString()}</Table.Cell>
               <Table.Cell textAlign="right">
-                <IfAuthorized roles={[Role.SeasonManagement]}>
-                  <Button as={Link} to={`${url}/${season.id}/edit`} size="mini">
-                    <Icon name="edit" />
-                    Edit
-                  </Button>
-                  <DeleteSeasonButton
-                    season={season}
-                    services={services}
-                    onDelete={onDelete}
-                  />
-                </IfAuthorized>
+                <Grid>
+                  <Grid.Row only="computer" textAlign="right">
+                    <IfAuthorized roles={[Role.SeasonManagement]}>
+                      <Button
+                        as={Link}
+                        to={`${url}/${season.id}/edit`}
+                        size="mini"
+                      >
+                        <Icon name="edit" />
+                        Edit
+                      </Button>
+                      <DeleteSeasonButton
+                        season={season}
+                        services={services}
+                        onDelete={onDelete}
+                      />
+                    </IfAuthorized>
+                  </Grid.Row>
+                  <Grid.Row only="mobile tablet" centered>
+                    <Dropdown
+                      direction="left"
+                      floating
+                      button
+                      className="mini icon"
+                    >
+                      <Dropdown.Menu>
+                        <IfAuthorized roles={[Role.SeasonManagement]}>
+                          <Dropdown.Item
+                            as={Link}
+                            to={`${url}/${season.id}/edit`}
+                          >
+                            Edit
+                          </Dropdown.Item>
+                          <IfAuthorized roles={[Role.SeasonManagement]}>
+                            <Dropdown.Item as={Link}>
+                              <DeleteSeasonButton
+                                season={season}
+                                services={services}
+                                onDelete={onDelete}
+                              />
+                            </Dropdown.Item>
+                          </IfAuthorized>
+                        </IfAuthorized>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </Grid.Row>
+                </Grid>
               </Table.Cell>
             </Table.Row>
           ))}
