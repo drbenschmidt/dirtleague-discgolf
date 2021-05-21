@@ -3,6 +3,7 @@ import express from 'express';
 import morgan from 'morgan';
 import compression from 'compression';
 import https from 'https';
+import http from 'http';
 import fs from 'fs';
 import { renderFile } from 'ejs';
 import { getDefaultConfigManager } from './config/manager';
@@ -18,6 +19,11 @@ import buildRoundsRoute from './routes/rounds';
 import buildCourseLayoutsRoute from './routes/course-layouts';
 import genericErrorHandler from './http/generic-error-handler';
 import corsHandler from './http/cors-handler';
+import insecureRedirector from './http/insecure-redirector';
+
+const sanitizeString = (str: string) => {
+  return str.replace(/^"(.*)"$/, '$1');
+};
 
 const config = getDefaultConfigManager();
 const app = express();
@@ -77,9 +83,18 @@ app.use('/api/events', buildEventsRoute());
 app.use('/api/rounds', buildRoundsRoute());
 
 if (config.props.DIRT_API_USE_HTTPS) {
-  const key = fs.readFileSync(config.props.DIRT_API_HTTPS_PK, 'utf8');
-  const cert = fs.readFileSync(config.props.DIRT_API_HTTPS_CERT, 'utf8');
-  const ca = fs.readFileSync(config.props.DIRT_API_HTTPS_CA, 'utf8');
+  const key = fs.readFileSync(
+    sanitizeString(config.props.DIRT_API_HTTPS_PK),
+    'utf8'
+  );
+  const cert = fs.readFileSync(
+    sanitizeString(config.props.DIRT_API_HTTPS_CERT),
+    'utf8'
+  );
+  const ca = fs.readFileSync(
+    sanitizeString(config.props.DIRT_API_HTTPS_CA),
+    'utf8'
+  );
 
   const credentials = {
     key,
@@ -91,6 +106,10 @@ if (config.props.DIRT_API_USE_HTTPS) {
 
   httpsServer.listen(port, () => {
     console.log(`Secure DirtLeague API listening on ${port}!`);
+  });
+
+  insecureRedirector.listen(80, () => {
+    console.log(`Insecure Redirector listening on 80`);
   });
 } else {
   app.listen(port, async () => {
