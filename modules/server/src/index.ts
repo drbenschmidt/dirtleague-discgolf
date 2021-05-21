@@ -2,6 +2,8 @@ import path from 'path';
 import express from 'express';
 import morgan from 'morgan';
 import compression from 'compression';
+import https from 'https';
+import fs from 'fs';
 import { renderFile } from 'ejs';
 import { getDefaultConfigManager } from './config/manager';
 import { applyToken } from './auth/handler';
@@ -74,6 +76,24 @@ app.use('/api/courseLayouts', buildCourseLayoutsRoute());
 app.use('/api/events', buildEventsRoute());
 app.use('/api/rounds', buildRoundsRoute());
 
-app.listen(port, async () => {
-  console.log(`DirtLeague API listening at http://localhost:${port}`);
-});
+if (config.props.DIRT_API_USE_HTTPS) {
+  const key = fs.readFileSync(config.props.DIRT_API_HTTPS_PK, 'utf8');
+  const cert = fs.readFileSync(config.props.DIRT_API_HTTPS_CERT, 'utf8');
+  const ca = fs.readFileSync(config.props.DIRT_API_HTTPS_CA, 'utf8');
+
+  const credentials = {
+    key,
+    cert,
+    ca,
+  };
+
+  const httpsServer = https.createServer(credentials, app);
+
+  httpsServer.listen(port, () => {
+    console.log(`Secure DirtLeague API listening on ${port}!`);
+  });
+} else {
+  app.listen(port, async () => {
+    console.log(`DirtLeague API listening at http://localhost:${port}`);
+  });
+}
