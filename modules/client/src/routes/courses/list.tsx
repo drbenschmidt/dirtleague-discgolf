@@ -59,7 +59,13 @@ const CourseList = (): ReactElement => {
               <Table.Cell>{course.name}</Table.Cell>
               <Table.Cell textAlign="right">
                 <Grid>
-                  <Grid.Row only="computer" textAlign="right">
+                  <Grid.Row
+                    only="computer"
+                    style={{
+                      justifyContent: 'flex-end',
+                      marginRight: '0.7rem',
+                    }}
+                  >
                     <Button as={Link} to={`${url}/${course.id}`} size="mini">
                       <Icon name="address book" />
                       View

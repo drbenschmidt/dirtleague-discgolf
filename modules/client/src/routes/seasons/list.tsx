@@ -123,7 +123,13 @@ const SeasonList = (): ReactElement => {
               <Table.Cell>{season.endDate.toDateString()}</Table.Cell>
               <Table.Cell textAlign="right">
                 <Grid>
-                  <Grid.Row only="computer" textAlign="right">
+                  <Grid.Row
+                    only="computer"
+                    style={{
+                      justifyContent: 'flex-end',
+                      marginRight: '0.7rem',
+                    }}
+                  >
                     <IfAuthorized roles={[Role.SeasonManagement]}>
                       <Button
                         as={Link}
