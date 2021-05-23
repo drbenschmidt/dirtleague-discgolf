@@ -11,6 +11,7 @@ const corsHandler = cors({
     'http://172.13.51.107:8080',
     'http://dev.dirtleague.org',
     'http://dev.dirtleague.org:8080',
+    'http://192.168.1.116:3000',
   ],
   credentials: true,
 });

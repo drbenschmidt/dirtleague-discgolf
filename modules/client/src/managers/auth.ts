@@ -59,15 +59,20 @@ class AuthManager {
   };
 
   getIsAuthenticated = async (): Promise<boolean> => {
-    const result = await this.service.isAuthenticated();
+    try {
+      const result = await this.service.isAuthenticated();
 
-    this.isAuthenticated = result.isAuthenticated;
+      this.isAuthenticated = result.isAuthenticated;
 
-    if (result.userData) {
-      this.user = result.userData.user;
+      if (result.userData) {
+        this.user = result.userData.user;
+      }
+
+      return result.isAuthenticated;
+    } catch (e) {
+      console.error(e);
+      return false;
     }
-
-    return result.isAuthenticated;
   };
 
   setUser = (user: UserModel, token: string): void => {

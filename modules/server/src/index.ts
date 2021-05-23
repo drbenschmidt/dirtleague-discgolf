@@ -1,12 +1,12 @@
 import path from 'path';
 import express from 'express';
-import morgan from 'morgan';
 import compression from 'compression';
 import https from 'https';
 import fs from 'fs';
 import { renderFile } from 'ejs';
 import { getDefaultConfigManager } from './config/manager';
 import { applyToken } from './auth/handler';
+import morganMiddleware from './logging/morgan';
 import buildUsersRoute from './routes/users';
 import buildAuthRoute from './routes/auth';
 import buildProfilesRoute from './routes/players';
@@ -16,6 +16,7 @@ import buildSeasonsRoute from './routes/seasons';
 import buildEventsRoute from './routes/events';
 import buildRoundsRoute from './routes/rounds';
 import buildCourseLayoutsRoute from './routes/course-layouts';
+import buildClientErrorsRoute from './routes/client-errors';
 import genericErrorHandler from './http/generic-error-handler';
 import corsHandler from './http/cors-handler';
 import insecureRedirector from './http/insecure-redirector';
@@ -31,7 +32,6 @@ const port = config.props.DIRT_API_PORT;
 // CORS handling needs to come first.
 app.use(corsHandler);
 
-// TODO: Check for prod/if enabled.
 app.use(compression());
 
 // Setup our handlers/middlewares.
@@ -67,8 +67,7 @@ app.get(['/', ...allUrls], (req, res) => {
   res.render('index.html', { CONFIG_STRING: configEncoded });
 });
 
-// TODO: Switch this between dev/prod.
-app.use(morgan('dev'));
+app.use(morganMiddleware);
 
 // Add the routers for each area.
 app.use('/api/users', buildUsersRoute());
@@ -80,6 +79,8 @@ app.use('/api/seasons', buildSeasonsRoute());
 app.use('/api/courseLayouts', buildCourseLayoutsRoute());
 app.use('/api/events', buildEventsRoute());
 app.use('/api/rounds', buildRoundsRoute());
+
+app.use('/api/clientErrors', buildClientErrorsRoute());
 
 if (config.props.DIRT_API_USE_HTTPS) {
   const key = fs.readFileSync(
