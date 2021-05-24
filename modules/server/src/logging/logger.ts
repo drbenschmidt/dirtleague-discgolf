@@ -1,5 +1,19 @@
+import path from 'path';
 import winston, { LoggerOptions } from 'winston';
 import type { Logger } from 'winston';
+import { getDefaultConfigManager } from '../config/manager';
+
+const config = getDefaultConfigManager();
+const { DIRT_API_LOGS_ROOT } = config.props;
+
+const getFilename = (filename: string): string => {
+  let root = './logs';
+  if (DIRT_API_LOGS_ROOT && DIRT_API_LOGS_ROOT.length > 0) {
+    root = DIRT_API_LOGS_ROOT;
+  }
+
+  return path.join(root, filename);
+};
 
 let logger: Logger = null;
 let clientLogger: Logger = null;
@@ -21,12 +35,12 @@ export const getLogger = (): Logger => {
       format: winston.format.json(),
       transports: [
         new winston.transports.File({
-          filename: './logs/error.log',
+          filename: getFilename('error.log'),
           level: 'error',
         }),
-        new winston.transports.File({ filename: './logs/all.log' }),
+        new winston.transports.File({ filename: getFilename('all.log') }),
         new winston.transports.File({
-          filename: '.logs/simple.log',
+          filename: getFilename('simple.log'),
           format: winston.format.simple(),
         }),
       ],
@@ -51,7 +65,7 @@ export const getClientLogger = (): Logger => {
       format: winston.format.json(),
       transports: [
         new winston.transports.File({
-          filename: './logs/client/error.log',
+          filename: getFilename('client/error.log'),
           level: 'error',
         }),
       ],
