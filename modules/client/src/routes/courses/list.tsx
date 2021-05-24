@@ -105,7 +105,7 @@ const CourseList = (): ReactElement => {
                             Edit
                           </Dropdown.Item>
                           <IfAuthorized roles={[Role.CourseManagement]}>
-                            <Dropdown.Item as={Link}>
+                            <Dropdown.Item>
                               <DeleteEntityButton
                                 id={course.id}
                                 modelName="Course"

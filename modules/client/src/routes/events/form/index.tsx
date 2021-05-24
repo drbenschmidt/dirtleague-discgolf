@@ -15,7 +15,6 @@ import { EntityDetailsParams } from '../../types';
 import DatePicker from '../../../components/forms/date-picker';
 import TabCollection from '../../../components/forms/tab-collection';
 import EntitySearch from '../../../components/forms/entity-search';
-import RepositoryServices from '../../../data-access/repository-services';
 import RoundForm from './round-form';
 import FocusOnMount from '../../../components/generic/focus-on-mount';
 import Breadcrumbs, {
@@ -27,7 +26,6 @@ import useModelValidation from '../../../hooks/useModelValidation';
 export interface EventFormComponentProps {
   entityModel: EventModel;
   isEditing: boolean;
-  services: RepositoryServices | null;
 }
 
 const EventFormComponent = (
@@ -54,11 +52,11 @@ const EventFormComponent = (
         try {
           setIsInFlight(true);
           if (isEditing) {
-            await services?.events.update(model.current);
+            await services.events.update(model.current);
 
             history.push(`/events/${model.current.id}`);
           } else {
-            const response = await services?.events.create(model.current);
+            const response = await services.events.create(model.current);
 
             history.push(`/events/${response?.id}`);
           }
@@ -199,13 +197,7 @@ const EventForm = (): ReactElement | null => {
     return null;
   }
 
-  return (
-    <EventFormComponent
-      entityModel={entityModel}
-      isEditing={isEditing}
-      services={services}
-    />
-  );
+  return <EventFormComponent entityModel={entityModel} isEditing={isEditing} />;
 };
 
 export default memo(EventForm);

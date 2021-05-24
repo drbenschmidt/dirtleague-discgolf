@@ -110,12 +110,6 @@ export const getModelValue = (value: any): any => {
     return Array.from(value, v => getModelValue(v));
   }
 
-  if (isDate(value)) {
-    // TODO: Handle this on the server, also make sure it's UTC if it isn't already.
-    // Return in a MySQL friendly way.
-    return (value as Date).toISOString().slice(0, 19).replace('T', ' ');
-  }
-
   return value;
 };
 

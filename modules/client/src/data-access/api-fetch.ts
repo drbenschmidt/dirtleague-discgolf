@@ -49,10 +49,11 @@ class ApiFetch {
 
   static getBaseUrl(): string {
     const { REACT_APP_API_ROOT } = getConfig();
+    const {
+      location: { protocol, hostname },
+    } = window;
 
-    const result = `${window.location.protocol}//${
-      REACT_APP_API_ROOT || 'localhost:8080'
-    }`;
+    const result = `${protocol}//${REACT_APP_API_ROOT || `${hostname}:8081`}`;
 
     return result;
   }

@@ -42,7 +42,7 @@ if (enableDebugLogging) {
 const db = createConnectionPool(options);
 
 // Make sure we clean up our mess when the process exists.
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === 'production') {
   process.once('SIGTERM', () => {
     db.dispose().catch(ex => {
       console.error(ex);
