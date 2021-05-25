@@ -12,6 +12,21 @@ import SignUpButton from './components/sign-up/button';
 import Toaster from './components/notifications/toaster';
 import IfAuthorized from './components/auth/if-admin';
 
+declare const VERSION: string;
+
+const getVersion = () => {
+  const versionParts = VERSION.split('-');
+  if (versionParts.length === 4) {
+    const [version, preRelease, commitsAhead, hash] = versionParts;
+
+    return `${version} ${preRelease} (${hash})`;
+  }
+
+  const [version, commitsAhead, hash] = versionParts;
+
+  return `${version} (${hash})`;
+};
+
 export const MenuLink = (
   props: PropsWithChildren<MenuItemProps>
 ): ReactElement => {
@@ -41,7 +56,7 @@ export const Footer = (): ReactElement => {
     <Grid inverted>
       <Grid.Row>
         <Grid.Column width="16" textAlign="center" verticalAlign="middle">
-          Dirt League
+          Dirt League {getVersion()}
         </Grid.Column>
       </Grid.Row>
     </Grid>
