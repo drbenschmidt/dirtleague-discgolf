@@ -1,3 +1,4 @@
+/* eslint-disable */
 'use strict';
 
 const fs = require('fs');
@@ -26,10 +27,14 @@ const ModuleNotFoundPlugin = require('react-dev-utils/ModuleNotFoundPlugin');
 const ForkTsCheckerWebpackPlugin = require('react-dev-utils/ForkTsCheckerWebpackPlugin');
 const typescriptFormatter = require('react-dev-utils/typescriptFormatter');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
+const GitRevisionPlugin = require('git-revision-webpack-plugin');
 
 const postcssNormalize = require('postcss-normalize');
-
 const appPackageJson = require(paths.appPackageJson);
+const gitRevisionPlugin = new GitRevisionPlugin({
+  branch: true,
+  versionCommand: 'describe --always --tags'
+});
 
 // Source maps are resource heavy and can cause out of memory issue for large source files.
 const shouldUseSourceMap = process.env.GENERATE_SOURCEMAP !== 'false';
@@ -559,6 +564,12 @@ module.exports = function (webpackEnv) {
       ],
     },
     plugins: [
+      gitRevisionPlugin,
+      new webpack.DefinePlugin({
+        VERSION: JSON.stringify(gitRevisionPlugin.version()),
+        COMMITHASH: JSON.stringify(gitRevisionPlugin.commithash()),
+        BRANCH: JSON.stringify(gitRevisionPlugin.branch()),
+      }),
       // Generates an `index.html` file with the <script> injected.
       new HtmlWebpackPlugin(
         Object.assign(
