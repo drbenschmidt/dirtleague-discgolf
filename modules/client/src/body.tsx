@@ -19,12 +19,12 @@ const getVersion = () => {
   if (versionParts.length === 4) {
     const [version, preRelease, commitsAhead, hash] = versionParts;
 
-    return `${version} ${preRelease} (${hash})`;
+    return `${version} ${preRelease} (${hash} + ${commitsAhead})`;
   }
 
   const [version, commitsAhead, hash] = versionParts;
 
-  return `${version} (${hash})`;
+  return `${version} (${hash} + ${commitsAhead})`;
 };
 
 export const MenuLink = (
