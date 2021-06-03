@@ -1,6 +1,7 @@
 import type { ParsedQs } from 'qs';
 import { SQLQuery } from '@databases/mysql';
 import QueryContext, {
+  Pagination,
   QueryContextProps,
   Sort,
   SortDirection,
@@ -50,6 +51,19 @@ const parseSort = (sort: QsLike): Sort[] => {
   return parts.map(prop => ({ prop, direction: getDirection(prop) }));
 };
 
+const parsePage = (page: QsLike): Pagination => {
+  if (!page) {
+    return null;
+  }
+
+  const { offset, limit } = page as ParsedQs;
+
+  return {
+    offset: parseInt(offset as string, 10),
+    limit: parseInt(limit as string, 10),
+  };
+};
+
 // Take a query string and convert it into an object we can build a queryable object off of.
 // ex: ?include=author&fields[article]=id,subject,body&fields[people]=name&sort=-author.name,author.id
 //     &filter={hard part, come up with a way to parse this}
@@ -57,11 +71,12 @@ export const parseQueryString = (
   rootTable: string,
   qs: ParsedQs
 ): QueryContextProps => {
-  const { include, fields, sort, filter } = qs;
+  const { include, fields, sort, filter, page } = qs;
 
   const result = {
     rootTable,
     filter,
+    page: parsePage(page),
     include: parseInclude(include),
     fields: parseFields(fields),
     sort: parseSort(sort),

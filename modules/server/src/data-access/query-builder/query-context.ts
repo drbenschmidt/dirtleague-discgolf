@@ -22,12 +22,18 @@ export type Sort = {
   direction: SortDirection;
 };
 
+export type Pagination = {
+  offset: number;
+  limit: number;
+};
+
 export interface QueryContextProps {
   rootTable: string;
   filter?: string;
   include?: string[];
   fields?: Map<string, string[]>;
   sort?: Sort[];
+  page?: Pagination;
 }
 
 class QueryContext {
@@ -68,6 +74,16 @@ class QueryContext {
     return sql``;
   }
 
+  private getPagination(): SQLQuery {
+    const { limit, offset } = this.props.page;
+
+    if (!this.props.page) {
+      return sql``;
+    }
+
+    return sql`LIMIT ${limit} OFFSET ${offset}`;
+  }
+
   getSql(): SQLQuery {
     const { rootTable } = this.props;
     // eslint-disable-next-line no-underscore-dangle
@@ -77,8 +93,9 @@ class QueryContext {
     const joins = this.getJoins();
     const where = this.getWhere();
     const orderBy = this.getOrderBy();
+    const pagination = this.getPagination();
 
-    return sql`SELECT ${select} FROM ${table} AS ${rootAlias} ${joins} ${where} ${orderBy}`;
+    return sql`SELECT ${select} FROM ${table} AS ${rootAlias} ${joins} ${where} ${orderBy} ${pagination}`;
   }
 }
 
