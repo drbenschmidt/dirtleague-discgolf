@@ -23,6 +23,20 @@ export const buildSelect = (names: string[], prefix: string): SQLQuery => {
   return sql.join(fields, ', ');
 };
 
+export const buildSelect2 = (names: string[], prefix: string): SQLQuery => {
+  const fields = names.map(key => {
+    if (prefix.length === 0) {
+      // eslint-disable-next-line no-underscore-dangle
+      return sql.__dangerous__rawValue(`${key}`);
+    }
+
+    // eslint-disable-next-line no-underscore-dangle
+    return sql.__dangerous__rawValue(`${prefix}.${key}`);
+  });
+
+  return sql.join(fields, ', ');
+};
+
 export const buildSelects = (
   kvps: [fields: string[], prefix: string][]
 ): SQLQuery => {

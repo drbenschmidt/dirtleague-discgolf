@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { Queryable, sql } from '@databases/mysql';
+import { Queryable, sql, SQLQuery } from '@databases/mysql';
 import { buildWhereClause } from '../query-builder/filtering';
 import { buildInsertClause } from '../query-builder/inserting';
 import { buildUpdateStatement } from '../query-builder/setting';
@@ -23,6 +23,12 @@ export abstract class Table<TRow extends { id?: number }>
 
   constructor(db: Queryable) {
     this.db = db;
+  }
+
+  async query<TResult>(query: SQLQuery): Promise<TResult[]> {
+    const result = await this.db.query(query);
+
+    return result;
   }
 
   insert = async (model: TRow): Promise<number> => {

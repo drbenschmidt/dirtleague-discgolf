@@ -3,7 +3,7 @@
       "plugins": [{ "transform": "ts-transformer-keys/transformer" }],
       "module": "commonjs",
       "esModuleInterop": true,
-      "target": "es2015",
+      "target": "es2019",
       "noImplicitAny": true,
       "moduleResolution": "node",
       "sourceMap": true,

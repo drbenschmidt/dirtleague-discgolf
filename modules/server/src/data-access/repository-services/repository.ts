@@ -1,4 +1,5 @@
 /* eslint-disable max-classes-per-file */
+import { SQLQuery } from '@databases/mysql';
 import { asyncForEach, set, UserModel } from '@dirtleague/common';
 import getCrud from '../../utils/getCrud';
 import EntityContext from '../entity-context';
@@ -24,6 +25,10 @@ export default abstract class Repository<
     this.servicesInstance = servicesInstance;
     this.user = user;
     this.context = context;
+  }
+
+  async query<TResult>(query: SQLQuery): Promise<TResult[]> {
+    return this.entityTable.query(query);
   }
 
   delete = async (id: number): Promise<void> => {

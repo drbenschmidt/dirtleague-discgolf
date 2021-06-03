@@ -4,6 +4,7 @@ import withTryCatch from '../http/withTryCatch';
 import { DirtLeagueRequest, requireRoles } from '../auth/handler';
 import withRepositoryServices from '../http/withRepositoryServices';
 import toJson from '../utils/toJson';
+import { fromQueryString } from '../data-access/query-builder/from-query-string';
 
 const buildRoute = (): Router => {
   const router = express.Router();
@@ -14,6 +15,19 @@ const buildRoute = (): Router => {
 
     return user.playerId === parseInt(id, 10);
   };
+
+  router.get(
+    '/query',
+    withRepositoryServices,
+    withTryCatch(async (req, res) => {
+      const { services, query } = req;
+      const sqlQuery = fromQueryString('players', query);
+
+      const result = await services.players.query(sqlQuery);
+
+      res.json(result);
+    })
+  );
 
   router.get(
     '/',
