@@ -2,13 +2,14 @@ import { sql, SQLQuery } from '@databases/mysql';
 import { buildSelect2 } from './selecting';
 
 /**
- * 1. Make a QueryContext(props) object
+ * 1. √ Make a QueryContext(props) object
  * 2. Within QueryContext, have it build a map of table aliases based on rootTable + all relationships.
  * 3. Within QueryContext, have it lookup relationship mappings so it knows how to join
  * 4. Within QueryContext, have it prefix all SELECT columns with table aliases
- * 5. Within QueryContext, have it handle sorting
+ * 5. √ Within QueryContext, have it handle sorting
  * 6. Within QueryContext, have it handle filtering
  */
+
 // Idea, have EntityContext be able to generate the list of table names and relations.
 // Have EntityContext create QueryContext objects since it'll be what knows all.
 
@@ -36,6 +37,9 @@ export interface QueryContextProps {
   page?: Pagination;
 }
 
+// eslint-disable-next-line no-underscore-dangle
+const rawValue = (text: string) => sql.__dangerous__rawValue(text);
+
 class QueryContext {
   props: QueryContextProps;
 
@@ -58,20 +62,30 @@ class QueryContext {
   }
 
   private getAlias(table: string): SQLQuery {
-    // eslint-disable-next-line no-underscore-dangle
-    return sql.__dangerous__rawValue(`_${table.toLowerCase()}`);
+    return rawValue(`_${table.toLowerCase()}`);
   }
 
   private getJoins(): SQLQuery {
     return sql``;
   }
 
-  private getWhere(): SQLQuery {
+  private getWhere(): SQLQuery | null {
     return sql``;
   }
 
   private getOrderBy(): SQLQuery {
-    return sql``;
+    if (!this.props.sort || this.props.sort.length === 0) {
+      return sql``;
+    }
+
+    const orders = sql.join(
+      this.props.sort.map(({ prop, direction }) =>
+        rawValue(`${prop} ${direction === SortDirection.Asc ? 'ASC' : 'DESC'}`)
+      ),
+      ', '
+    );
+
+    return sql`ORDER BY ${orders}`;
   }
 
   private getPagination(): SQLQuery {
@@ -87,7 +101,7 @@ class QueryContext {
   getSql(): SQLQuery {
     const { rootTable } = this.props;
     // eslint-disable-next-line no-underscore-dangle
-    const table = sql.__dangerous__rawValue(rootTable);
+    const table = rawValue(rootTable);
     const rootAlias = this.getAlias(rootTable);
     const select = this.getSelect();
     const joins = this.getJoins();
@@ -95,7 +109,9 @@ class QueryContext {
     const orderBy = this.getOrderBy();
     const pagination = this.getPagination();
 
-    return sql`SELECT ${select} FROM ${table} AS ${rootAlias} ${joins} ${where} ${orderBy} ${pagination}`;
+    const result = sql`SELECT ${select} FROM ${table} ${joins} ${where} ${orderBy} ${pagination}`;
+
+    return result;
   }
 }
 

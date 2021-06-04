@@ -48,7 +48,18 @@ const parseSort = (sort: QsLike): Sort[] => {
     return name.charAt(0) === '-' ? SortDirection.Desc : SortDirection.Asc;
   };
 
-  return parts.map(prop => ({ prop, direction: getDirection(prop) }));
+  const getProp = (name: string) => {
+    if (name.charAt(0) === '-') {
+      return name.substr(1);
+    }
+
+    return name;
+  };
+
+  return parts.map(prop => ({
+    prop: getProp(prop),
+    direction: getDirection(prop),
+  }));
 };
 
 const parsePage = (page: QsLike): Pagination => {
