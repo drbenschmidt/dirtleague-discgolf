@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import { sql, SQLQuery } from '@databases/mysql';
 import { buildSelect2 } from './selecting';
 
@@ -12,6 +13,35 @@ import { buildSelect2 } from './selecting';
 
 // Idea, have EntityContext be able to generate the list of table names and relations.
 // Have EntityContext create QueryContext objects since it'll be what knows all.
+
+type Mapping = {
+  [key: string]: string;
+};
+
+type Mappings = {
+  [key: string]: Mapping;
+};
+
+class JoinMappings {
+  private mappings: Mappings = {
+    users: {
+      players: 'from.playerId = to.id',
+    },
+    players: {
+      users: 'from.id = to.playerId',
+    },
+  };
+
+  get(fromTable: string, fromAlias: string, toTable: string, toAlias: string) {
+    const mapping = this.mappings?.[fromTable]?.[toTable];
+
+    if (mapping) {
+      return mapping.replace('from', fromAlias).replace('to', toAlias);
+    }
+
+    return null;
+  }
+}
 
 export enum SortDirection {
   Asc = 'asc',
@@ -42,12 +72,14 @@ const rawValue = (text: string) => sql.__dangerous__rawValue(text);
 
 class QueryContext {
   props: QueryContextProps;
+  mappings = new JoinMappings();
 
   constructor(props: QueryContextProps) {
     this.props = props;
   }
 
   private getSelect(): SQLQuery {
+    // TODO: Check to see if there are includes as we'll need prefixes fa-sho.
     const { fields } = this.props;
     const arr = Array.from(fields.entries());
     const statements = arr.flatMap(([table, fieldNames]) => {
@@ -61,19 +93,49 @@ class QueryContext {
     return sql.join(statements, ', ');
   }
 
+  private getAliasName(table: string): string {
+    return `_${table.toLowerCase()}`;
+  }
+
   private getAlias(table: string): SQLQuery {
-    return rawValue(`_${table.toLowerCase()}`);
+    return rawValue(this.getAliasName(table));
   }
 
   private getJoins(): SQLQuery {
-    return sql``;
+    if (this.props.include?.length === 0) {
+      return sql``;
+    }
+
+    // We're going to assume that the include names will provide the join direction as well.
+    // ex) include = ['user', 'user.userRoles']
+    // Since 'user' has no prefix, it's assumed to be rootTable. 'user.userRoles' has a prefix, so its direction will be users -> userRoles
+    const joins = this.props.include.map(relation => {
+      let [from, to] = relation.split('.');
+
+      // Case: include was not prefixed.
+      if (from && !to) {
+        to = from;
+        from = this.props.rootTable;
+      }
+
+      const fromAs = this.getAliasName(from);
+      const toAs = this.getAliasName(to);
+
+      const result = this.mappings.get(from, fromAs, to, toAs);
+
+      return rawValue(`JOIN ${to} AS ${toAs} ON ${result}`);
+    });
+
+    return sql.join(joins, '');
   }
 
   private getWhere(): SQLQuery | null {
+    // TODO: Check to see if there are includes as we'll need prefixes fa-sho.
     return sql``;
   }
 
   private getOrderBy(): SQLQuery {
+    // TODO: Check to see if there are includes as we'll need prefixes fa-sho.
     if (!this.props.sort || this.props.sort.length === 0) {
       return sql``;
     }
@@ -85,7 +147,7 @@ class QueryContext {
       ', '
     );
 
-    return sql`ORDER BY ${orders}`;
+    return sql` ORDER BY ${orders}`;
   }
 
   private getPagination(): SQLQuery {
@@ -95,7 +157,7 @@ class QueryContext {
       return sql``;
     }
 
-    return sql`LIMIT ${limit} OFFSET ${offset}`;
+    return sql` LIMIT ${limit} OFFSET ${offset}`;
   }
 
   getSql(): SQLQuery {
@@ -109,7 +171,7 @@ class QueryContext {
     const orderBy = this.getOrderBy();
     const pagination = this.getPagination();
 
-    const result = sql`SELECT ${select} FROM ${table} ${joins} ${where} ${orderBy} ${pagination}`;
+    const result = sql`SELECT ${select} FROM ${table} AS ${rootAlias} ${joins}${where}${orderBy}${pagination}`;
 
     return result;
   }

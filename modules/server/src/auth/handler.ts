@@ -13,6 +13,7 @@ export interface DirtLeagueRequest extends Request {
   token: string;
   user: UserModel;
   services: RepositoryServices;
+  entityContext: EntityContext;
 }
 
 interface JsonWebToken {

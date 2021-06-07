@@ -1,4 +1,4 @@
-import { Queryable, Transaction } from '@databases/mysql';
+import { Queryable, SQLQuery, Transaction } from '@databases/mysql';
 import TransactionOptions from '@databases/mysql/lib/types/TransactionOptions';
 import UsersTable from './users';
 import PlayersTable from './players';
@@ -62,6 +62,10 @@ class EntityContext {
     return this.db.tx(async (conn: Transaction) => {
       return fn(new EntityContext(conn));
     }, options);
+  }
+
+  async execute<TResult>(query: SQLQuery): Promise<TResult[]> {
+    return this.db.query(query);
   }
 
   static CreateFromPool(): EntityContext {

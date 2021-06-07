@@ -20,10 +20,10 @@ const buildRoute = (): Router => {
     '/query',
     withRepositoryServices,
     withTryCatch(async (req, res) => {
-      const { services, query } = req;
+      const { entityContext, query } = req;
       const sqlQuery = fromQueryString('players', query);
 
-      const result = await services.players.query(sqlQuery);
+      const result = await entityContext.execute(sqlQuery);
 
       res.json(result);
     })

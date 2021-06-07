@@ -8,12 +8,11 @@ const withRepositoryServices = (
   res: Response,
   next: NextFunction
 ): void => {
-  const services = new RepositoryServices(
-    req.user,
-    EntityContext.CreateFromPool()
-  );
+  const entityContext = EntityContext.CreateFromPool();
+  const services = new RepositoryServices(req.user, entityContext);
 
   req.services = services;
+  req.entityContext = entityContext;
 
   next();
 };
